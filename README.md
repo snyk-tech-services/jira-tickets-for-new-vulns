@@ -2,7 +2,7 @@
 ### Simple program pulling the Snyk issues and opening JIRA tickets for those not already having one
 
 ## Installation
-git clone into your GOPATH
+git clone the repo
 
 ## Usage
 ```
