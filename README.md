@@ -19,3 +19,7 @@ git clone the repo
 
 ## Packages
 github.com/michael-go/go-jsn/jsn to make JSON parsing a breeze
+
+### Using NPM?
+Check out this package too => https://github.com/snyk/snyk-jira-issue-creator
+
