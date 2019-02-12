@@ -18,7 +18,7 @@ git clone the repo
 ## Still a work in progress. Better testing and error handling is required. This was a quick first prototype, first time in Go.
 
 ## Packages
-github.com/michael-go/go-jsn/jsn to make JSON parsing a breeze
+https://github.com/michael-go/go-jsn/jsn to make JSON parsing a breeze
 
 ### Using NPM?
 Check out this package too => https://github.com/snyk/snyk-jira-issue-creator
