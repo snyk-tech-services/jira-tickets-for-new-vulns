@@ -15,9 +15,10 @@ git clone the repo
     -severity=<high|medium|low>             // Optional. Severity threshold to open tickets for. Defaults to high.
     -type=<all|vuln|license>                // Optional. Issue type to open tickets for. Defaults to all.
 ```
-## Still a work in progress. Better testing and error handling is required. This was a quick first prototype, first time in Go.
+## Initial prototype demonstrating usage of Snyk APIs to log Jira tickets programmatically.
+### Please report issues.
 
-## Packages
+## Dependencies
 https://github.com/michael-go/go-jsn/jsn to make JSON parsing a breeze
 
 ### Using NPM?
