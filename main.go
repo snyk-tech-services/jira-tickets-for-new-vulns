@@ -45,8 +45,9 @@ func main() {
 	endpointAPIPtr := flag.String("api", "https://snyk.io/api", "Your API endpoint")
 	apiTokenPtr := flag.String("token", "", "Your API token")
 	jiraProjectIDPtr := flag.String("jiraProjectID", "", "Your JIRA projectID")
-	severityPtr := flag.String("severity", "high", "Your severity threshold")
-	typePtr := flag.String("type", "all", "Your issue type (all|vuln|license)")
+	jiraTicketTypePtr := flag.String("jiraTicketType", "Bug", "Chosen JIRA ticket type - Default Bug")
+	severityPtr := flag.String("severity", "low", "Your severity threshold - Default low")
+	typePtr := flag.String("type", "all", "Your issue type (all|vuln|license) - Default all")
 	flag.Parse()
 
 	var orgID string = *orgIDPtr
@@ -54,6 +55,7 @@ func main() {
 	var endpointAPI string = *endpointAPIPtr
 	var apiToken string = *apiTokenPtr
 	var jiraProjectID string = *jiraProjectIDPtr
+	var jiraTicketType string = *jiraTicketTypePtr
 	var severity string = *severityPtr
 	var issueType string = *typePtr
 
@@ -63,9 +65,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	fmt.Println("Retrieving Project")
+	projectInfo := getProjectDetails(endpointAPI, orgID, projectID, apiToken)
+
 	fmt.Println("Getting Existing JIRA tickets")
 	tickets := getJiraTicket(endpointAPI, orgID, projectID, apiToken)
-	projectInfo := getProjectDetails(endpointAPI, orgID, projectID, apiToken)
+
 	//fmt.Println(tickets)
 	fmt.Println("Getting vulns")
 	vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, projectID, apiToken, severity, issueType, tickets)
@@ -74,7 +79,8 @@ func main() {
 	if len(vulnsForJira) == 0 {
 		fmt.Println("No new JIRA ticket required")
 	} else {
-		openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, projectInfo, vulnsForJira)
+		fmt.Println("Opening JIRA Tickets")
+		openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, projectInfo, vulnsForJira)
 	}
 
 }
@@ -89,6 +95,13 @@ func getProjectDetails(endpointAPI string, orgID string, projectID string, token
 	if err != nil {
 		fmt.Print(err.Error())
 		os.Exit(1)
+	}
+	if response.StatusCode == 404 {
+		fmt.Println("Project not found")
+		os.Exit(1)
+	}
+	if response.StatusCode < 400 {
+		fmt.Printf("Unexpected response %d", response.StatusCode)
 	}
 
 	responseData, err := ioutil.ReadAll(response.Body)
