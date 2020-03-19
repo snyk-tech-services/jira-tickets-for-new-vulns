@@ -7,7 +7,7 @@ git clone the repo
 
 ## Usage
 ```
-./main 
+./snyk-jira-sync-<yourplatform> 
     -orgID=<SNYK_ORG_ID>                    // Can find it under settings
     -projectID=<SNYK_PROJECT_ID>            // Can find it under project->settings
     -api=<API endpoint>                     // Optional. Default to https://snyk.io/api or to your https://<instance>/api
