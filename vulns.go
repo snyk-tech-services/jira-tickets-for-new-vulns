@@ -1,21 +1,29 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"os"
 
 	"github.com/michael-go/go-jsn/jsn"
 	"github.com/tidwall/sjson"
 )
 
+// IssuesFilter is the top level filter type of filtering Snyk response
+type IssuesFilter struct {
+	Filters Filter `json:"filters"`
+}
+
+// Filter allows to filter on severity, type, ignore or patched vuln
+type Filter struct {
+	Severities []string `json:"severities"`
+	Types      []string `json:"types"`
+	Ignored    bool     `json:"ignored"`
+	Patched    bool     `json:"patched"`
+}
+
 func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, token string, severity string, issueType string, tickets map[string]string) []interface{} {
 
-	message := IssuesFilter{
+	body := IssuesFilter{
 		Filter{
 			Severities: []string{"high"},
 			Types:      []string{"vuln", "license"},
@@ -24,41 +32,24 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 		},
 	}
 	if issueType != "all" && issueType != "" {
-		message.Filters.Types = []string{issueType}
+		body.Filters.Types = []string{issueType}
 	}
 	switch severity {
 	case "high":
-		message.Filters.Severities = []string{"high"}
+		body.Filters.Severities = []string{"high"}
 	case "medium":
-		message.Filters.Severities = []string{"high", "medium"}
+		body.Filters.Severities = []string{"high", "medium"}
 	case "low":
-		message.Filters.Severities = []string{"high", "medium", "low"}
+		body.Filters.Severities = []string{"high", "medium", "low"}
 	default:
 		log.Fatalln("Unexpected severity threshold")
 	}
-	//fmt.Println(message)
-	b, err := json.Marshal(message)
+	marshalledBody, err := json.Marshal(body)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	request, _ := http.NewRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issues", bytes.NewBuffer(b))
-	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("Authorization", "token "+token)
-
-	client := &http.Client{}
-	response, err := client.Do(request)
-
-	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
-	}
-
-	responseData, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
+	responseData := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issues", token, marshalledBody)
 
 	j, err := jsn.NewJson(responseData)
 	var vulnsPerPath []interface{}
@@ -67,35 +58,32 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 		if _, found := tickets[e.K("id").String().Value]; !found {
 			vulnsPerPath = append(vulnsPerPath, e)
 		}
-
 	}
 	for _, e := range j.K("issues").K("licenses").Array().Elements() {
-
 		if _, found := tickets[e.K("id").String().Value]; !found {
 			vulnsPerPath = append(vulnsPerPath, e)
 		}
-
 	}
 
 	return vulnsPerPath
-
 }
 
-func consolidatePathsIntoVulnsForJira(vulnsPerPath []interface{}) map[string]interface{} {
-	var vulnsForJira map[string]interface{}
-	vulnsForJira = make(map[string]interface{})
-	for _, vulnPerPath := range vulnsPerPath {
-		vuln := vulnPerPath
+func consolidateAllPathsIntoSingleVuln(vulnsPerPath []interface{}) map[string]interface{} {
+	vulnsWithAllPaths := make(map[string]interface{})
+
+	for _, vuln := range vulnsPerPath {
+		//vuln := vulnPerPath
 		vulnJSON, _ := jsn.NewJson(vuln)
 
-		if _, found := vulnsForJira[vulnJSON.K("id").String().Value]; !found {
-
+		if _, found := vulnsWithAllPaths[vulnJSON.K("id").String().Value]; !found {
+			// Changing "from": ["a","b","c"] to "from": [["a","b","c"]]
 			var vulnJSONPaths [][]string
 			var vulnJSONPath []string
 			for _, value := range vulnJSON.K("from").Array().Elements() {
 				vulnJSONPath = append(vulnJSONPath, value.Stringify())
 			}
 			vulnJSONPaths = append(vulnJSONPaths, vulnJSONPath)
+			// Modify json with the "from" array change
 			vuln, _ = sjson.Set(vulnJSON.Stringify(), "from", vulnJSONPaths)
 
 		} else {
@@ -103,10 +91,12 @@ func consolidatePathsIntoVulnsForJira(vulnsPerPath []interface{}) map[string]int
 			for _, value := range vulnJSON.K("from").Array().Elements() {
 				vulnJSONPath = append(vulnJSONPath, value.Stringify())
 			}
-			currentlyUpdatedVuln, _ := jsn.NewJson(vulnsForJira[vulnJSON.K("id").String().Value])
-			vuln, _ = sjson.Set(currentlyUpdatedVuln.Stringify(), "from.-1", vulnJSONPath)
+			vulnToAddPathTo, _ := jsn.NewJson(vulnsWithAllPaths[vulnJSON.K("id").String().Value])
+			// from.-1 appends to the end of the array
+			vuln, _ = sjson.Set(vulnToAddPathTo.Stringify(), "from.-1", vulnJSONPath)
 		}
-		vulnsForJira[vulnJSON.K("id").String().Value] = vuln
+		// Update the vuln with changes
+		vulnsWithAllPaths[vulnJSON.K("id").String().Value] = vuln
 	}
-	return vulnsForJira
+	return vulnsWithAllPaths
 }
