@@ -1,0 +1,59 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2.1
+orbs:
+  snyk: snyk/snyk@0.0.8
+jobs:
+  build-test-monitor:
+      docker:
+        # specify the version
+        - image: circleci/golang:1.13
+
+      steps:
+        - checkout
+        - run: go test -v
+        - snyk/scan:
+            fail-on-issues: true
+            monitor-on-build: true
+            token-variable: SNYK_TOKEN
+  build-test:
+      docker:
+        # specify the version
+        - image: circleci/golang:1.13
+
+      steps:
+        - checkout
+        - run: go test -v
+        - snyk/scan:
+            fail-on-issues: true
+            monitor-on-build: false
+            token-variable: SNYK_TOKEN
+
+workflows:
+  version: 2.1
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build-test-monitor
+  build-test-monitor:
+    jobs:
+      - build-test-monitor:
+          filters:
+            branches:
+              only:
+                  - master
+  build-test:
+      jobs:
+        - build-test:
+            filters:
+              branches:
+                ignore:
+                  - master
+      
