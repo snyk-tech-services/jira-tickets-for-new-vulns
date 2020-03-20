@@ -1,0 +1,42 @@
+{
+    "npm:growl:20160721": [
+      {
+        "jiraIssue": {
+          "id": "10802",
+          "key": "FPI-796"
+        }
+      }
+    ],
+    "SNYK-JS-HANDLEBARS-174183": [
+      {
+        "jiraIssue": {
+          "id": "10801",
+          "key": "FPI-795"
+        }
+      }
+    ],
+    "npm:lodash:20180130": [
+      {
+        "jiraIssue": {
+          "id": "10800",
+          "key": "FPI-794"
+        }
+      }
+    ],
+    "SNYK-JS-MARKED-451540": [
+      {
+        "jiraIssue": {
+          "id": "10799",
+          "key": "FPI-793"
+        }
+      }
+    ],
+    "npm:marked:20170815-1": [
+      {
+        "jiraIssue": {
+          "id": "10798",
+          "key": "FPI-792"
+        }
+      }
+    ]
+  }

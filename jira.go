@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/michael-go/go-jsn/jsn"
@@ -31,7 +30,7 @@ type IssueType struct {
 	Name string `json:"name"`
 }
 
-func getJiraTicket(endpointAPI string, orgID string, projectID string, token string) map[string]string {
+func getJiraTickets(endpointAPI string, orgID string, projectID string, token string) map[string]string {
 	responseData := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/jira-issues", token, nil)
 
 	tickets, err := jsn.NewJson(responseData)
@@ -49,7 +48,8 @@ func getJiraTicket(endpointAPI string, orgID string, projectID string, token str
 
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, projectInfo jsn.Json, vulnsForJira map[string]interface{}) {
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, projectInfo jsn.Json, vulnsForJira map[string]interface{}) string {
+	responseDataAggregated := ""
 	for _, vulnForJira := range vulnsForJira {
 
 		jsonVuln, _ := jsn.NewJson(vulnForJira)
@@ -64,6 +64,7 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 			log.Fatalln(err)
 		}
 		responseData := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfo.K("id").String().Value+"/issue/"+vulnID+"/jira-issue", token, ticket)
-		fmt.Println(string(responseData))
+		responseDataAggregated += "\n" + string(responseData)
 	}
+	return responseDataAggregated
 }
