@@ -2,6 +2,8 @@
 ### Simple program pulling the Snyk issues and opening JIRA tickets for those not already having one
 Aimed to be executed at regular interval or with a trigger of your choice.
 
+[![CircleCI](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns.svg?style=svg)](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns)
+
 ## Installation
 git clone the repo
 
