@@ -1,0 +1,26 @@
+{
+    "name": "snyk-playground/typescript:package.json",
+    "id": "12345678-1234-1234-1234-123456789012",
+    "created": "2020-03-19T14:26:38.906Z",
+    "origin": "github",
+    "type": "yarn",
+    "readOnly": false,
+    "testFrequency": "daily",
+    "totalDependencies": 106,
+    "issueCountsBySeverity": {
+      "low": 2,
+      "high": 14,
+      "medium": 6
+    },
+    "imageTag": "0.1.0",
+    "hostname": null,
+    "lastTestedDate": "2020-03-19T14:27:05.973Z",
+    "browseUrl": "https://app.snyk.io/org/playground/project/12345678-1234-1234-1234-123456789012",
+    "owner": null,
+    "importingUser": {
+      "id": "12345678-1234-1234-1234-123456789012",
+      "name": "aarlaud",
+      "username": "aarlaud",
+      "email": "antoine@snyk.io"
+    }
+  }

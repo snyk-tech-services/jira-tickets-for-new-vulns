@@ -56,7 +56,7 @@ Open Source, so feel free to contribute !
 	projectInfo := getProjectDetails(endpointAPI, orgID, projectID, apiToken)
 
 	fmt.Println("2/4 - Getting Existing JIRA tickets")
-	tickets := getJiraTicket(endpointAPI, orgID, projectID, apiToken)
+	tickets := getJiraTickets(endpointAPI, orgID, projectID, apiToken)
 
 	fmt.Println("3/4 - Getting vulns")
 	vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, projectID, apiToken, severity, issueType, tickets)
@@ -66,7 +66,8 @@ Open Source, so feel free to contribute !
 		fmt.Println("4/4 - No new JIRA ticket required")
 	} else {
 		fmt.Println("4/4 - Opening JIRA Tickets")
-		openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, projectInfo, vulnsForJira)
+		jiraResponse := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, projectInfo, vulnsForJira)
+		fmt.Println(jiraResponse)
 	}
 
 }

@@ -64,7 +64,6 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 			vulnsPerPath = append(vulnsPerPath, e)
 		}
 	}
-
 	return vulnsPerPath
 }
 

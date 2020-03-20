@@ -10,9 +10,8 @@ import (
 )
 
 func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body []byte) []byte {
-
 	bodyBuffer := bytes.NewBuffer(nil)
-	if body != nil {
+	if verb == "POST" && body != nil {
 		bodyBuffer = bytes.NewBuffer(body)
 	}
 
