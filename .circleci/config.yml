@@ -43,9 +43,9 @@ jobs:
           username: _json_key
           password: $GCLOUD_GCR_SNYK_TS_READER
     steps:
+      - checkout
       - attach_workspace:
           at: ./dist
-      - checkout
       - run:
           name: "Publish Release on GitHub"
           command: |    
