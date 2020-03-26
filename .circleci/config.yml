@@ -31,8 +31,10 @@ jobs:
             monitor-on-build: false
             token-variable: SNYK_TOKEN
         - run: ./generate-binaries.sh
-        - save_workspace:
-            at: ./dist
+        - persist_to_workspace:
+            root: .
+            paths:
+              - dist/*
 
   publish-github-release:
     docker:
@@ -73,7 +75,7 @@ workflows:
               branches:
                 ignore:
                   - master
-                  
+
   publish-github-release:
       jobs:
         - publish-github-release:
