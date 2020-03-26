@@ -41,7 +41,7 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 
 	jiraTicket := &JiraIssue{
 		Field{
-			Summary:     projectInfo.K("name").String().Value + jsonVuln.K("title").String().Value,
+			Summary:     projectInfo.K("name").String().Value + " - " + jsonVuln.K("title").String().Value,
 			Description: descriptionBody,
 		},
 	}
