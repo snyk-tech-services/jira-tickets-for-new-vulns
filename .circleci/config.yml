@@ -17,6 +17,7 @@ jobs:
             fail-on-issues: true
             monitor-on-build: true
             token-variable: SNYK_TOKEN
+
   build-test:
       docker:
         # specify the version
@@ -29,6 +30,24 @@ jobs:
             fail-on-issues: true
             monitor-on-build: false
             token-variable: SNYK_TOKEN
+        - run: ./generate-binaries.sh
+        - persist_to_workspace:
+            root: .
+            paths:
+              - dist/*
+
+  publish-github-release:
+    docker:
+      - image: gcr.io/snyk-technical-services/cicd-github
+    steps:
+      - attach_workspace:
+          at: ./dist
+      - run:
+          name: "Publish Release on GitHub"
+          command: |    
+            VERSIONJUMP=$(git log --oneline -1 --pretty=%B | cat | awk -F '/' '{print $1}')   
+            VERSION=$(./nextver.sh "$VERSIONJUMP")
+            ghr $VERSION -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ./dist/
 
 workflows:
   version: 2.1
@@ -55,5 +74,13 @@ workflows:
             filters:
               branches:
                 ignore:
+                  - master
+
+  publish-github-release:
+      jobs:
+        - publish-github-release:
+            filters:
+              branches:
+                only:
                   - master
       
