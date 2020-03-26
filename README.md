@@ -5,7 +5,7 @@ Aimed to be executed at regular interval or with a trigger of your choice.
 [![CircleCI](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns.svg?style=svg)](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns)
 
 ## Installation
-git clone the repo
+Use the binaries from [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
 
 ## Usage
 ```
@@ -19,6 +19,10 @@ git clone the repo
     -severity=<high|medium|low>             // Optional. Severity threshold to open tickets for. Defaults to low.
     -type=<all|vuln|license>                // Optional. Issue type to open tickets for. Defaults to all.
 ```
+
+## Installation from source
+git clone the repo
+
 ### Please report issues.
 
 ## Dependencies
