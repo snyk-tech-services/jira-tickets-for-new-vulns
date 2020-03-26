@@ -17,6 +17,7 @@ jobs:
             fail-on-issues: true
             monitor-on-build: true
             token-variable: SNYK_TOKEN
+
   build-test:
       docker:
         # specify the version
@@ -31,7 +32,7 @@ jobs:
             token-variable: SNYK_TOKEN
         - run: ./generate-binaries.sh
         - save_workspace:
-          at: ./dist
+            at: ./dist
 
   publish-github-release:
     docker:
@@ -72,6 +73,7 @@ workflows:
               branches:
                 ignore:
                   - master
+                  
   publish-github-release:
       jobs:
         - publish-github-release:
