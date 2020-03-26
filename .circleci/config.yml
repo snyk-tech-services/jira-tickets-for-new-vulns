@@ -17,6 +17,11 @@ jobs:
             fail-on-issues: true
             monitor-on-build: true
             token-variable: SNYK_TOKEN
+        - run: ./generate-binaries.sh
+        - persist_to_workspace:
+            root: .
+            paths:
+              - dist/*
 
   build-test:
       docker:
@@ -30,11 +35,6 @@ jobs:
             fail-on-issues: true
             monitor-on-build: false
             token-variable: SNYK_TOKEN
-        - run: ./generate-binaries.sh
-        - persist_to_workspace:
-            root: .
-            paths:
-              - dist/*
 
   publish-github-release:
     docker:
@@ -51,7 +51,7 @@ jobs:
           command: |    
             VERSIONJUMP=$(git log --oneline -1 --pretty=%B | cat | grep -E 'minor|major|patch' | awk -F ':' '{print $1}')   
             VERSION=$(/workdir/nextver.sh "$VERSIONJUMP")
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${VERSION} ./dist/
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${VERSION} dist/
 
 workflows:
   version: 2.1
