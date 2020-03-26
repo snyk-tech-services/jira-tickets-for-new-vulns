@@ -45,7 +45,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ./dist
+          at: .
       - run:
           name: "Publish Release on GitHub"
           command: |    
