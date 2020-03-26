@@ -45,6 +45,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ./dist
+      - checkout
       - run:
           name: "Publish Release on GitHub"
           command: |    
@@ -64,13 +65,20 @@ workflows:
                 - master
     jobs:
       - build-test-monitor
-  build-test-monitor:
+  build-test-monitor-publish:
     jobs:
       - build-test-monitor:
           filters:
             branches:
               only:
                   - master
+      - publish-github-release:
+          requires:
+            - build-test-monitor
+          filters:
+            branches:
+              only:
+                - master
   build-test:
       jobs:
         - build-test:
@@ -79,11 +87,4 @@ workflows:
                 ignore:
                   - master
 
-  publish-github-release:
-      jobs:
-        - publish-github-release:
-            filters:
-              branches:
-                only:
-                  - master
       
