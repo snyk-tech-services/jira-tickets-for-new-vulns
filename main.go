@@ -27,14 +27,14 @@ Open Source, so feel free to contribute !
 
 	fmt.Println(asciiArt)
 
-	orgIDPtr := flag.String("orgID", "", "Your Org ID")
-	projectIDPtr := flag.String("projectID", "", "Your Project ID")
-	endpointAPIPtr := flag.String("api", "https://snyk.io/api", "Your API endpoint")
+	orgIDPtr := flag.String("orgID", "", "Your Snyk Organization ID (check under Settings)")
+	projectIDPtr := flag.String("projectID", "", "Optional. Your Project ID. Will sync all projects of your organization if not provided")
+	endpointAPIPtr := flag.String("api", "https://snyk.io/api", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
 	apiTokenPtr := flag.String("token", "", "Your API token")
 	jiraProjectIDPtr := flag.String("jiraProjectID", "", "Your JIRA projectID")
-	jiraTicketTypePtr := flag.String("jiraTicketType", "Bug", "Chosen JIRA ticket type")
-	severityPtr := flag.String("severity", "low", "Your severity threshold")
-	typePtr := flag.String("type", "all", "Your issue type (all|vuln|license)")
+	jiraTicketTypePtr := flag.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
+	severityPtr := flag.String("severity", "low", "Optional. Your severity threshold")
+	typePtr := flag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
 	flag.Parse()
 
 	var orgID string = *orgIDPtr
