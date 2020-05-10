@@ -67,7 +67,7 @@ Open Source, so feel free to contribute !
 	}
 
 	for _, project := range projectIDs {
-		fmt.Println("1/4 - Retrieving Project %s", project)
+		fmt.Println("1/4 - Retrieving Project", project)
 		projectInfo := getProjectDetails(endpointAPI, orgID, project, apiToken)
 
 		fmt.Println("2/4 - Getting Existing JIRA tickets")
