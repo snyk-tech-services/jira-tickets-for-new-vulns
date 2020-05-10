@@ -46,28 +46,45 @@ Open Source, so feel free to contribute !
 	var severity string = *severityPtr
 	var issueType string = *typePtr
 
-	if len(orgID) == 0 || len(projectID) == 0 || len(apiToken) == 0 || len(jiraProjectID) == 0 {
+	if len(orgID) == 0 || len(apiToken) == 0 || len(jiraProjectID) == 0 {
 		fmt.Println("Missing argument(s)")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
-	fmt.Println("1/4 - Retrieving Project")
-	projectInfo := getProjectDetails(endpointAPI, orgID, projectID, apiToken)
+	projectIDs := make([]string, 0)
 
-	fmt.Println("2/4 - Getting Existing JIRA tickets")
-	tickets := getJiraTickets(endpointAPI, orgID, projectID, apiToken)
+	if len(projectID) == 0 {
+		fmt.Println("Project ID not specified - importing all projects")
 
-	fmt.Println("3/4 - Getting vulns")
-	vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, projectID, apiToken, severity, issueType, tickets)
-	vulnsForJira := consolidateAllPathsIntoSingleVuln(vulnsPerPath)
+		projects := getOrgProjects(endpointAPI, orgID, apiToken)
 
-	if len(vulnsForJira) == 0 {
-		fmt.Println("4/4 - No new JIRA ticket required")
+		for _, p := range projects.K("projects").Array().Elements() {
+			projectIDs = append(projectIDs, p.K("id").String().Value)
+		}
 	} else {
-		fmt.Println("4/4 - Opening JIRA Tickets")
-		jiraResponse := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, projectInfo, vulnsForJira)
-		fmt.Println(jiraResponse)
+		projectIDs = append(projectIDs, projectID)
+	}
+
+	for _, project := range projectIDs {
+		fmt.Println("1/4 - Retrieving Project %s", project)
+		projectInfo := getProjectDetails(endpointAPI, orgID, project, apiToken)
+
+		fmt.Println("2/4 - Getting Existing JIRA tickets")
+		tickets := getJiraTickets(endpointAPI, orgID, project, apiToken)
+
+		fmt.Println("3/4 - Getting vulns")
+		vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, project, apiToken, severity, issueType, tickets)
+		vulnsForJira := consolidateAllPathsIntoSingleVuln(vulnsPerPath)
+
+		if len(vulnsForJira) == 0 {
+			fmt.Println("4/4 - No new JIRA ticket required")
+		} else {
+			fmt.Println("4/4 - Opening JIRA Tickets")
+			jiraResponse := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, projectInfo, vulnsForJira)
+			fmt.Println(jiraResponse)
+		}
+
 	}
 
 }
