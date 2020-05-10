@@ -36,6 +36,15 @@ jobs:
             monitor-on-build: false
             token-variable: SNYK_TOKEN
 
+  build-test-from-fork:
+      docker:
+        # specify the version
+        - image: circleci/golang:1.13
+
+      steps:
+        - checkout
+        - run: go test -v
+
   publish-github-release:
     docker:
       - image: gcr.io/snyk-technical-services/cicd-github
@@ -86,5 +95,9 @@ workflows:
               branches:
                 ignore:
                   - master
-
-      
+                  - /pull\/[0-9]+/
+        - build-test-from-fork:
+            filters:
+              branches:
+                only:
+                  - /pull\/[0-9]+/

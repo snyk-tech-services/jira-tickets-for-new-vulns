@@ -25,3 +25,22 @@ func TestGetProjectDetailsFunc(t *testing.T) {
 
 	return
 }
+
+
+// Test GetProjectDetails function
+func TestGetOrgProjects(t *testing.T) {
+	expectedTestURL := "/v1/org/123/projects"
+	assert := assert.New(t)
+	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
+
+	defer server.Close()
+
+	response := getOrgProjects(server.URL, "123", "123")
+
+	opts := jsondiff.DefaultConsoleOptions()
+	marshalledResp, _ := json.Marshal(response)
+	comparison, _ := jsondiff.Compare(readFixture("./fixtures/org.json"), marshalledResp, &opts)
+	assert.Equal("FullMatch", comparison.String())
+
+	return
+}
