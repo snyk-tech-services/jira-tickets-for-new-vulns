@@ -32,9 +32,11 @@ jobs:
         - checkout
         - run: go test -v
         - snyk/scan:
-            fail-on-issues: true
+            fail-on-issues: false
             monitor-on-build: false
             token-variable: SNYK_TOKEN
+            additional-arguments: --json-file-output=snykTestResults.json
+        - run: ./snyk-prevent-gh-commit-status-linux ./snykTestResults.json ${GITHUB_TOKEN} ${CIRCLE_PROJECT_USERNAME} ${CIRCLE_PROJECT_REPONAME} ${CIRCLE_SHA1}
 
   build-test-from-fork:
       docker:
