@@ -41,6 +41,4 @@ github.com/tidwall/sjson
 github.com/kentaro-m/blackfriday-confluence
 gopkg.in/russross/blackfriday.v2
 
-### Using NPM?
-Check out this package too => https://github.com/snyk/snyk-jira-issue-creator
 
