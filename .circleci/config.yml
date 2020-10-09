@@ -60,6 +60,9 @@ jobs:
           command: |    
             VERSIONJUMP=$(git log --oneline -1 --pretty=%B | cat | grep -E 'minor|major|patch' | awk -F ':' '{print $1}')   
             VERSION=$(/workdir/nextver.sh "$VERSIONJUMP")
+            sha256 dist/snyk-jira-sync-linux > dist/snyk-jira-sync-linux.sha256
+            sha256 dist/snyk-jira-sync-macos > dist/snyk-jira-sync-macos.sha256
+            sha256 dist/snyk-jira-sync-win.exe > dist/snyk-jira-sync-win.exe.sha256
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${VERSION} dist/
 
 workflows:
