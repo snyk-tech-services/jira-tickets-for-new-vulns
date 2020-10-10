@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -34,6 +36,8 @@ Open Source, so feel free to contribute !
 	jiraProjectIDPtr := flag.String("jiraProjectID", "", "Your JIRA projectID")
 	jiraTicketTypePtr := flag.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
 	severityPtr := flag.String("severity", "low", "Optional. Your severity threshold")
+	maturityFilterPtr := flag.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
+	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	typePtr := flag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
 	flag.Parse()
 
@@ -45,9 +49,10 @@ Open Source, so feel free to contribute !
 	var jiraTicketType string = *jiraTicketTypePtr
 	var severity string = *severityPtr
 	var issueType string = *typePtr
+	var maturityFilterString string = *maturityFilterPtr
+	var priorityScoreThreshold int = *priorityScorePtr
 
 	if len(orgID) == 0 || len(apiToken) == 0 || len(jiraProjectID) == 0 {
-		fmt.Println("Missing argument(s)")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -65,6 +70,10 @@ Open Source, so feel free to contribute !
 	} else {
 		projectIDs = append(projectIDs, projectID)
 	}
+	if priorityScoreThreshold < 0 || priorityScoreThreshold > 1000 {
+		log.Fatalf("INPUT ERROR: %d is not a valid score. Must be between 0-1000.", priorityScoreThreshold)
+	}
+	maturityFilter := createMaturityFilter(strings.Split(maturityFilterString, ","))
 
 	for _, project := range projectIDs {
 		fmt.Println("1/4 - Retrieving Project", project)
@@ -74,7 +83,7 @@ Open Source, so feel free to contribute !
 		tickets := getJiraTickets(endpointAPI, orgID, project, apiToken)
 
 		fmt.Println("3/4 - Getting vulns")
-		vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, project, apiToken, severity, issueType, tickets)
+		vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, project, apiToken, severity, maturityFilter, priorityScoreThreshold, issueType, tickets)
 		vulnsForJira := consolidateAllPathsIntoSingleVuln(vulnsPerPath)
 
 		if len(vulnsForJira) == 0 {
