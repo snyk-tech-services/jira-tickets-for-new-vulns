@@ -9,9 +9,8 @@ require (
 	github.com/nsf/jsondiff v0.0.0-20190712045011-8443391ee9b6
 	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/stretchr/testify v1.4.0
-	github.com/tidwall/gjson v1.6.0 // indirect
-	github.com/tidwall/pretty v1.0.1 // indirect
-	github.com/tidwall/sjson v1.0.4
+	github.com/tidwall/pretty v1.1.0 // indirect
+	github.com/tidwall/sjson v1.1.5
 	github.com/zhsso/tchannel v0.0.0-20150829002443-a1a640bf2f10
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2 // indirect
 	gopkg.in/russross/blackfriday.v2 v2.0.0
