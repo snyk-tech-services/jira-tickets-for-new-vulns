@@ -26,7 +26,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -token=<API Token>                                                  // Snyk API Token. Service accounts work.
     -jiraProjectID=<12345>                                              // Jira project ID the tickets will be opened against
     -jiraTicketType=<Task|Bug|....>                                     // Optional. Type of ticket to open. Defaults to Bug
-    -severity=<high|medium|low>                                         // Optional. Severity threshold to open tickets for. Defaults to low.
+    -severity=<critical|high|medium|low>                                // Optional. Severity threshold to open tickets for. Defaults to low.
     -priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold 
     -maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas
     -type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.

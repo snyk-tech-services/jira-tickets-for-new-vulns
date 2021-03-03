@@ -43,12 +43,14 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 		body.Filters.Types = []string{issueType}
 	}
 	switch severity {
+	case "critical":
+		body.Filters.Severities = []string{"critical"}
 	case "high":
-		body.Filters.Severities = []string{"high"}
+		body.Filters.Severities = []string{"critical", "high"}
 	case "medium":
-		body.Filters.Severities = []string{"high", "medium"}
+		body.Filters.Severities = []string{"critical", "high", "medium"}
 	case "low":
-		body.Filters.Severities = []string{"high", "medium", "low"}
+		body.Filters.Severities = []string{"critical", "high", "medium", "low"}
 	default:
 		log.Fatalln("Unexpected severity threshold")
 	}
