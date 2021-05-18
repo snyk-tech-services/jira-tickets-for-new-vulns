@@ -64,7 +64,6 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 			jiraTicket.Fields.Assignee = "{\"accountId\": \""+assigneeID+"\"}"
 		}
 		
-
 		ticket, err := json.Marshal(jiraTicket)
 		if err != nil {
 			log.Fatalln(err)
