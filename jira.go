@@ -18,6 +18,7 @@ type Field struct {
 	Summary     string    `json:"summary"`
 	Description string    `json:"description"`
 	IssueTypes  IssueType `json:"issuetype"`
+	Assignee	string    `json:"assignee"`
 }
 
 // Project is the JIRA project ID
@@ -48,7 +49,7 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, projectInfo jsn.Json, vulnsForJira map[string]interface{}) string {
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, projectInfo jsn.Json, vulnsForJira map[string]interface{}) string {
 	responseDataAggregated := ""
 	for _, vulnForJira := range vulnsForJira {
 
@@ -58,6 +59,11 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 
 		jiraTicket.Fields.Projects.ID = jiraProjectID
 		jiraTicket.Fields.IssueTypes.Name = jiraTicketType
+
+		if assigneeID != "" {
+			jiraTicket.Fields.Assignee = "{\"accountId\": \""+assigneeID+"\"}"
+		}
+		
 
 		ticket, err := json.Marshal(jiraTicket)
 		if err != nil {
