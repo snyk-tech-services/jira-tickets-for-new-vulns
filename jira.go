@@ -18,6 +18,12 @@ type Field struct {
 	Summary     string    `json:"summary"`
 	Description string    `json:"description"`
 	IssueTypes  IssueType `json:"issuetype"`
+	Assignees	Assignee  `json:"assignee"`
+}
+
+// Assignee is the account ID of the JIRA user to assign tickets to
+type Assignee struct {
+	ID string `json:"accountId,omitempty"`
 }
 
 // Project is the JIRA project ID
@@ -48,7 +54,7 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, projectInfo jsn.Json, vulnsForJira map[string]interface{}) string {
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, projectInfo jsn.Json, vulnsForJira map[string]interface{}) string {
 	responseDataAggregated := ""
 	for _, vulnForJira := range vulnsForJira {
 
@@ -58,11 +64,13 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 
 		jiraTicket.Fields.Projects.ID = jiraProjectID
 		jiraTicket.Fields.IssueTypes.Name = jiraTicketType
+		jiraTicket.Fields.Assignees.ID = assigneeID
 
 		ticket, err := json.Marshal(jiraTicket)
 		if err != nil {
 			log.Fatalln(err)
 		}
+
 		responseData := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfo.K("id").String().Value+"/issue/"+vulnID+"/jira-issue", token, ticket)
 		responseDataAggregated += "\n" + string(responseData)
 	}
