@@ -30,6 +30,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold 
     -maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas
     -type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.
+    -assigneeId=<123abc456def789>                                       // Optional.  Jira ID of user to assign tickets to.
 ```
 
 ## Installation from source
