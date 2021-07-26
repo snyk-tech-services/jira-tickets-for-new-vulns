@@ -41,7 +41,7 @@ func TestOpenJiraTicketFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	jiraResponse := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", projectInfo, vulnsForJira)
+	jiraResponse := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", projectInfo, vulnsForJira, false)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
 
 	//expectedTestURL := "/v1/org/"+orgID+"/project/"+projectInfo.K("id").String().Value+"/issue/"+vulnID+"/jira-issue"

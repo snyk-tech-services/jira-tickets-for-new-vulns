@@ -1,15 +1,21 @@
 package main
 
 import (
+	"fmt"
 	"encoding/json"
 	"log"
-
+	"strings"
 	"github.com/michael-go/go-jsn/jsn"
+	"os"
 )
 
 // JiraIssue represents the top level Struct for JIRA issue description
 type JiraIssue struct {
 	Fields Field `json:"fields"`
+}
+
+type PriorityType struct {
+	Name string `json:"name"`
 }
 
 // Field represents a JIRA issue basic fields
@@ -19,6 +25,7 @@ type Field struct {
 	Description string    `json:"description"`
 	IssueTypes  IssueType `json:"issuetype"`
 	Assignees	Assignee  `json:"assignee"`
+	Priority	PriorityType `json:"priority"`
 }
 
 // Assignee is the account ID of the JIRA user to assign tickets to
@@ -54,7 +61,7 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, projectInfo jsn.Json, vulnsForJira map[string]interface{}) string {
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) string {
 	responseDataAggregated := ""
 	for _, vulnForJira := range vulnsForJira {
 
@@ -65,6 +72,21 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 		jiraTicket.Fields.Projects.ID = jiraProjectID
 		jiraTicket.Fields.IssueTypes.Name = jiraTicketType
 		jiraTicket.Fields.Assignees.ID = assigneeID
+		if(priorityIsSeverity){
+			jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN",strings.ToUpper(jsonVuln.K("severity").String().Value))
+			val, present := os.LookupEnv(jiraMappingEnvVarName)
+			if(present){
+				jiraTicket.Fields.Priority.Name = val
+			} else {
+				if(jsonVuln.K("severity").String().Value == "critical"){
+					jiraTicket.Fields.Priority.Name = "Highest"
+				} else {
+					jiraTicket.Fields.Priority.Name = strings.Title(jsonVuln.K("severity").String().Value)
+				}
+				
+			}
+			
+		}
 
 		ticket, err := json.Marshal(jiraTicket)
 		if err != nil {
