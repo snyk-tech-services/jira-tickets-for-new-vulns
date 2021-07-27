@@ -40,6 +40,8 @@ Open Source, so feel free to contribute !
 	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	typePtr := flag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
 	assigneeIDPtr := flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to")
+	labelsPtr := flag.String("labels","", "Optional. Jira ticket labels")
+	priorityIsSeverityPtr := flag.Bool("priorityIsSeverity", false, "Use issue severity as priority")
 	flag.Parse()
 
 	var orgID string = *orgIDPtr
@@ -53,6 +55,8 @@ Open Source, so feel free to contribute !
 	var maturityFilterString string = *maturityFilterPtr
 	var priorityScoreThreshold int = *priorityScorePtr
 	var assigneeID string = *assigneeIDPtr
+	var labels string = *labelsPtr
+	var priorityIsSeverity bool = *priorityIsSeverityPtr
 
 	if len(orgID) == 0 || len(apiToken) == 0 || len(jiraProjectID) == 0 {
 		flag.PrintDefaults()
@@ -92,7 +96,7 @@ Open Source, so feel free to contribute !
 			fmt.Println("4/4 - No new JIRA ticket required")
 		} else {
 			fmt.Println("4/4 - Opening JIRA Tickets")
-			jiraResponse := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, projectInfo, vulnsForJira)
+			jiraResponse := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsForJira, priorityIsSeverity)
 			fmt.Println(jiraResponse)
 		}
 
