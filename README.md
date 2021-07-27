@@ -32,6 +32,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.
     -assigneeId=<123abc456def789>                                       // Optional.  Jira ID of user to assign tickets to.
     -priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (Low|Medium|High|Critical=>Low|Medium|High|Highest)
+    -labels=<IssueLabel1>,IssueLabel2                                   // Optional. Set JIRA ticket labels
 ```
 
 ### Priority is Severity

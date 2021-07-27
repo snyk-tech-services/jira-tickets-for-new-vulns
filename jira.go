@@ -15,7 +15,7 @@ type JiraIssue struct {
 }
 
 type PriorityType struct {
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 }
 
 // Field represents a JIRA issue basic fields
@@ -24,8 +24,9 @@ type Field struct {
 	Summary     string    `json:"summary"`
 	Description string    `json:"description"`
 	IssueTypes  IssueType `json:"issuetype"`
-	Assignees	Assignee  `json:"assignee"`
-	Priority	PriorityType `json:"priority"`
+	Assignees	Assignee  `json:"assignee,omitempty"`
+	Priority	*PriorityType `json:"priority,omitempty"`
+	Labels		[]string  `json:"labels,omitempty"`
 }
 
 // Assignee is the account ID of the JIRA user to assign tickets to
@@ -61,7 +62,7 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) string {
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) string {
 	responseDataAggregated := ""
 	for _, vulnForJira := range vulnsForJira {
 
@@ -72,20 +73,26 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 		jiraTicket.Fields.Projects.ID = jiraProjectID
 		jiraTicket.Fields.IssueTypes.Name = jiraTicketType
 		jiraTicket.Fields.Assignees.ID = assigneeID
+		if(labels != ""){
+			jiraTicket.Fields.Labels = strings.Split(labels,",")
+		}
 		if(priorityIsSeverity){
+			var priority PriorityType
 			jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN",strings.ToUpper(jsonVuln.K("severity").String().Value))
 			val, present := os.LookupEnv(jiraMappingEnvVarName)
 			if(present){
-				jiraTicket.Fields.Priority.Name = val
+				priority.Name = val
 			} else {
 				if(jsonVuln.K("severity").String().Value == "critical"){
-					jiraTicket.Fields.Priority.Name = "Highest"
+					priority.Name = "Highest"
 				} else {
-					jiraTicket.Fields.Priority.Name = strings.Title(jsonVuln.K("severity").String().Value)
+					
+					priority.Name = strings.Title(jsonVuln.K("severity").String().Value)
+					
 				}
 				
 			}
-			
+			jiraTicket.Fields.Priority = &priority
 		}
 
 		ticket, err := json.Marshal(jiraTicket)
