@@ -20,6 +20,7 @@ func HTTPResponseStubAndMirrorRequest(url string, method string, token string) *
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		body, _ := ioutil.ReadAll(r.Body)
+		
 		if r.Method == "POST" && len(body) == 0 {
 			log.Fatal("Missing Body on POST request")
 		} else if r.Method == "GET" && len(body) > 0 {
