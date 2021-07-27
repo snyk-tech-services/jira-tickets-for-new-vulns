@@ -31,21 +31,23 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas
     -type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.
     -assigneeId=<123abc456def789>                                       // Optional.  Jira ID of user to assign tickets to.
-    -priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (Low|Medium|High|Critical=>Low|Medium|High|Highest)
+    -priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
     -labels=<IssueLabel1>,IssueLabel2                                   // Optional. Set JIRA ticket labels
 ```
 
 ### Priority is Severity
 Option to get the JIRA ticket priority set based on issue severity.
 Defaults map to:
-Issue severity|JIRA Priority
-critical|Highest
-high|High
-medium|Medium
-low|Low
+
+Issue severity | JIRA Priority
+----- | -----
+critical | Highest
+high | High
+medium | Medium
+low | Low
 
 Use SNYK_JIRA_PRIORITY_FOR_XXX_VULN env var to override the default an set your value.
-Example:
+> Example:
 > Critical sevs should receive the Hot Fix priority in JIRA
 >
 > export SNYK_JIRA_PRIORITY_FOR_CRITICAL_VULN='Hot Fix'
