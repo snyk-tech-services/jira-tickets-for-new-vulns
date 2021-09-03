@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"log"
-	"strings"
-	"github.com/michael-go/go-jsn/jsn"
 	"os"
+	"strings"
+
+	"github.com/michael-go/go-jsn/jsn"
 )
 
 // JiraIssue represents the top level Struct for JIRA issue description
@@ -20,13 +21,13 @@ type PriorityType struct {
 
 // Field represents a JIRA issue basic fields
 type Field struct {
-	Projects    Project   `json:"project"`
-	Summary     string    `json:"summary"`
-	Description string    `json:"description"`
-	IssueTypes  IssueType `json:"issuetype"`
-	Assignees	Assignee  `json:"assignee,omitempty"`
-	Priority	*PriorityType `json:"priority,omitempty"`
-	Labels		[]string  `json:"labels,omitempty"`
+	Projects    Project       `json:"project"`
+	Summary     string        `json:"summary"`
+	Description string        `json:"description"`
+	IssueTypes  IssueType     `json:"issuetype"`
+	Assignees   Assignee      `json:"assignee,omitempty"`
+	Priority    *PriorityType `json:"priority,omitempty"`
+	Labels      []string      `json:"labels,omitempty"`
 }
 
 // Assignee is the account ID of the JIRA user to assign tickets to
@@ -73,24 +74,24 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 		jiraTicket.Fields.Projects.ID = jiraProjectID
 		jiraTicket.Fields.IssueTypes.Name = jiraTicketType
 		jiraTicket.Fields.Assignees.ID = assigneeID
-		if(labels != ""){
-			jiraTicket.Fields.Labels = strings.Split(labels,",")
+		if labels != "" {
+			jiraTicket.Fields.Labels = strings.Split(labels, ",")
 		}
-		if(priorityIsSeverity){
+
+		if priorityIsSeverity {
 			var priority PriorityType
-			jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN",strings.ToUpper(jsonVuln.K("severity").String().Value))
+			jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN", strings.ToUpper(jsonVuln.K("severity").String().Value))
 			val, present := os.LookupEnv(jiraMappingEnvVarName)
-			if(present){
+			if present {
 				priority.Name = val
 			} else {
-				if(jsonVuln.K("severity").String().Value == "critical"){
+				if jsonVuln.K("severity").String().Value == "critical" {
 					priority.Name = "Highest"
 				} else {
-					
+
 					priority.Name = strings.Title(jsonVuln.K("severity").String().Value)
-					
+
 				}
-				
 			}
 			jiraTicket.Fields.Priority = &priority
 		}
