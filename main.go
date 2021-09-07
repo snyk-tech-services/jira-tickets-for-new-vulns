@@ -40,7 +40,7 @@ Open Source, so feel free to contribute !
 	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	typePtr := flag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
 	assigneeIDPtr := flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to")
-	labelsPtr := flag.String("labels","", "Optional. Jira ticket labels")
+	labelsPtr := flag.String("labels", "", "Optional. Jira ticket labels")
 	priorityIsSeverityPtr := flag.Bool("priorityIsSeverity", false, "Use issue severity as priority")
 	flag.Parse()
 
@@ -92,14 +92,20 @@ Open Source, so feel free to contribute !
 		vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, project, apiToken, severity, maturityFilter, priorityScoreThreshold, issueType, tickets)
 		vulnsForJira := consolidateAllPathsIntoSingleVuln(vulnsPerPath)
 
+		var exitCode int = 0
 		if len(vulnsForJira) == 0 {
 			fmt.Println("4/4 - No new JIRA ticket required")
 		} else {
 			fmt.Println("4/4 - Opening JIRA Tickets")
 			jiraResponse := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsForJira, priorityIsSeverity)
 			fmt.Println(jiraResponse)
+			if jiraResponse == "" {
+				fmt.Println("Failure to create a ticket")
+				exitCode = 1
+			}
 		}
 
+		os.Exit(exitCode)
 	}
 
 }

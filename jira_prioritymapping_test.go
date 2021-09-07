@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"encoding/json"
+	"os"
 	"testing"
 
 	"github.com/michael-go/go-jsn/jsn"
@@ -13,7 +13,7 @@ import (
 // Test openJiraTickets function
 func TestOpenJiraTicketWithPriorityMappingFunc(t *testing.T) {
 	assert := assert.New(t)
-	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue","","")
+	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue", "", "")
 
 	defer server.Close()
 
@@ -38,7 +38,7 @@ func TestOpenJiraTicketWithPriorityMappingFunc(t *testing.T) {
 
 func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 	assert := assert.New(t)
-	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue","","")
+	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue", "", "")
 
 	defer server.Close()
 
@@ -61,10 +61,9 @@ func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 	return
 }
 
-
 func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 	assert := assert.New(t)
-	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue","","")
+	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue", "", "")
 
 	defer server.Close()
 
@@ -74,7 +73,7 @@ func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	os.Setenv("SNYK_JIRA_PRIORITY_FOR_MEDIUM_VULN","not too bad")
+	os.Setenv("SNYK_JIRA_PRIORITY_FOR_MEDIUM_VULN", "not too bad")
 	jiraResponse := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
