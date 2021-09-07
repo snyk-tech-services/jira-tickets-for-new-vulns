@@ -20,7 +20,7 @@ func HTTPResponseStubAndMirrorRequest(url string, method string, token string) *
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		body, _ := ioutil.ReadAll(r.Body)
-		
+
 		if r.Method == "POST" && len(body) == 0 {
 			log.Fatal("Missing Body on POST request")
 		} else if r.Method == "GET" && len(body) > 0 {
@@ -47,6 +47,27 @@ func HTTPResponseCheckAndStub(url string, testType string) *httptest.Server {
 			resp = []byte("404 - url mismatch")
 		} else {
 			resp = readFixture("./fixtures/" + testType + ".json")
+		}
+
+		w.Write(resp)
+	}))
+}
+
+// HTTPResponseCheckAndStub Check url match and Stubbing HTTP response
+func HTTPResponseCheckAndStub_() *httptest.Server {
+	var resp []byte
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if "/v1/org/123/project/123/issue/SNYK-JS-PACRESOLVER-1564857/paths" == r.RequestURI {
+			resp = readFixture("./fixtures/issuePACRESOLVERPath.json")
+		} else if "/v1/org/123/project/123/issue/SNYK-JS-DOTPROP-543489/paths" == r.RequestURI {
+			resp = readFixture("./fixtures/issueJSDOTPath.json")
+		} else if "/v1/org/123/project/123/issue/SNYK-JS-ACORN-559469/paths" == r.RequestURI {
+			resp = readFixture("./fixtures/issueACORNPath.json")
+		} else if "/v1/org/123/project/123/aggregated-issues" == r.RequestURI {
+			resp = readFixture("./fixtures/projectAggregatedIssuesPerPath.json")
+		} else {
+			resp = []byte("404 - url mismatch")
 		}
 
 		w.Write(resp)
