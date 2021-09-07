@@ -40,7 +40,7 @@ Open Source, so feel free to contribute !
 	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	typePtr := flag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
 	assigneeIDPtr := flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to")
-	labelsPtr := flag.String("labels","", "Optional. Jira ticket labels")
+	labelsPtr := flag.String("labels", "", "Optional. Jira ticket labels")
 	priorityIsSeverityPtr := flag.Bool("priorityIsSeverity", false, "Use issue severity as priority")
 	flag.Parse()
 
@@ -84,19 +84,19 @@ Open Source, so feel free to contribute !
 	for _, project := range projectIDs {
 		fmt.Println("1/4 - Retrieving Project", project)
 		projectInfo := getProjectDetails(endpointAPI, orgID, project, apiToken)
+		fmt.Println(projectInfo)
 
 		fmt.Println("2/4 - Getting Existing JIRA tickets")
 		tickets := getJiraTickets(endpointAPI, orgID, project, apiToken)
 
 		fmt.Println("3/4 - Getting vulns")
 		vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, project, apiToken, severity, maturityFilter, priorityScoreThreshold, issueType, tickets)
-		vulnsForJira := consolidateAllPathsIntoSingleVuln(vulnsPerPath)
 
-		if len(vulnsForJira) == 0 {
+		if len(vulnsPerPath) == 0 {
 			fmt.Println("4/4 - No new JIRA ticket required")
 		} else {
 			fmt.Println("4/4 - Opening JIRA Tickets")
-			jiraResponse := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsForJira, priorityIsSeverity)
+			jiraResponse := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
 			fmt.Println(jiraResponse)
 		}
 

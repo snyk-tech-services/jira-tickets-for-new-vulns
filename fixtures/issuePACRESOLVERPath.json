@@ -1,0 +1,16 @@
+{
+  "snapshotId": "b3ad0553-6991-4687-b56f-e591c6707811",
+  "paths": [
+    [
+      { "name": "snyk", "version": "1.228.3" },
+      { "name": "proxy-agent", "version": "3.1.0" },
+      { "name": "pac-proxy-agent", "version": "3.0.0" },
+      { "name": "pac-resolver", "version": "3.0.0" }
+    ]
+  ],
+  "total": 1,
+  "links": {
+    "last": "https://app.snyk.io/api/v1/org/f6999a85-c519-4ee7-ae55-3269b9bfa4b6/project/9d64b8a9-883e-42f9-abd3-66b274b66a4c/issue/SNYK-JS-PACRESOLVER-1564857/paths?page=1&snapshotId=b3ad0553-6991-4687-b56f-e591c6707811"
+  }
+}
+

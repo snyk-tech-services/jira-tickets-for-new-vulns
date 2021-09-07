@@ -1,0 +1,13 @@
+{
+  "snapshotId": "b3ad0553-6991-4687-b56f-e591c6707811",
+  "paths": [
+    [
+      { "name": "@snyk/nodejs-runtime-agent", "version": "1.14.0" },
+      { "name": "acorn", "version": "5.7.3" }
+    ]
+  ],
+  "total": 1,
+  "links": {
+    "last": "https://app.snyk.io/api/v1/org/f6999a85-c519-4ee7-ae55-3269b9bfa4b6/project/9d64b8a9-883e-42f9-abd3-66b274b66a4c/issue/SNYK-JS-ACORN-559469/paths?page=1&snapshotId=b3ad0553-6991-4687-b56f-e591c6707811"
+  }
+}
