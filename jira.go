@@ -112,7 +112,8 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 
 		if strings.Contains(string(responseDataAggregatedByte), "Field 'priority'") && priorityIsSeverity == true {
 			fmt.Println("Retrying with priorityIsSeverity set to false, max retry 1")
-			responseDataAggregatedByte = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, false)
+			priorityIsSeverity = false
+			responseDataAggregatedByte = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
 		}
 		fullResponseDataAggregated += "\n" + string(responseDataAggregatedByte) + "\n"
 	}
