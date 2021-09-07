@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"log"
-	"strings"
-	"github.com/michael-go/go-jsn/jsn"
 	"os"
+	"strings"
+
+	"github.com/michael-go/go-jsn/jsn"
 )
 
 // JiraIssue represents the top level Struct for JIRA issue description
@@ -20,13 +21,13 @@ type PriorityType struct {
 
 // Field represents a JIRA issue basic fields
 type Field struct {
-	Projects    Project   `json:"project"`
-	Summary     string    `json:"summary"`
-	Description string    `json:"description"`
-	IssueTypes  IssueType `json:"issuetype"`
-	Assignees	Assignee  `json:"assignee,omitempty"`
-	Priority	*PriorityType `json:"priority,omitempty"`
-	Labels		[]string  `json:"labels,omitempty"`
+	Projects    Project       `json:"project"`
+	Summary     string        `json:"summary"`
+	Description string        `json:"description"`
+	IssueTypes  IssueType     `json:"issuetype"`
+	Assignees   Assignee      `json:"assignee,omitempty"`
+	Priority    *PriorityType `json:"priority,omitempty"`
+	Labels      []string      `json:"labels,omitempty"`
 }
 
 // Assignee is the account ID of the JIRA user to assign tickets to
@@ -62,46 +63,59 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) string {
-	responseDataAggregated := ""
-	for _, vulnForJira := range vulnsForJira {
+func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool) []byte {
 
-		jsonVuln, _ := jsn.NewJson(vulnForJira)
-		vulnID := jsonVuln.K("id").String().Value
-		jiraTicket := formatJiraTicket(jsonVuln, projectInfo)
+	jsonVuln, _ := jsn.NewJson(vulnForJira)
+	vulnID := jsonVuln.K("id").String().Value
+	jiraTicket := formatJiraTicket(jsonVuln, projectInfo)
 
-		jiraTicket.Fields.Projects.ID = jiraProjectID
-		jiraTicket.Fields.IssueTypes.Name = jiraTicketType
-		jiraTicket.Fields.Assignees.ID = assigneeID
-		if(labels != ""){
-			jiraTicket.Fields.Labels = strings.Split(labels,",")
-		}
-		if(priorityIsSeverity){
-			var priority PriorityType
-			jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN",strings.ToUpper(jsonVuln.K("severity").String().Value))
-			val, present := os.LookupEnv(jiraMappingEnvVarName)
-			if(present){
-				priority.Name = val
-			} else {
-				if(jsonVuln.K("severity").String().Value == "critical"){
-					priority.Name = "Highest"
-				} else {
-					
-					priority.Name = strings.Title(jsonVuln.K("severity").String().Value)
-					
-				}
-				
-			}
-			jiraTicket.Fields.Priority = &priority
-		}
-
-		ticket, err := json.Marshal(jiraTicket)
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		responseData := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfo.K("id").String().Value+"/issue/"+vulnID+"/jira-issue", token, ticket)
-		responseDataAggregated += "\n" + string(responseData)
+	jiraTicket.Fields.Projects.ID = jiraProjectID
+	jiraTicket.Fields.IssueTypes.Name = jiraTicketType
+	jiraTicket.Fields.Assignees.ID = assigneeID
+	if labels != "" {
+		jiraTicket.Fields.Labels = strings.Split(labels, ",")
 	}
-	return responseDataAggregated
+	if priorityIsSeverity {
+		var priority PriorityType
+		jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN", strings.ToUpper(jsonVuln.K("severity").String().Value))
+		val, present := os.LookupEnv(jiraMappingEnvVarName)
+		if present {
+			priority.Name = val
+		} else {
+			if jsonVuln.K("severity").String().Value == "critical" {
+				priority.Name = "Highest"
+			} else {
+
+				priority.Name = strings.Title(jsonVuln.K("severity").String().Value)
+
+			}
+
+		}
+		jiraTicket.Fields.Priority = &priority
+	}
+
+	ticket, err := json.Marshal(jiraTicket)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	responseData := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfo.K("id").String().Value+"/issue/"+vulnID+"/jira-issue", token, ticket)
+
+	return responseData
+}
+
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) string {
+	fullResponseDataAggregated := ""
+
+	for _, vulnForJira := range vulnsForJira {
+		responseDataAggregatedByte := openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
+
+		if strings.Contains(string(responseDataAggregatedByte), "Field 'priority'") && priorityIsSeverity == true {
+			fmt.Println("Retrying with priorityIsSeverity set to false, max retry 1")
+			responseDataAggregatedByte = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, false)
+		}
+		fullResponseDataAggregated += "\n" + string(responseDataAggregatedByte) + "\n"
+	}
+
+	return fullResponseDataAggregated
 }
