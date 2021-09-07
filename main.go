@@ -84,20 +84,20 @@ Open Source, so feel free to contribute !
 	for _, project := range projectIDs {
 		fmt.Println("1/4 - Retrieving Project", project)
 		projectInfo := getProjectDetails(endpointAPI, orgID, project, apiToken)
+		fmt.Println(projectInfo)
 
 		fmt.Println("2/4 - Getting Existing JIRA tickets")
 		tickets := getJiraTickets(endpointAPI, orgID, project, apiToken)
 
 		fmt.Println("3/4 - Getting vulns")
 		vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, project, apiToken, severity, maturityFilter, priorityScoreThreshold, issueType, tickets)
-		vulnsForJira := consolidateAllPathsIntoSingleVuln(vulnsPerPath)
 
 		var exitCode int = 0
-		if len(vulnsForJira) == 0 {
+		if len(vulnsPerPath) == 0 {
 			fmt.Println("4/4 - No new JIRA ticket required")
 		} else {
 			fmt.Println("4/4 - Opening JIRA Tickets")
-			jiraResponse := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsForJira, priorityIsSeverity)
+			jiraResponse := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
 			fmt.Println(jiraResponse)
 			if jiraResponse == "" {
 				fmt.Println("Failure to create a ticket")

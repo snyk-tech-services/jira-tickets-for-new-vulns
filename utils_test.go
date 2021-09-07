@@ -55,6 +55,27 @@ func HTTPResponseCheckAndStub(url string, testType string) *httptest.Server {
 	}))
 }
 
+// HTTPResponseCheckAndStub Check url match and Stubbing HTTP response
+func HTTPResponseCheckAndStub_() *httptest.Server {
+	var resp []byte
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if "/v1/org/123/project/123/issue/SNYK-JS-PACRESOLVER-1564857/paths" == r.RequestURI {
+			resp = readFixture("./fixtures/issuePACRESOLVERPath.json")
+		} else if "/v1/org/123/project/123/issue/SNYK-JS-DOTPROP-543489/paths" == r.RequestURI {
+			resp = readFixture("./fixtures/issueJSDOTPath.json")
+		} else if "/v1/org/123/project/123/issue/SNYK-JS-ACORN-559469/paths" == r.RequestURI {
+			resp = readFixture("./fixtures/issueACORNPath.json")
+		} else if "/v1/org/123/project/123/aggregated-issues" == r.RequestURI {
+			resp = readFixture("./fixtures/projectAggregatedIssuesPerPath.json")
+		} else {
+			resp = []byte("404 - url mismatch")
+		}
+
+		w.Write(resp)
+	}))
+}
+
 // HTTPResponseStub Stubbing HTTP response
 func HTTPResponseCheckOpenJiraTickets(url string) *httptest.Server {
 	var resp []byte
