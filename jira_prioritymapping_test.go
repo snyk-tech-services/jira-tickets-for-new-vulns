@@ -23,7 +23,10 @@ func TestOpenJiraTicketWithPriorityMappingFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	jiraResponse := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
+	jiraResponse, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
+	if err != nil {
+		panic(err)
+	}
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
@@ -48,7 +51,10 @@ func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	jiraResponse := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
+	jiraResponse, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
+	if err != nil {
+		panic(err)
+	}
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
@@ -74,7 +80,10 @@ func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 		panic(err)
 	}
 	os.Setenv("SNYK_JIRA_PRIORITY_FOR_MEDIUM_VULN", "not too bad")
-	jiraResponse := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
+	jiraResponse, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
+	if err != nil {
+		panic(err)
+	}
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)

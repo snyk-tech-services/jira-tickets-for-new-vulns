@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -63,7 +65,7 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 
 }
 
-func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool) []byte {
+func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool) ([]byte, error) {
 
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
 	vulnID := jsonVuln.K("id").String().Value
@@ -101,22 +103,39 @@ func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectI
 
 	responseData := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfo.K("id").String().Value+"/issue/"+vulnID+"/jira-issue", token, ticket)
 
-	return responseData
+	emptyByteVar := make([]byte, 128)
+
+	if bytes.Equal(responseData, emptyByteVar) {
+		return emptyByteVar, errors.New("Failure, snyk API request responseData is empty")
+	}
+
+	return responseData, nil
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) string {
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) (string, error) {
 	fullResponseDataAggregated := ""
 
 	for _, vulnForJira := range vulnsForJira {
-		responseDataAggregatedByte := openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
+		responseDataAggregatedByte, err := openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
+
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		if strings.Contains(string(responseDataAggregatedByte), "Field 'priority'") && priorityIsSeverity == true {
 			fmt.Println("Retrying with priorityIsSeverity set to false, max retry 1")
 			priorityIsSeverity = false
-			responseDataAggregatedByte = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
+			responseDataAggregatedByte, err = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 		fullResponseDataAggregated += "\n" + string(responseDataAggregatedByte) + "\n"
 	}
 
-	return fullResponseDataAggregated
+	if fullResponseDataAggregated == "" {
+		return "", errors.New("Failure, jira request response is empty")
+	}
+
+	return fullResponseDataAggregated, nil
 }
