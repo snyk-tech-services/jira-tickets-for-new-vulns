@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body []byte) []byte {
@@ -27,17 +28,26 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 		fmt.Print(err.Error())
 		os.Exit(1)
 	}
+
 	if response.StatusCode == 404 {
 		fmt.Printf("Resource not found for %s", endpointURL)
 		os.Exit(1)
-	}
-	if response.StatusCode > 400 {
+	} else if response.StatusCode == 422 {
+		fmt.Printf("Error %d, Unprocessable Entity\n", response.StatusCode)
+	} else if response.StatusCode > 400 {
 		fmt.Printf("Unexpected response %d\n", response.StatusCode)
+		os.Exit(1)
 	}
 
 	responseData, err := ioutil.ReadAll(response.Body)
+
 	if err != nil {
-		log.Fatal(err)
+		if strings.Contains(string(responseData), "priority") {
+			fmt.Println(err)
+			fmt.Println("retrying without the priority field")
+		} else {
+			log.Fatal(err)
+		}
 	}
 	return responseData
 }

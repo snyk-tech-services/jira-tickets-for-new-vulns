@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 )
 
 type mirroredResponse struct {
@@ -78,9 +80,37 @@ func HTTPResponseCheckAndStub_() *httptest.Server {
 func HTTPResponseCheckOpenJiraTickets(url string) *httptest.Server {
 	var resp []byte
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		if r.RequestURI != url {
 			resp = []byte("404 - url mismatch")
 		} else {
+			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse.json")
+		}
+
+		w.Write(resp)
+	}))
+}
+
+// HTTPResponseStub Stubbing HTTP response
+func HTTPResponseCheckOpenJiraTicketsWithError(url string) *httptest.Server {
+	var resp []byte
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		body, er := ioutil.ReadAll(r.Body)
+
+		if er != nil {
+			log.Fatal(er)
+		}
+
+		if r.RequestURI != url {
+			resp = []byte("404 - url mismatch")
+		} else if strings.Contains(string(body), "priority") == true {
+			fmt.Println("Error case")
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			resp = readFixture("./fixtures/singleJiraTicketOpeningErrorResponse.json")
+		} else {
+			fmt.Println("Working case")
+			w.WriteHeader(http.StatusAccepted)
 			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse.json")
 		}
 

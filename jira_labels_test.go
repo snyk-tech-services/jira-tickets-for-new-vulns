@@ -31,7 +31,7 @@ func TestGetJiraTicketFunc(t *testing.T) {
 // Test openJiraTickets function
 func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 	assert := assert.New(t)
-	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue","","")
+	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue", "", "")
 
 	defer server.Close()
 
@@ -41,7 +41,10 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	jiraResponse := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "Label1,Label2", projectInfo, vulnsForJira, false)
+	jiraResponse, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "Label1,Label2", projectInfo, vulnsForJira, false)
+	if err != nil {
+		panic(err)
+	}
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
@@ -56,7 +59,7 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 
 func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 	assert := assert.New(t)
-	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue","","")
+	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue", "", "")
 
 	defer server.Close()
 
@@ -66,7 +69,10 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	jiraResponse := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
+	jiraResponse, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
+	if err != nil {
+		panic(err)
+	}
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
