@@ -1,8 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	"github.com/michael-go/go-jsn/jsn"
 )
@@ -12,12 +17,24 @@ type JiraIssue struct {
 	Fields Field `json:"fields"`
 }
 
+type PriorityType struct {
+	Name string `json:"name,omitempty"`
+}
+
 // Field represents a JIRA issue basic fields
 type Field struct {
-	Projects    Project   `json:"project"`
-	Summary     string    `json:"summary"`
-	Description string    `json:"description"`
-	IssueTypes  IssueType `json:"issuetype"`
+	Projects    Project       `json:"project"`
+	Summary     string        `json:"summary"`
+	Description string        `json:"description"`
+	IssueTypes  IssueType     `json:"issuetype"`
+	Assignees   Assignee      `json:"assignee,omitempty"`
+	Priority    *PriorityType `json:"priority,omitempty"`
+	Labels      []string      `json:"labels,omitempty"`
+}
+
+// Assignee is the account ID of the JIRA user to assign tickets to
+type Assignee struct {
+	ID string `json:"accountId,omitempty"`
 }
 
 // Project is the JIRA project ID
@@ -31,7 +48,11 @@ type IssueType struct {
 }
 
 func getJiraTickets(endpointAPI string, orgID string, projectID string, token string) map[string]string {
-	responseData := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/jira-issues", token, nil)
+	responseData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/jira-issues", token, nil)
+	if err != nil {
+		fmt.Println("Could not get the tickets")
+		log.Fatal(err)
+	}
 
 	tickets, err := jsn.NewJson(responseData)
 	if err != nil {
@@ -45,26 +66,121 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 		return true
 	})
 	return tickRefs
-
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, projectInfo jsn.Json, vulnsForJira map[string]interface{}) string {
-	responseDataAggregated := ""
-	for _, vulnForJira := range vulnsForJira {
+func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool) ([]byte, error) {
 
-		jsonVuln, _ := jsn.NewJson(vulnForJira)
-		vulnID := jsonVuln.K("id").String().Value
-		jiraTicket := formatJiraTicket(jsonVuln, projectInfo)
+	jsonVuln, _ := jsn.NewJson(vulnForJira)
+	vulnID := jsonVuln.K("id").String().Value
+	jiraTicket := formatJiraTicket(jsonVuln, projectInfo)
 
-		jiraTicket.Fields.Projects.ID = jiraProjectID
-		jiraTicket.Fields.IssueTypes.Name = jiraTicketType
+	jiraTicket.Fields.Projects.ID = jiraProjectID
+	jiraTicket.Fields.IssueTypes.Name = jiraTicketType
+	jiraTicket.Fields.Assignees.ID = assigneeID
 
-		ticket, err := json.Marshal(jiraTicket)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		responseData := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfo.K("id").String().Value+"/issue/"+vulnID+"/jira-issue", token, ticket)
-		responseDataAggregated += "\n" + string(responseData)
+	projectInfoId := projectInfo.K("id").String().Value
+
+	if projectInfoId == "" {
+		return nil, errors.New("Failure, Could not retrieve project ID")
 	}
-	return responseDataAggregated
+
+	if labels != "" {
+		jiraTicket.Fields.Labels = strings.Split(labels, ",")
+	}
+	if priorityIsSeverity {
+		var priority PriorityType
+		jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN", strings.ToUpper(jsonVuln.K("severity").String().Value))
+		val, present := os.LookupEnv(jiraMappingEnvVarName)
+		if present {
+			priority.Name = val
+		} else {
+			if jsonVuln.K("severity").String().Value == "critical" {
+				priority.Name = "Highest"
+			} else {
+
+				priority.Name = strings.Title(jsonVuln.K("severity").String().Value)
+
+			}
+
+		}
+		jiraTicket.Fields.Priority = &priority
+	}
+
+	ticket, err := json.Marshal(jiraTicket)
+	if err != nil {
+		fmt.Println("Error while creating the ticket")
+		return nil, errors.New("Failure, Failure to create ticket(s)")
+	}
+
+	responseData, er := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfoId+"/issue/"+vulnID+"/jira-issue", token, ticket)
+
+	if er != nil {
+		fmt.Println("Request failed")
+		return nil, errors.New("Failure, Failure to create ticket(s)")
+	}
+
+	if bytes.Equal(responseData, nil) {
+		fmt.Printf("Request response from %s is empty\n", endpointAPI)
+		return nil, errors.New("Failure, Failure to create ticket(s)")
+	}
+
+	return responseData, er
+}
+
+func displayErrorForIssue(vulnForJira interface{}, endpointAPI string) string {
+
+	jsonVuln, _ := jsn.NewJson(vulnForJira)
+	vulnID := jsonVuln.K("id").String().Value
+	fmt.Printf("Request to %s failed too many time\n Ticket cannot be created for this issue: %s\n", endpointAPI, vulnID)
+	return vulnID + "\n"
+}
+
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) (int, string, string, error) {
+	fullResponseDataAggregated := ""
+	fullListNotCreatedIssue := ""
+	RequestFailed := false
+	issueCreated := 0
+	MaxNumberOfRetry := 1
+
+	for _, vulnForJira := range vulnsForJira {
+		RequestFailed = false
+		responseDataAggregatedByte, err := openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
+
+		if err != nil {
+			fmt.Printf("Request to %s failed\n", endpointAPI)
+			RequestFailed = true
+		}
+
+		if RequestFailed == true {
+			for numberOfRetries := 0; numberOfRetries < MaxNumberOfRetry; numberOfRetries++ {
+				fmt.Println("Retrying with priorityIsSeverity set to false, max retry ", MaxNumberOfRetry)
+				priorityIsSeverity = false
+				responseDataAggregatedByte, err = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
+				if err != nil {
+					fmt.Println("In for")
+					fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
+				} else {
+					RequestFailed = false
+					break
+				}
+			}
+		}
+		if RequestFailed == true && strings.Contains(strings.ToLower(string(responseDataAggregatedByte)), "error") {
+			fmt.Println("out for")
+			fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
+			continue
+		}
+
+		if responseDataAggregatedByte != nil {
+			fullResponseDataAggregated += "\n" + string(responseDataAggregatedByte) + "\n"
+			issueCreated += 1
+		}
+	}
+
+	if fullResponseDataAggregated == "" {
+		fmt.Printf("Request response from %s is empty\n", endpointAPI)
+		return issueCreated, fullResponseDataAggregated, fullListNotCreatedIssue, errors.New("Failure, Failure to create ticket(s)")
+	}
+
+	return issueCreated, fullResponseDataAggregated, fullListNotCreatedIssue, nil
 }

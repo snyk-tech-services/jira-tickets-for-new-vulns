@@ -27,14 +27,35 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -jiraProjectID=<12345>                                              // Jira project ID the tickets will be opened against
     -jiraTicketType=<Task|Bug|....>                                     // Optional. Type of ticket to open. Defaults to Bug
     -severity=<critical|high|medium|low>                                // Optional. Severity threshold to open tickets for. Defaults to low.
-    -priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold 
     -maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas
     -type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.
+    -assigneeId=<123abc456def789>                                       // Optional.  Jira ID of user to assign tickets to.
+    -priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
+    -labels=<IssueLabel1>,IssueLabel2                                   // Optional. Set JIRA ticket labels
+    -priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold
 ```
+
+### Priority is Severity
+Option to get the JIRA ticket priority set based on issue severity.
+Defaults map to:
+
+Issue severity | JIRA Priority
+----- | -----
+critical | Highest
+high | High
+medium | Medium
+low | Low
+
+Use SNYK_JIRA_PRIORITY_FOR_XXX_VULN env var to override the default an set your value.
+> Example:
+> Critical sevs should receive the Hot Fix priority in JIRA
+>
+> export SNYK_JIRA_PRIORITY_FOR_CRITICAL_VULN='Hot Fix'
 
 ## Installation from source
 git clone the repo, build.
 > `go run main.go jira.go jira_utils.go vulns.go snyk.go snyk_utils.go`
+
 
 ### Please report issues.
 

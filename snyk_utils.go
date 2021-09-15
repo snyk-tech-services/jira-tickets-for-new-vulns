@@ -2,15 +2,17 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"os"
+	"strings"
 )
 
-func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body []byte) []byte {
+func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body []byte) ([]byte, error) {
+
 	bodyBuffer := bytes.NewBuffer(nil)
+
 	if verb == "POST" && body != nil {
 		bodyBuffer = bytes.NewBuffer(body)
 	}
@@ -24,20 +26,31 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 	response, err := client.Do(request)
 
 	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
-	}
-	if response.StatusCode == 404 {
-		fmt.Printf("Resource not found for %s", endpointURL)
-		os.Exit(1)
-	}
-	if response.StatusCode > 400 {
-		fmt.Printf("Unexpected response %d\n", response.StatusCode)
+		fmt.Printf("Request on endpoint '%s' failed with error %s\n", endpointURL, err.Error())
+		return nil, errors.New("Request failed")
 	}
 
 	responseData, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
+
+	if response.StatusCode == 404 {
+		fmt.Printf("Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		return nil, errors.New("Request failed")
+	} else if response.StatusCode == 422 {
+		fmt.Printf("Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		fmt.Printf("Details : %s\n", string(responseData))
+		return nil, errors.New("Request failed")
+	} else if response.StatusCode > 400 {
+		fmt.Printf("Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		fmt.Printf("Details : %s\n", string(responseData))
+		return nil, errors.New("Request failed")
 	}
-	return responseData
+
+	if err != nil {
+		if strings.Contains(strings.ToLower(string(responseData)), "error") {
+			fmt.Println(err)
+			fmt.Println("Retrying without the priority field")
+		}
+		return nil, errors.New("Request failed")
+	}
+	return responseData, nil
 }

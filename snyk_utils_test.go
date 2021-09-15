@@ -47,7 +47,10 @@ func TestMakeSnykRequestFunc(t *testing.T) {
 
 	defer server.Close()
 
-	response := makeSnykAPIRequest(expectedPOSTMethod, server.URL+expectedTestURL, expectedToken, dummyBodyMarshalled)
+	response, err := makeSnykAPIRequest(expectedPOSTMethod, server.URL+expectedTestURL, expectedToken, dummyBodyMarshalled)
+	if err != nil {
+		panic(err)
+	}
 
 	var unmarshalledResp map[string]interface{}
 	json.Unmarshal(response, &unmarshalledResp)
@@ -60,7 +63,10 @@ func TestMakeSnykRequestFunc(t *testing.T) {
 
 	defer server.Close()
 
-	response = makeSnykAPIRequest(expectedGETMethod, server.URL+expectedTestURL, expectedToken, nil)
+	response, err = makeSnykAPIRequest(expectedGETMethod, server.URL+expectedTestURL, expectedToken, nil)
+	if err != nil {
+		panic(err)
+	}
 
 	json.Unmarshal(response, &unmarshalledResp)
 
