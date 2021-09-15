@@ -14,20 +14,23 @@ type IssuesFilter struct {
 	Filters Filter `json:"filters"`
 }
 
-// PriorityScoreRange defines the range of priority for which to retrieve issues
-type PriorityScoreRange struct {
-	Minimum int `json:"min"`
-	Maximum int `json:"max"`
+type score struct {
+	Min int `json:"min"`
+	Max int `json:"max"`
+}
+
+type Priority struct {
+	Score score `json:"score"`
 }
 
 // Filter allows to filter on severity, type, ignore or patched vuln
 type Filter struct {
-	Severities      []string           `json:"severities"`
-	ExploitMaturity []string           `json:"exploitMaturity,omitempty"`
-	PriorityScore   PriorityScoreRange `json:"priorityScore"`
-	Types           []string           `json:"types"`
-	Ignored         bool               `json:"ignored"`
-	Patched         bool               `json:"patched"`
+	Severities      []string `json:"severities"`
+	ExploitMaturity []string `json:"exploitMaturity,omitempty"`
+	Priority        Priority `json:"priority"`
+	Types           []string `json:"types"`
+	Ignored         bool     `json:"ignored"`
+	Patched         bool     `json:"patched"`
 }
 
 func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, token string, severity string, maturityFilter []string, priorityScoreThreshold int, issueType string, tickets map[string]string) map[string]interface{} {
@@ -36,6 +39,7 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 		Filter{
 			Severities: []string{"high"},
 			Types:      []string{"vuln", "license"},
+			Priority:   Priority{score{Min: 0, Max: 1000}},
 			Ignored:    false,
 			Patched:    false,
 		},
@@ -58,18 +62,25 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 	if len(maturityFilter) > 0 {
 		body.Filters.ExploitMaturity = maturityFilter
 	}
-	body.Filters.PriorityScore.Minimum = 0
-	body.Filters.PriorityScore.Maximum = 1000
+
+	body.Filters.Priority.Score.Min = 0
+	body.Filters.Priority.Score.Max = 1000
 	if priorityScoreThreshold > 0 {
-		body.Filters.PriorityScore.Minimum = priorityScoreThreshold
+		body.Filters.Priority.Score.Min = priorityScoreThreshold
 	}
+
 	marshalledBody, err := json.Marshal(body)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	responseAggregatedData := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/aggregated-issues", token, marshalledBody)
+	responseAggregatedData, err := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/aggregated-issues", token, marshalledBody)
+	if err != nil {
+		fmt.Printf("Could not get aggregated data from %s org %s project %s", endpointAPI, orgID, projectID)
+		log.Fatalln(err)
+	}
+
 	j, err := jsn.NewJson(responseAggregatedData)
 	var vulnsPerPath map[string]interface{}
 	for _, e := range j.K("issues").Array().Elements() {
@@ -80,9 +91,14 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 			}
 			json.Unmarshal(bytes, &vulnsPerPath)
 			var issueId = e.K("id").String().Value
-			ProjectIssuePathData := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", token, nil)
+			ProjectIssuePathData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", token, nil)
+			if err != nil {
+				fmt.Printf("Could not get aggregated data from %s org %s project %s issue %s", endpointAPI, orgID, projectID, issueId)
+				log.Fatalln(err)
+			}
 			k, er := jsn.NewJson(ProjectIssuePathData)
 			if er != nil {
+				fmt.Printf("Json creation failed\n")
 				log.Fatalln(er)
 			}
 			vulnsPerPath["from"] = k.K("paths").Stringify()
@@ -96,9 +112,14 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 			}
 			json.Unmarshal(bytes, &vulnsPerPath)
 			var issueId = e.K("id").String().Value
-			ProjectIssuePathData := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", token, nil)
+			ProjectIssuePathData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", token, nil)
+			if err != nil {
+				fmt.Printf("Could not get aggregated data from %s org %s project %s issue %s", endpointAPI, orgID, projectID, issueId)
+				log.Fatalln(err)
+			}
 			k, er := jsn.NewJson(ProjectIssuePathData)
 			if er != nil {
+				fmt.Printf("Json creation failed\n")
 				log.Fatalln(er)
 			}
 			vulnsPerPath["from"] = k.K("paths").Stringify()

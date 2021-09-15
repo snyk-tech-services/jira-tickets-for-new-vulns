@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/michael-go/go-jsn/jsn"
@@ -41,7 +42,7 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	jiraResponse, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "Label1,Label2", projectInfo, vulnsForJira, false)
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "Label1,Label2", projectInfo, vulnsForJira, false)
 	if err != nil {
 		panic(err)
 	}
@@ -49,10 +50,9 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
+	assert.Equal(NotCreatedIssueId, "")
+	fmt.Println(numberIssueCreated)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithLabels.json")), string(mirroredResponse.Body))
-
-	//expectedTestURL := "/v1/org/"+orgID+"/project/"+projectInfo.K("id").String().Value+"/issue/"+vulnID+"/jira-issue"
-	//"/v1/org/123/project/123/jira-issues"
 
 	return
 }
@@ -69,7 +69,7 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	jiraResponse, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
 	if err != nil {
 		panic(err)
 	}
@@ -77,10 +77,9 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
+	assert.Equal(NotCreatedIssueId, "")
+	fmt.Println(numberIssueCreated)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithoutLabels.json")), string(mirroredResponse.Body))
-
-	//expectedTestURL := "/v1/org/"+orgID+"/project/"+projectInfo.K("id").String().Value+"/issue/"+vulnID+"/jira-issue"
-	//"/v1/org/123/project/123/jira-issues"
 
 	return
 }
