@@ -37,11 +37,11 @@ Open Source, so feel free to contribute !
 	jiraTicketTypePtr := flag.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
 	severityPtr := flag.String("severity", "low", "Optional. Your severity threshold")
 	maturityFilterPtr := flag.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
-	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	typePtr := flag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
 	assigneeIDPtr := flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to")
 	labelsPtr := flag.String("labels", "", "Optional. Jira ticket labels")
 	priorityIsSeverityPtr := flag.Bool("priorityIsSeverity", false, "Use issue severity as priority")
+	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	flag.Parse()
 
 	var orgID string = *orgIDPtr
@@ -53,35 +53,30 @@ Open Source, so feel free to contribute !
 	var severity string = *severityPtr
 	var issueType string = *typePtr
 	var maturityFilterString string = *maturityFilterPtr
-	var priorityScoreThreshold int = *priorityScorePtr
 	var assigneeID string = *assigneeIDPtr
 	var labels string = *labelsPtr
 	var priorityIsSeverity bool = *priorityIsSeverityPtr
+	var priorityScoreThreshold int = *priorityScorePtr
 
 	if len(orgID) == 0 || len(apiToken) == 0 || len(jiraProjectID) == 0 {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
-	projectIDs := make([]string, 0)
+	projectIDs, er := getProjectsIds(projectID, endpointAPI, orgID, apiToken)
 
-	if len(projectID) == 0 {
-		fmt.Println("Project ID not specified - importing all projects")
-
-		projects := getOrgProjects(endpointAPI, orgID, apiToken)
-
-		for _, p := range projects.K("projects").Array().Elements() {
-			projectIDs = append(projectIDs, p.K("id").String().Value)
-		}
-	} else {
-		projectIDs = append(projectIDs, projectID)
+	if er != nil {
+		log.Fatal(er)
 	}
+
 	if priorityScoreThreshold < 0 || priorityScoreThreshold > 1000 {
 		log.Fatalf("INPUT ERROR: %d is not a valid score. Must be between 0-1000.", priorityScoreThreshold)
 	}
+
 	maturityFilter := createMaturityFilter(strings.Split(maturityFilterString, ","))
 
 	for _, project := range projectIDs {
+
 		fmt.Println("1/4 - Retrieving Project", project)
 		projectInfo := getProjectDetails(endpointAPI, orgID, project, apiToken)
 		fmt.Println(projectInfo)
@@ -92,23 +87,20 @@ Open Source, so feel free to contribute !
 		fmt.Println("3/4 - Getting vulns")
 		vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, project, apiToken, severity, maturityFilter, priorityScoreThreshold, issueType, tickets)
 
-		var exitCode int = 0
 		if len(vulnsPerPath) == 0 {
 			fmt.Println("4/4 - No new JIRA ticket required")
 		} else {
 			fmt.Println("4/4 - Opening JIRA Tickets")
-			jiraResponse, err := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
+			numberIssueCreated, jiraResponse, notCreatedJiraIssues, err := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
 			if err != nil {
+				fmt.Println("Failure, Failure to create ticket(s)")
 				log.Fatal(err)
 			}
-			fmt.Println(jiraResponse)
 			if jiraResponse == "" {
-				fmt.Println("Failure to create a ticket")
-				exitCode = 1
+				fmt.Println("Failure to create a ticket(s)")
 			}
+			fmt.Printf("-----Summary----- \n Number of tickets created: %d\n List of issueId for which the ticket could not be created: %s\n", numberIssueCreated, notCreatedJiraIssues)
 		}
-
-		os.Exit(exitCode)
 	}
 
 }
