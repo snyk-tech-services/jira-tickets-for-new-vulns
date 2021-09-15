@@ -157,7 +157,6 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 				priorityIsSeverity = false
 				responseDataAggregatedByte, err = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
 				if err != nil {
-					fmt.Println("In for")
 					fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
 				} else {
 					RequestFailed = false
@@ -166,7 +165,6 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 			}
 		}
 		if RequestFailed == true && strings.Contains(strings.ToLower(string(responseDataAggregatedByte)), "error") {
-			fmt.Println("out for")
 			fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
 			continue
 		}
