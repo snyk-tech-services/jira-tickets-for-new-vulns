@@ -1,0 +1,26 @@
+{
+    "SNYK-JS-PACRESOLVER-1564857": [
+      {
+        "jiraIssue": {
+          "id": "10800",
+          "key": "FPI-794"
+        }
+      }
+    ],
+    "SNYK-JS-DOTPROP-543489": [
+      {
+        "jiraIssue": {
+          "id": "10799",
+          "key": "FPI-793"
+        }
+      }
+    ],
+    "SNYK-JS-ACORN-559469": [
+      {
+        "jiraIssue": {
+          "id": "10798",
+          "key": "FPI-792"
+        }
+      }
+    ]
+  }

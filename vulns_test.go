@@ -9,11 +9,6 @@ import (
 // Test getVulnsWithoutTicket function
 func TestGetVulnsWithoutTicketFunc(t *testing.T) {
 
-	//getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, token string, severity string, issueType string, tickets map[string]string) []interface{} {
-	//return []interface, array of vulns
-	// get http server to return projectIssuesPerPath.json like API would
-	// compare []interface with projectVulnsPerPath.json
-
 	assert := assert.New(t)
 
 	server := HTTPResponseCheckAndStub_()
@@ -27,7 +22,7 @@ func TestGetVulnsWithoutTicketFunc(t *testing.T) {
 	var maturityLevels []string
 	response := getVulnsWithoutTicket(server.URL, "123", "123", "123", "low", maturityLevels, 0, "all", tickets)
 	//fmt.Println("response: ", response)
-	assert.Equal(12, len(response))
+	assert.Equal(3, len(response))
 
 	return
 }

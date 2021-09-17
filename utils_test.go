@@ -213,7 +213,7 @@ func HTTPResponseEndToEnd() *httptest.Server {
 
 		} else if r.RequestURI == "/v1/org/123/project/123/jira-issues" {
 
-			resp = readFixture("./fixtures/existingJiraTickets.json")
+			resp = readFixture("./fixtures/existingJiraTicketsEndToEnd.json")
 
 		} else if r.RequestURI == "/v1/org/123/project/123/aggregated-issues" {
 
@@ -244,7 +244,7 @@ func HTTPResponseEndToEnd() *httptest.Server {
 			resp = readFixture("./fixtures/singleJiraTicketOpeningResponseEndToEndACORN.json")
 
 		} else {
-			fmt.Println("Error while mocking request")
+			fmt.Println("Error while mocking request ", r.URL)
 		}
 
 		w.WriteHeader(http.StatusOK)

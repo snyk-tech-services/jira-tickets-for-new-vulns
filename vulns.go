@@ -83,50 +83,66 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 
 	j, err := jsn.NewJson(responseAggregatedData)
 	var vulnsPerPath map[string]interface{}
+	vulnsWithAllPaths := make(map[string]interface{})
+
 	for _, e := range j.K("issues").Array().Elements() {
-		if _, found := tickets[e.K("id").String().Value]; !found {
-			bytes, err := json.Marshal(e)
-			if err != nil {
-				log.Fatalln(err)
+
+		if e.K("id").String().Value != "" {
+			if tickets[e.K("id").String().Value] != "" {
+				var issueId = e.K("id").String().Value
+
+				bytes, err := json.Marshal(e)
+				if err != nil {
+					log.Fatalln(err)
+				}
+				json.Unmarshal(bytes, &vulnsPerPath)
+
+				ProjectIssuePathData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", token, nil)
+				if err != nil {
+					fmt.Printf("Could not get aggregated data from %s org %s project %s issue %s", endpointAPI, orgID, projectID, issueId)
+					log.Fatalln(err)
+				}
+				ProjectIssuePathDataJson, er := jsn.NewJson(ProjectIssuePathData)
+				if er != nil {
+					fmt.Printf("Json creation failed\n")
+					log.Fatalln(er)
+				}
+				vulnsPerPath["from"] = ProjectIssuePathDataJson.K("paths").Stringify()
+
 			}
-			json.Unmarshal(bytes, &vulnsPerPath)
-			var issueId = e.K("id").String().Value
-			ProjectIssuePathData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", token, nil)
-			if err != nil {
-				fmt.Printf("Could not get aggregated data from %s org %s project %s issue %s", endpointAPI, orgID, projectID, issueId)
-				log.Fatalln(err)
-			}
-			k, er := jsn.NewJson(ProjectIssuePathData)
-			if er != nil {
-				fmt.Printf("Json creation failed\n")
-				log.Fatalln(er)
-			}
-			vulnsPerPath["from"] = k.K("paths").Stringify()
 		}
+		vulnsWithAllPaths[e.K("id").String().Value] = vulnsPerPath
 	}
-	for _, e := range j.K("issues").K("licenses").Array().Elements() {
-		if _, found := tickets[e.K("id").String().Value]; !found {
-			bytes, err := json.Marshal(e)
-			if err != nil {
-				log.Fatalln(err)
+	for _, e := range j.K("licenses").Array().Elements() {
+
+		if e.K("id").String().Value != "" {
+			if tickets[e.K("id").String().Value] != "" {
+				var issueId = e.K("id").String().Value
+
+				bytes, err := json.Marshal(e)
+				if err != nil {
+					log.Fatalln(err)
+				}
+				json.Unmarshal(bytes, &vulnsPerPath)
+
+				ProjectIssuePathData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", token, nil)
+				if err != nil {
+					fmt.Printf("Could not get aggregated data from %s org %s project %s issue %s", endpointAPI, orgID, projectID, issueId)
+					log.Fatalln(err)
+				}
+				ProjectIssuePathDataJson, er := jsn.NewJson(ProjectIssuePathData)
+				if er != nil {
+					fmt.Printf("Json creation failed\n")
+					log.Fatalln(er)
+				}
+				vulnsPerPath["from"] = ProjectIssuePathDataJson.K("paths").Stringify()
+
 			}
-			json.Unmarshal(bytes, &vulnsPerPath)
-			var issueId = e.K("id").String().Value
-			ProjectIssuePathData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", token, nil)
-			if err != nil {
-				fmt.Printf("Could not get aggregated data from %s org %s project %s issue %s", endpointAPI, orgID, projectID, issueId)
-				log.Fatalln(err)
-			}
-			k, er := jsn.NewJson(ProjectIssuePathData)
-			if er != nil {
-				fmt.Printf("Json creation failed\n")
-				log.Fatalln(er)
-			}
-			vulnsPerPath["from"] = k.K("paths").Stringify()
 		}
+		vulnsWithAllPaths[e.K("id").String().Value] = vulnsPerPath
 	}
 
-	return vulnsPerPath
+	return vulnsWithAllPaths
 }
 
 func consolidateAllPathsIntoSingleVuln(vulnsPerPath []interface{}) map[string]interface{} {
