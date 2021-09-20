@@ -148,7 +148,6 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 
 	for _, vulnForJira := range vulnsForJira {
 		RequestFailed = false
-
 		responseDataAggregatedByte, err := openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
 
 		if err != nil {
