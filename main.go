@@ -74,12 +74,14 @@ Open Source, so feel free to contribute !
 	}
 
 	maturityFilter := createMaturityFilter(strings.Split(maturityFilterString, ","))
+	numberIssueCreated := 0
+	notCreatedJiraIssues := ""
+	jiraResponse := ""
 
 	for _, project := range projectIDs {
 
 		fmt.Println("1/4 - Retrieving Project", project)
 		projectInfo := getProjectDetails(endpointAPI, orgID, project, apiToken)
-		fmt.Println(projectInfo)
 
 		fmt.Println("2/4 - Getting Existing JIRA tickets")
 		tickets := getJiraTickets(endpointAPI, orgID, project, apiToken)
@@ -91,15 +93,12 @@ Open Source, so feel free to contribute !
 			fmt.Println("4/4 - No new JIRA ticket required")
 		} else {
 			fmt.Println("4/4 - Opening JIRA Tickets")
-			numberIssueCreated, jiraResponse, notCreatedJiraIssues, err := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
-			if err != nil {
-				fmt.Println("Failure, Failure to create ticket(s)")
-				log.Fatal(err)
-			}
+			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
+
 			if jiraResponse == "" {
 				fmt.Println("Failure to create a ticket(s)")
 			}
-			fmt.Printf("-----Summary----- \n Number of tickets created: %d\n List of issueId for which the ticket could not be created: %s\n", numberIssueCreated, notCreatedJiraIssues)
+			fmt.Printf("-----Summary----- \n Number of tickets created: %d for project ID: %s\n List of issueId for which the ticket could not be created: %s\n", numberIssueCreated, project, notCreatedJiraIssues)
 		}
 	}
 
