@@ -112,19 +112,22 @@ func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectI
 		return nil, errors.New("Failure, Failure to create ticket(s)")
 	}
 
-	responseData, er := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfoId+"/issue/"+vulnID+"/jira-issue", token, ticket)
+	if len(vulnID) != 0 {
+		var er error
+		responseData, er := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfoId+"/issue/"+vulnID+"/jira-issue", token, ticket)
 
-	if er != nil {
-		fmt.Println("Request failed")
-		return nil, errors.New("Failure, Failure to create ticket(s)")
+		if er != nil {
+			fmt.Println("Request failed")
+			return nil, errors.New("Failure, Failure to create ticket(s)")
+		}
+
+		if bytes.Equal(responseData, nil) {
+			fmt.Printf("Request response from %s is empty\n", endpointAPI)
+			return nil, errors.New("Failure, Failure to create ticket(s)")
+		}
+		return responseData, nil
 	}
-
-	if bytes.Equal(responseData, nil) {
-		fmt.Printf("Request response from %s is empty\n", endpointAPI)
-		return nil, errors.New("Failure, Failure to create ticket(s)")
-	}
-
-	return responseData, er
+	return nil, errors.New("Failure to create ticket, vuln ID is empty")
 }
 
 func displayErrorForIssue(vulnForJira interface{}, endpointAPI string) string {
@@ -135,7 +138,7 @@ func displayErrorForIssue(vulnForJira interface{}, endpointAPI string) string {
 	return vulnID + "\n"
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) (int, string, string, error) {
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) (int, string, string) {
 	fullResponseDataAggregated := ""
 	fullListNotCreatedIssue := ""
 	RequestFailed := false
@@ -177,8 +180,7 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 
 	if fullResponseDataAggregated == "" {
 		fmt.Printf("Request response from %s is empty\n", endpointAPI)
-		return issueCreated, fullResponseDataAggregated, fullListNotCreatedIssue, errors.New("Failure, Failure to create ticket(s)")
 	}
 
-	return issueCreated, fullResponseDataAggregated, fullListNotCreatedIssue, nil
+	return issueCreated, fullResponseDataAggregated, fullListNotCreatedIssue
 }
