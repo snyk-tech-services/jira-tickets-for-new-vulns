@@ -31,7 +31,9 @@ func TestEndToEndFunc(t *testing.T) {
 	out, _ := ioutil.ReadAll(r)
 	os.Stdout = rescueStdout
 
-	compare := strings.Contains(string(out), "Number of tickets created: 12")
+	println(string(out))
+
+	compare := strings.Contains(string(out), "Number of tickets created: 3")
 
 	assert.Equal(t, compare, true)
 

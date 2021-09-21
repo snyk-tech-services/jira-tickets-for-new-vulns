@@ -25,13 +25,11 @@ func TestOpenJiraTicketFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
-	if err != nil {
-		panic(err)
-	}
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
+
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
-	fmt.Println(NumberIssueCreated)
+	fmt.Println("NumberIssueCreated :", NumberIssueCreated)
 
 	return
 }
@@ -48,10 +46,8 @@ func TestOpenJiraTicketErrorAndRetryFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
-	if err != nil {
-		panic(err)
-	}
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
+
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
 	fmt.Println(NumberIssueCreated)
@@ -72,10 +68,7 @@ func TestOpenJiraMultipleTicketsErrorAndRetryFunc(t *testing.T) {
 		panic(err)
 	}
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
-	if err != nil {
-		panic(err)
-	}
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
 
 	assert.Equal("", NotCreatedIssueId)
 	fmt.Println(NumberIssueCreated)
@@ -113,10 +106,8 @@ func TestOpenJiraMultipleTicketsErrorAndRetryAndFailFunc(t *testing.T) {
 		panic(err)
 	}
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
-	if err != nil {
-		panic(err)
-	}
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
+
 	assert.Equal(string(readFixture("./fixtures/results/NotCreatedIssueIdSingle")), NotCreatedIssueId)
 	fmt.Println(NumberIssueCreated)
 
@@ -154,7 +145,7 @@ func TestOpenJiraMultipleTicketsFailureFunc(t *testing.T) {
 		panic(err)
 	}
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, true)
 
 	fmt.Println(NumberIssueCreated)
 

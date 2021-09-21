@@ -23,11 +23,11 @@ func TestGetVulnsWithoutTicketFunc(t *testing.T) {
 	var tickets map[string]string
 	tickets = make(map[string]string)
 	// Simulate an existing ticket for that vuln
-	tickets["npm:growl:20160721"] = "FPI-796"
+	tickets["SNYK-JS-PACRESOLVER-1564857"] = "FPI-794"
 	var maturityLevels []string
 	response := getVulnsWithoutTicket(server.URL, "123", "123", "123", "low", maturityLevels, 0, "all", tickets)
-	//fmt.Println("response: ", response)
-	assert.Equal(12, len(response))
+	//fmt.Println(response)
+	assert.Equal(2, len(response))
 
 	return
 }

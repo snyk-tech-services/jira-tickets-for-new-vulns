@@ -244,7 +244,7 @@ func HTTPResponseEndToEnd() *httptest.Server {
 			resp = readFixture("./fixtures/singleJiraTicketOpeningResponseEndToEndACORN.json")
 
 		} else {
-			fmt.Println("Error while mocking request")
+			fmt.Println("Error while mocking request", r.URL)
 		}
 
 		w.WriteHeader(http.StatusOK)
