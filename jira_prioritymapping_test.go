@@ -20,7 +20,7 @@ func TestOpenJiraTicketWithPriorityMappingFunc(t *testing.T) {
 
 	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
 	vulnsForJira := make(map[string]interface{})
-	err := json.Unmarshal(readFixture("./fixtures/vulnsForJira.json"), &vulnsForJira)
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPath.json"), &vulnsForJira)
 	if err != nil {
 		panic(err)
 	}
@@ -45,7 +45,7 @@ func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 
 	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
 	vulnsForJira := make(map[string]interface{})
-	err := json.Unmarshal(readFixture("./fixtures/vulnsForJira.json"), &vulnsForJira)
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPath.json"), &vulnsForJira)
 	if err != nil {
 		panic(err)
 	}
@@ -70,7 +70,7 @@ func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 
 	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
 	vulnsForJira := make(map[string]interface{})
-	err := json.Unmarshal(readFixture("./fixtures/vulnsForJira.json"), &vulnsForJira)
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPath.json"), &vulnsForJira)
 	if err != nil {
 		panic(err)
 	}

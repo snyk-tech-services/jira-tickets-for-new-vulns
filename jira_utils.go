@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -12,22 +11,33 @@ import (
 
 func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 
+	issueData := jsonVuln.K("issueData")
+
 	paths := "\n**Impacted Paths:**\n"
+
 	for count, e := range jsonVuln.K("from").Array().Elements() {
-		var arr []string
-		_ = json.Unmarshal([]byte(e.Stringify()), &arr)
-		paths += "- " + strings.Join(arr, " => ") + "\n"
+
+		newPathArray := make([]string, len(e.Array().Elements()))
+		for count_, j := range e.Array().Elements() {
+
+			name := fmt.Sprintf("%s@%s", j.K("name").Stringify(), j.K("version").Stringify())
+
+			newPathArray[count_] = name
+		}
+
+		paths += "- " + strings.Join(newPathArray, " => ") + "\n"
 
 		if count > 10 {
 			paths += "- ... [" + fmt.Sprintf("%d", len(jsonVuln.K("from").Array().Elements())-count) + " more paths](" + projectInfo.K("browseUrl").String().Value + ")"
 			break
 		}
 	}
-	snykBreadcrumbs := "\n[See this issue on Snyk](" + projectInfo.K("browseUrl").String().Value + ")\n"
-	moreAboutThisIssue := "\n\n[More About this issue](" + jsonVuln.K("url").String().Value + ")\n"
-	descriptionFromIssue := jsonVuln.K("description").String().Value
 
-	if descriptionFromIssue == "" && jsonVuln.K("type").String().Value == "license" {
+	snykBreadcrumbs := "\n[See this issue on Snyk](" + projectInfo.K("browseUrl").String().Value + ")\n"
+	moreAboutThisIssue := "\n\n[More About this issue](" + issueData.K("url").String().Value + ")\n"
+	descriptionFromIssue := ""
+
+	if issueData.K("type").String().Value == "license" {
 		descriptionFromIssue = `This dependency is infriguing your organization license policy. 
 								Refer to the Reporting tab for possible instructions from your legal team.`
 	}
@@ -41,13 +51,12 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 
 	jiraTicket := &JiraIssue{
 		Field{
-			Summary:     projectInfo.K("name").String().Value + " - " + jsonVuln.K("title").String().Value,
+			Summary:     projectInfo.K("name").String().Value + " - " + issueData.K("title").String().Value,
 			Description: descriptionBody,
 		},
 	}
 
 	return jiraTicket
-
 }
 
 func markdownToConfluenceWiki(textToConvert string) string {
