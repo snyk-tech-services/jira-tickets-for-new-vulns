@@ -72,6 +72,7 @@ func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectI
 
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
 	vulnID := jsonVuln.K("id").String().Value
+
 	jiraTicket := formatJiraTicket(jsonVuln, projectInfo)
 
 	jiraTicket.Fields.Projects.ID = jiraProjectID
@@ -89,16 +90,16 @@ func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectI
 	}
 	if priorityIsSeverity {
 		var priority PriorityType
-		jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN", strings.ToUpper(jsonVuln.K("severity").String().Value))
+		jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN", strings.ToUpper(jsonVuln.K("issueData").K("severity").String().Value))
 		val, present := os.LookupEnv(jiraMappingEnvVarName)
 		if present {
 			priority.Name = val
 		} else {
-			if jsonVuln.K("severity").String().Value == "critical" {
+			if jsonVuln.K("issueData").K("severity").String().Value == "critical" {
 				priority.Name = "Highest"
 			} else {
 
-				priority.Name = strings.Title(jsonVuln.K("severity").String().Value)
+				priority.Name = strings.Title(jsonVuln.K("issueData").K("severity").String().Value)
 
 			}
 

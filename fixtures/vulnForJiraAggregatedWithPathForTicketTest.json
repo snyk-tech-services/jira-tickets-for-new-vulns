@@ -1,0 +1,52 @@
+{
+    "id": "SNYK-JS-MINIMIST-559764",
+    "issueType": "vuln",
+    "pkgName": "pac-resolver",
+    "pkgVersions": ["3.0.0"],
+    "priorityScore": 798,
+    "priority": {
+      "score": 798,
+      "factors": [
+        {
+          "name": "exploitMaturity",
+          "description": "Proof of Concept exploit"
+        },
+        { "name": "isFresh", "description": "Recently disclosed" },
+        { "name": "isFixable", "description": "Has a fix available" },
+        { "name": "cvssScore", "description": "CVSS 8.1" }
+      ]
+    },
+    "issueData": {
+      "id": "SNYK-JS-MINIMIST-559764",
+      "title": "Remote Code Execution (RCE)",
+      "severity": "medium",
+      "url": "https://snyk.io/vuln/SNYK-JS-MINIMIST-559764",
+      "identifiers": { "CVE": ["CVE-2021-23406"], "CWE": ["CWE-94"] },
+      "credit": ["Tim Perry"],
+      "exploitMaturity": "proof-of-concept",
+      "semver": { "vulnerable": ["<5.0.0"] },
+      "publicationTime": "2021-08-22T13:26:31.060241Z",
+      "disclosureTime": "2021-05-30T13:37:37Z",
+      "CVSSv3": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H/E:P",
+      "cvssScore": 8.1,
+      "language": "js",
+      "patches": [],
+      "nearestFixedInVersion": ""
+    },
+    "isPatched": false,
+    "isIgnored": false,
+    "fixInfo": {
+      "isUpgradable": true,
+      "isPinnable": false,
+      "isPatchable": false,
+      "isPartiallyFixable": true,
+      "nearestFixedInVersion": "",
+      "fixedIn": ["5.0.0"]
+    },
+    "links": {
+      "paths": "https://app.snyk.io/api/v1/org/f6999a85-c519-4ee7-ae55-3269b9bfa4b6/project/9d64b8a9-883e-42f9-abd3-66b274b66a4c/history/1c2130c4-82a5-4130-9632-fcbf204a8267/issue/SNYK-JS-MINIMIST-559764/paths"
+    },
+    "from" : [[{"name":"snyk","version":"1.228.3"},{"name":"proxy-agent","version":"3.1.0"},{"name":"pac-proxy-agent","version":"3.0.0"},{"name":"pac-resolver","version":"3.0.0"}]]
+  }
+
+
