@@ -38,7 +38,7 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 
 	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
 	vulnsForJira := make(map[string]interface{})
-	err := json.Unmarshal(readFixture("./fixtures/vulnsForJira.json"), &vulnsForJira)
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPath.json"), &vulnsForJira)
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +63,11 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 
 	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
 	vulnsForJira := make(map[string]interface{})
+<<<<<<< HEAD
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPath.json"), &vulnsForJira)
+=======
 	err := json.Unmarshal(readFixture("./fixtures/vulnsForJira.json"), &vulnsForJira)
+>>>>>>> master
 	if err != nil {
 		panic(err)
 	}
