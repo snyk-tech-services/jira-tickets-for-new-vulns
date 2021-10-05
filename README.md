@@ -18,16 +18,13 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
     -jiraProjectID=<12345>                  // Jira project ID the tickets will be opened against
 ```
 
-```
 ## Example (Using MacOS and Opening Task tickets in Jira): 
 1. Download the .bin
 2. Run the script using the following command
 ./snyk-jira-sync-macos --orgID <Grab from Snyk Settings> --projectID <Grab from Snyk Project URL> --token <Snyk API Token> --jiraProjectID <from jira> --jiraTicketType <Grab Ticket Type from Jira>
 
-Note: jiraProjectID is an integer value that can be found by going to https://<your-domain.atlassian.net>/rest/api/3/project and grabbing the id value
- 
-and jiraTicketType is dependent on the customer Jira Ticket type
-
+Note: jiraProjectID is an integer value that can be found by going to https://<your-domain.atlassian.net>/rest/api/3/project and grabbing the id value and jiraTicketType is dependent on the customer Jira Ticket type
+```
 
 ### Extended options
 ```
