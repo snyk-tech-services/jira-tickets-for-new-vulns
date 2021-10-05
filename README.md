@@ -19,6 +19,7 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
 ```
 
 ## Example (Using MacOS and Opening Task tickets in Jira): 
+```
 1. Download the .bin
 2. Run the script using the following command
 ./snyk-jira-sync-macos --orgID <Grab from Snyk Settings> --projectID <Grab from Snyk Project URL> --token <Snyk API Token> --jiraProjectID <from jira> --jiraTicketType <Grab Ticket Type from Jira>
@@ -27,7 +28,7 @@ Note: jiraProjectID is an integer value that can be found by going to https://<y
 ```
 
 ### Extended options
-
+```
 ./snyk-jira-sync-<yourplatform> 
     -orgID=<SNYK_ORG_ID>                                                // Can find it under settings
     -projectID=<SNYK_PROJECT_ID>                                        // Optional. Syncs all projects in Organization if not provided.
@@ -43,7 +44,7 @@ Note: jiraProjectID is an integer value that can be found by going to https://<y
     -priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
     -labels=<IssueLabel1>,IssueLabel2                                   // Optional. Set JIRA ticket labels
     -priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold
-
+```
 
 ### Priority is Severity
 Option to get the JIRA ticket priority set based on issue severity.
