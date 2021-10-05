@@ -7,7 +7,8 @@ Aimed to be executed at regular interval or with a trigger of your choice (webho
 [![CircleCI](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns.svg?style=svg)](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns)
 
 ## Installation
-Use the binaries from [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
+Use the appropriate binary from [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
+
 
 ## Usage - Quick start
 ```
@@ -16,6 +17,18 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -token=<API Token>                      // Snyk API Token. Service accounts work.
     -jiraProjectID=<12345>                  // Jira project ID the tickets will be opened against
 ```
+
+```
+## Example (Using MacOS and Opening Task tickets in Jira): 
+1. Download the .bin
+2. Run the script using the following command
+./snyk-jira-sync-macos --orgID <Grab from Snyk Settings> --projectID <Grab from Snyk Project URL> --token <Snyk API Token> --jiraProjectID <from jira> --jiraTicketType <Grab Ticket Type from Jira>
+
+Note: jiraProjectID is an integer value that can be found by going to https://<your-domain.atlassian.net>/rest/api/3/project and grabbing the id value
+ 
+and jiraTicketType is dependent on the customer Jira Ticket type
+
+
 ### Extended options
 ```
 ./snyk-jira-sync-<yourplatform> 
