@@ -17,14 +17,25 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
     -token=<API Token>                      // Snyk API Token. Service accounts work.
     -jiraProjectID=<12345>                  // Jira project ID the tickets will be opened against
 ```
+## Notes:
+```
+- To find the orgID, go to Snyk -> Settings
 
-## Example (Using MacOS and Opening Task tickets in Jira): 
+- To find the projectID go to Snyk -> Select Project -> Grab the UUID from the URL
+
+- Snyk API token -> You should already have this but if you do not, go to Snyk -> Settings -> Service Accounts -> Create 
+
+- jiraProjectID -> This is from Jira and is a UUID. To find this, go to https://your-domain.atlassian.net/rest/api/3/project and under the ID key, you will see the ProjectID
+
+- jiraTicketType -> This is from Jira and can be found in Projects -> Project Settings -> Issue types
+```
+
+## Example (Using MacOS, an orgID of 6ad83e4e-099b-4dc4-ac2d-4b449ef61f40, a projectID of 86efd136-30e9-4546-94c1-5e7fc7b67574, a jiraProjectID of 10000 and Opening Task tickets in Jira): 
 ```
 1. Download the .bin
 2. Run the script using the following command
-./snyk-jira-sync-macos --orgID <Grab from Snyk Settings> --projectID <Grab from Snyk Project URL> --token <Snyk API Token> --jiraProjectID <from jira> --jiraTicketType <Grab Ticket Type from Jira>
+./snyk-jira-sync-macos --orgID  6ad83e4e-099b-4dc4-ac2d-4b449ef61f40 --projectID 86efd136-30e9-4546-94c1-5e7fc7b67574 --token <Snyk API Token> --jiraProjectID 10000 --jiraTicketType Task
 
-Note: jiraProjectID is an integer value that can be found by going to https://<your-domain.atlassian.net>/rest/api/3/project and grabbing the id value and jiraTicketType is dependent on the customer Jira Ticket type
 ```
 
 ### Extended options
