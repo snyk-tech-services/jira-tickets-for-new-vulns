@@ -25,12 +25,12 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
 
 - Snyk API token -> You should already have this but if you do not, go to Snyk -> Settings -> Service Accounts -> Create 
 
-- jiraProjectID -> This is from Jira and is a UUID. To find this, go to https://your-domain.atlassian.net/rest/api/3/project and under the ID key, you will see the ProjectID
+- jiraProjectID -> This is from Jira and is an integer. To find this, go to https://your-domain.atlassian.net/rest/api/3/project and under the ID key, you will see the ProjectID integer
 
 - jiraTicketType -> This is from Jira and can be found in Projects -> Project Settings -> Issue types
 ```
 
-## Example (Using MacOS, an orgID of 6ad83e4e-099b-4dc4-ac2d-4b449ef61f40, a projectID of 86efd136-30e9-4546-94c1-5e7fc7b67574, a jiraProjectID of 10000 and Opening Task tickets in Jira): 
+## Example (Using MacOS, an orgID of 6ad83e4e-099b-4dc4-ac2d-4b449ef61f40, a projectID of 86efd136-30e9-4546-94c1-5e7fc7b67574, a jiraProjectID of 10000 and opening Task tickets in Jira): 
 ```
 1. Download the .bin
 2. Run the script using the following command
