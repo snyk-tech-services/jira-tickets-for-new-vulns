@@ -17,11 +17,11 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
 ## Usage - Quick start
 ```
 ./snyk-jira-sync-<yourplatform> 
-    -orgID=<SNYK_ORG_ID>                    // Can find it under settings
-    -projectID=<Snyk Project ID>            // Can find it in the URL of the project or via API
-    -token=<API Token>                      // Snyk API Token. Service accounts work.
-    -jiraProjectID=<12345>                  // Jira project ID the tickets will be opened against
-    -jiraTicketType=<Ticket Type in jira>   // Find this in Jira
+    --orgID <SNYK_ORG_ID>                    // Can find it under settings
+    --projectID <Snyk Project ID>            // Can find it in the URL of the project or via API
+    --token <API Token>                      // Snyk API Token. Service accounts work.
+    --jiraProjectID <12345>                  // Jira project ID the tickets will be opened against
+    --jiraTicketType <Ticket Type in jira>   // Find this in Jira
 ```
 ## Script Parameters:
 ```
