@@ -1,5 +1,7 @@
 
 ### Sync your Snyk monitored projects and open automatically JIRA tickets for new issues and existing one(s) without ticket already created.
+>Note: 
+Copy the script below and modify the orgID, projectID, token, jiraProjectID, jiraTicketType and pcreate a bash file
 Cron it every X minutes/hours and fix the issues.
 Aimed to be executed at regular interval or with a trigger of your choice (webhooks).
 
@@ -14,8 +16,10 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
 ```
 ./snyk-jira-sync-<yourplatform> 
     -orgID=<SNYK_ORG_ID>                    // Can find it under settings
+    -projectID=<Snyk Project ID>            // Can find it in the URL of the project or via API
     -token=<API Token>                      // Snyk API Token. Service accounts work.
     -jiraProjectID=<12345>                  // Jira project ID the tickets will be opened against
+    -jiraTicketType=<Ticket Type in jira>   // Find this in Jira
 ```
 ## Notes:
 ```
