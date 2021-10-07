@@ -27,7 +27,7 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
 ```
 - To find the orgID, go to Snyk -> Settings
 
-- To find the projectID go to Snyk -> Select Project -> Grab the UUID from the URL
+- To find the projectID go to Snyk -> Select the desired Project -> Grab the UUID from the URL
 
 - Snyk API token -> You should already have this but if you do not, go to Snyk -> Settings -> Service Accounts -> Create 
 
