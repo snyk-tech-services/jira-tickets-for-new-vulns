@@ -23,7 +23,7 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
     -jiraProjectID=<12345>                  // Jira project ID the tickets will be opened against
     -jiraTicketType=<Ticket Type in jira>   // Find this in Jira
 ```
-## Notes:
+## Script Parameters:
 ```
 - To find the orgID, go to Snyk -> Settings
 
