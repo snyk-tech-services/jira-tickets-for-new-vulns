@@ -34,7 +34,8 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
 >Note: in this example, I am using macOS, an orgID of 6ad83e4e-099b-4dc4-ac2d-4b449ef61f40, a projectID of 86efd136-30e9-4546-94c1-5e7fc7b67574, a jiraProjectID of 10000 and opening Task tickets in Jira: 
 
 1. Download the macOS .bin
-2. Run the script using the following command /
+2. Run the script using the following command 
+
 ```./snyk-jira-sync-macos --orgID  6ad83e4e-099b-4dc4-ac2d-4b449ef61f40 --projectID 86efd136-30e9-4546-94c1-5e7fc7b67574 --token <Snyk API Token> --jiraProjectID 10000 --jiraTicketType Task```
 
 ### Extended options
