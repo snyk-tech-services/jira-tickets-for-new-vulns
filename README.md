@@ -2,7 +2,9 @@
 ### Sync your Snyk monitored projects and open automatically JIRA tickets for new issues and existing one(s) without ticket already created.
 >Note: 
 Copy the script below and modify the orgID, projectID, token, jiraProjectID, jiraTicketType and pcreate a bash file
+
 Cron it every X minutes/hours and fix the issues.
+
 Aimed to be executed at regular interval or with a trigger of your choice (webhooks).
 
 
