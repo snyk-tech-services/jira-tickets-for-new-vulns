@@ -38,7 +38,8 @@ Open Source, so feel free to contribute !
 	severityPtr := flag.String("severity", "low", "Optional. Your severity threshold")
 	maturityFilterPtr := flag.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
 	typePtr := flag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
-	assigneeIDPtr := flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to")
+	assigneeNamePtr := flag.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
+	assigneeIDPtr := flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
 	labelsPtr := flag.String("labels", "", "Optional. Jira ticket labels")
 	priorityIsSeverityPtr := flag.Bool("priorityIsSeverity", false, "Use issue severity as priority")
 	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
@@ -54,6 +55,7 @@ Open Source, so feel free to contribute !
 	var issueType string = *typePtr
 	var maturityFilterString string = *maturityFilterPtr
 	var assigneeID string = *assigneeIDPtr
+	var assigneeName string = *assigneeNamePtr
 	var labels string = *labelsPtr
 	var priorityIsSeverity bool = *priorityIsSeverityPtr
 	var priorityScoreThreshold int = *priorityScorePtr
@@ -71,6 +73,10 @@ Open Source, so feel free to contribute !
 
 	if priorityScoreThreshold < 0 || priorityScoreThreshold > 1000 {
 		log.Fatalf("INPUT ERROR: %d is not a valid score. Must be between 0-1000.", priorityScoreThreshold)
+	}
+
+	if assigneeName != "" && assigneeID != "" {
+		log.Fatalf(("INPUT ERROR: You passed both assigneeID and assigneeName in parameters\n Please, Use assigneeID OR assigneeName, not both"))
 	}
 
 	maturityFilter := createMaturityFilter(strings.Split(maturityFilterString, ","))
@@ -93,7 +99,7 @@ Open Source, so feel free to contribute !
 			fmt.Println("4/4 - No new JIRA ticket required")
 		} else {
 			fmt.Println("4/4 - Opening JIRA Tickets")
-			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
+			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
 
 			if jiraResponse == "" {
 				fmt.Println("Failure to create a ticket(s)")
