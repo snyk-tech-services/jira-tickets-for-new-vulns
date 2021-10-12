@@ -29,7 +29,8 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -severity=<critical|high|medium|low>                                // Optional. Severity threshold to open tickets for. Defaults to low.
     -maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas
     -type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.
-    -assigneeId=<123abc456def789>                                       // Optional.  Jira ID of user to assign tickets to.
+    -assigneeId=<123abc456def789>                                       // Optional.  Jira ID of user to assign tickets to. Note: Do not use assigneeName and assigneeId at the same time
+    -assigneeName=<AccountName>                                         // Optional.  Jira Name of user to assign tickets to. Note: Do not use assigneeName and assigneeId at the same time
     -priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
     -labels=<IssueLabel1>,IssueLabel2                                   // Optional. Set JIRA ticket labels
     -priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold
