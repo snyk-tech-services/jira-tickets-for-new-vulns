@@ -38,7 +38,7 @@ Open Source, so feel free to contribute !
 	severityPtr := flag.String("severity", "low", "Optional. Your severity threshold")
 	maturityFilterPtr := flag.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
 	typePtr := flag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
-	assigneeIDPtr := flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to")
+	assigneeNamePtr := flag.String("assigneeName", "", "Optional. The Jira user name to assign issues to")
 	labelsPtr := flag.String("labels", "", "Optional. Jira ticket labels")
 	priorityIsSeverityPtr := flag.Bool("priorityIsSeverity", false, "Use issue severity as priority")
 	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
@@ -53,7 +53,7 @@ Open Source, so feel free to contribute !
 	var severity string = *severityPtr
 	var issueType string = *typePtr
 	var maturityFilterString string = *maturityFilterPtr
-	var assigneeID string = *assigneeIDPtr
+	var assigneeName string = *assigneeNamePtr
 	var labels string = *labelsPtr
 	var priorityIsSeverity bool = *priorityIsSeverityPtr
 	var priorityScoreThreshold int = *priorityScorePtr
@@ -74,12 +74,14 @@ Open Source, so feel free to contribute !
 	}
 
 	maturityFilter := createMaturityFilter(strings.Split(maturityFilterString, ","))
+	numberIssueCreated := 0
+	notCreatedJiraIssues := ""
+	jiraResponse := ""
 
 	for _, project := range projectIDs {
 
 		fmt.Println("1/4 - Retrieving Project", project)
 		projectInfo := getProjectDetails(endpointAPI, orgID, project, apiToken)
-		fmt.Println(projectInfo)
 
 		fmt.Println("2/4 - Getting Existing JIRA tickets")
 		tickets := getJiraTickets(endpointAPI, orgID, project, apiToken)
@@ -91,15 +93,12 @@ Open Source, so feel free to contribute !
 			fmt.Println("4/4 - No new JIRA ticket required")
 		} else {
 			fmt.Println("4/4 - Opening JIRA Tickets")
-			numberIssueCreated, jiraResponse, notCreatedJiraIssues, err := openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
-			if err != nil {
-				fmt.Println("Failure, Failure to create ticket(s)")
-				log.Fatal(err)
-			}
+			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeName, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
+
 			if jiraResponse == "" {
 				fmt.Println("Failure to create a ticket(s)")
 			}
-			fmt.Printf("-----Summary----- \n Number of tickets created: %d\n List of issueId for which the ticket could not be created: %s\n", numberIssueCreated, notCreatedJiraIssues)
+			fmt.Printf("-----Summary----- \n Number of tickets created: %d for project ID: %s\n List of issueId for which the ticket could not be created: %s\n", numberIssueCreated, project, notCreatedJiraIssues)
 		}
 	}
 

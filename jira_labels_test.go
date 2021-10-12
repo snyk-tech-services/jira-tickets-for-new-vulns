@@ -38,14 +38,12 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 
 	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
 	vulnsForJira := make(map[string]interface{})
-	err := json.Unmarshal(readFixture("./fixtures/vulnsForJira.json"), &vulnsForJira)
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPath.json"), &vulnsForJira)
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "Label1,Label2", projectInfo, vulnsForJira, false)
-	if err != nil {
-		panic(err)
-	}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "Label1,Label2", projectInfo, vulnsForJira, false)
+
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
@@ -65,14 +63,12 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 
 	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
 	vulnsForJira := make(map[string]interface{})
-	err := json.Unmarshal(readFixture("./fixtures/vulnsForJira.json"), &vulnsForJira)
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPath.json"), &vulnsForJira)
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, err := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
-	if err != nil {
-		panic(err)
-	}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
+
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)

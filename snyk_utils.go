@@ -38,10 +38,12 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 	} else if response.StatusCode == 422 {
 		fmt.Printf("Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
 		fmt.Printf("Details : %s\n", string(responseData))
+		fmt.Printf("Requests body : %s\n", string(body))
 		return nil, errors.New("Request failed")
 	} else if response.StatusCode > 400 {
 		fmt.Printf("Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
 		fmt.Printf("Details : %s\n", string(responseData))
+		fmt.Printf("Requests body : %s\n", string(body))
 		return nil, errors.New("Request failed")
 	}
 
