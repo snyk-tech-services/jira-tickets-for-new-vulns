@@ -42,7 +42,7 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "Label1,Label2", projectInfo, vulnsForJira, false)
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", "Label1,Label2", projectInfo, vulnsForJira, false)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -67,7 +67,7 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", projectInfo, vulnsForJira, false)
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "Bug", "", "", "", projectInfo, vulnsForJira, false)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
