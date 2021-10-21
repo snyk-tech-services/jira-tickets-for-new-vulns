@@ -14,7 +14,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
 ./snyk-jira-sync-<yourplatform> 
     -orgID=<SNYK_ORG_ID>                    // Can find it under settings
     -token=<API Token>                      // Snyk API Token. Service accounts work.
-    -jiraProjectID=<12345>                  // Jira project ID the tickets will be opened against
+    -jiraProjectKey=<Key>                  // Jira project Key the tickets will be opened against
 ```
 ### Extended options
 ```
@@ -25,6 +25,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -api=<API endpoint>                                                 // Optional. Set to https://<instance>/api for private instances
     -token=<API Token>                                                  // Snyk API Token. Service accounts work.
     -jiraProjectID=<12345>                                              // Jira project ID the tickets will be opened against
+    -jiraProjectKey=<KEY>                                               // Jira project Key the tickets will be opened against
     -jiraTicketType=<Task|Bug|....>                                     // Optional. Type of ticket to open. Defaults to Bug
     -severity=<critical|high|medium|low>                                // Optional. Severity threshold to open tickets for. Defaults to low.
     -maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas

@@ -39,9 +39,10 @@ type Assignee struct {
 	AccountId string `json:"accountId,omitempty"`
 }
 
-// Project is the JIRA project ID
+// Project is the JIRA project ID or Key
 type Project struct {
-	ID string `json:"id"`
+	ID  string `json:"id,omitempty"`
+	Key string `json:"key,omitempty"`
 }
 
 // IssueType is type of Bug|Epic|Task
@@ -70,14 +71,19 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 	return tickRefs
 }
 
-func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool) ([]byte, error) {
+func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool) ([]byte, error) {
 
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
 	vulnID := jsonVuln.K("id").String().Value
 
 	jiraTicket := formatJiraTicket(jsonVuln, projectInfo)
 
-	jiraTicket.Fields.Projects.ID = jiraProjectID
+	if jiraProjectKey != "" {
+		jiraTicket.Fields.Projects.Key = jiraProjectKey
+	} else if jiraProjectID != "" {
+		jiraTicket.Fields.Projects.ID = jiraProjectID
+	}
+
 	jiraTicket.Fields.IssueTypes.Name = jiraTicketType
 
 	projectInfoId := projectInfo.K("id").String().Value
@@ -151,7 +157,7 @@ func displayErrorForIssue(vulnForJira interface{}, endpointAPI string) string {
 	return vulnID + "\n"
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) (int, string, string) {
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) (int, string, string) {
 	fullResponseDataAggregated := ""
 	fullListNotCreatedIssue := ""
 	RequestFailed := false
@@ -160,7 +166,7 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 
 	for _, vulnForJira := range vulnsForJira {
 		RequestFailed = false
-		responseDataAggregatedByte, err := openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
+		responseDataAggregatedByte, err := openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraProjectKey, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
 
 		if err != nil {
 			fmt.Printf("Request to %s failed\n", endpointAPI)
@@ -171,7 +177,7 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 			for numberOfRetries := 0; numberOfRetries < MaxNumberOfRetry; numberOfRetries++ {
 				fmt.Println("Retrying with priorityIsSeverity set to false, max retry ", MaxNumberOfRetry)
 				priorityIsSeverity = false
-				responseDataAggregatedByte, err = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
+				responseDataAggregatedByte, err = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraProjectKey, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
 				if err != nil {
 					fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
 				} else {

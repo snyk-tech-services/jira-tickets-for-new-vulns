@@ -33,7 +33,8 @@ Open Source, so feel free to contribute !
 	projectIDPtr := flag.String("projectID", "", "Optional. Your Project ID. Will sync all projects of your organization if not provided")
 	endpointAPIPtr := flag.String("api", "https://snyk.io/api", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
 	apiTokenPtr := flag.String("token", "", "Your API token")
-	jiraProjectIDPtr := flag.String("jiraProjectID", "", "Your JIRA projectID")
+	jiraProjectIDPtr := flag.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
+	jiraProjectKeyPtr := flag.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
 	jiraTicketTypePtr := flag.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
 	severityPtr := flag.String("severity", "low", "Optional. Your severity threshold")
 	maturityFilterPtr := flag.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
@@ -50,6 +51,7 @@ Open Source, so feel free to contribute !
 	var endpointAPI string = *endpointAPIPtr
 	var apiToken string = *apiTokenPtr
 	var jiraProjectID string = *jiraProjectIDPtr
+	var jiraProjectKey string = *jiraProjectKeyPtr
 	var jiraTicketType string = *jiraTicketTypePtr
 	var severity string = *severityPtr
 	var issueType string = *typePtr
@@ -60,7 +62,7 @@ Open Source, so feel free to contribute !
 	var priorityIsSeverity bool = *priorityIsSeverityPtr
 	var priorityScoreThreshold int = *priorityScorePtr
 
-	if len(orgID) == 0 || len(apiToken) == 0 || len(jiraProjectID) == 0 {
+	if len(orgID) == 0 || len(apiToken) == 0 || (len(jiraProjectID) == 0 && len(jiraProjectKey) == 0) {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -69,6 +71,10 @@ Open Source, so feel free to contribute !
 
 	if er != nil {
 		log.Fatal(er)
+	}
+
+	if jiraProjectID != "" && jiraProjectKey != "" {
+		log.Fatalf(("INPUT ERROR: You passed both jiraProjectID and jiraProjectKey in parameters\n Please, Use jiraProjectID OR jiraProjectKey, not both"))
 	}
 
 	if priorityScoreThreshold < 0 || priorityScoreThreshold > 1000 {
@@ -99,7 +105,7 @@ Open Source, so feel free to contribute !
 			fmt.Println("4/4 - No new JIRA ticket required")
 		} else {
 			fmt.Println("4/4 - Opening JIRA Tickets")
-			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
+			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraProjectKey, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
 
 			if jiraResponse == "" {
 				fmt.Println("Failure to create a ticket(s)")
