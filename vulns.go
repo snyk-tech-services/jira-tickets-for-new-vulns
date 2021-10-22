@@ -106,7 +106,7 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 					fmt.Printf("Json creation failed\n")
 					log.Fatalln(er)
 				}
-				vulnsPerPath["from"] = ProjectIssuePathDataJson.K("paths").Stringify()
+				vulnsPerPath["from"] = ProjectIssuePathDataJson.K("paths")
 				marshalledvulnsPerPath, err := json.Marshal(vulnsPerPath)
 				vulnsWithAllPaths[issueId], err = jsn.NewJson(marshalledvulnsPerPath)
 				if er != nil {
@@ -137,7 +137,7 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 					fmt.Printf("Json creation failed\n")
 					log.Fatalln(er)
 				}
-				vulnsPerPath["from"] = ProjectIssuePathDataJson.K("paths").Stringify()
+				vulnsPerPath["from"] = ProjectIssuePathDataJson.K("paths")
 				marshalledvulnsPerPath, err := json.Marshal(vulnsPerPath)
 				vulnsWithAllPaths[issueId], err = jsn.NewJson(marshalledvulnsPerPath)
 				if er != nil {
