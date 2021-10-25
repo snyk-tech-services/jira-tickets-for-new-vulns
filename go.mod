@@ -11,7 +11,7 @@ require (
 	github.com/rogpeppe/godef v1.1.2 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/stretchr/testify v1.4.0
-	github.com/tidwall/pretty v1.1.0 // indirect
+	github.com/tidwall/gjson v1.10.1 // indirect
 	github.com/tidwall/sjson v1.1.5
 	github.com/zhsso/tchannel v0.0.0-20150829002443-a1a640bf2f10
 	golang.org/x/tools/gopls v0.7.1 // indirect
