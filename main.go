@@ -97,6 +97,7 @@ Open Source, so feel free to contribute !
 
 		fmt.Println("2/4 - Getting Existing JIRA tickets")
 		tickets := getJiraTickets(endpointAPI, orgID, project, apiToken)
+		//fmt.Println(tickets)
 
 		fmt.Println("3/4 - Getting vulns")
 		vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, project, apiToken, severity, maturityFilter, priorityScoreThreshold, issueType, tickets)

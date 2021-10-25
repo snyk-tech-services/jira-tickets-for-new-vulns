@@ -131,6 +131,9 @@ func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectI
 		return nil, errors.New("Failure, Failure to create ticket(s)")
 	}
 
+	// TODO: this needs to be a debug
+	//fmt.Println("ticket to be send: ", string(ticket))
+
 	if len(vulnID) != 0 {
 		var er error
 		responseData, er := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfoId+"/issue/"+vulnID+"/jira-issue", token, ticket)
