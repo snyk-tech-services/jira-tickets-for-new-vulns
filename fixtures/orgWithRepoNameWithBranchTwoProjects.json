@@ -1,0 +1,137 @@
+{
+  "org": {
+    "name": "test",
+    "id": "f20676f4-3066-40aa-bdf6-ac28ba609xx3"
+  },
+  "projects": [
+    {
+      "id": "a0e4716d-0f0d-495b-a77b-bd9ba5692xx3",
+      "name": "test/goof(master):package.json",
+      "created": "2021-08-31T02:48:41.669Z",
+      "origin": "gitlab",
+      "type": "npm",
+      "readOnly": false,
+      "testFrequency": "daily",
+      "isMonitored": true,
+      "totalDependencies": 413,
+      "issueCountsBySeverity": {
+        "low": 6,
+        "high": 21,
+        "medium": 27,
+        "critical": 1
+      },
+      "imageTag": "0.0.3",
+      "imagePlatform": "",
+      "imageBaseImage": "",
+      "lastTestedDate": "2021-10-25T02:27:39.477Z",
+      "browseUrl": "https://app.snyk.io/org/test/project/a0e4716d-0f0d-495b-a77b-bd9ba5692xx3",
+      "owner": null,
+      "importingUser": {
+        "id": "822a3565-9b97-4960-ac2b-7313da220xx3",
+        "name": "test",
+        "username": "test",
+        "email": "test@snyk.io"
+      },
+      "tags": [],
+      "attributes": { "criticality": [], "lifecycle": [], "environment": [] },
+      "branch": "master"
+    },
+    {
+      "id": "a0e4716d-0f0d-495b-a77b-bd9ba5692xx3",
+      "name": "test/goof(someBranch):package.json",
+      "created": "2021-08-31T02:48:41.669Z",
+      "origin": "gitlab",
+      "type": "npm",
+      "readOnly": false,
+      "testFrequency": "daily",
+      "isMonitored": true,
+      "totalDependencies": 413,
+      "issueCountsBySeverity": {
+        "low": 6,
+        "high": 21,
+        "medium": 27,
+        "critical": 1
+      },
+      "imageTag": "0.0.3",
+      "imagePlatform": "",
+      "imageBaseImage": "",
+      "lastTestedDate": "2021-10-25T02:27:39.477Z",
+      "browseUrl": "https://app.snyk.io/org/test/project/a0e4716d-0f0d-495b-a77b-bd9ba5692xx3",
+      "owner": null,
+      "importingUser": {
+        "id": "822a3565-9b97-4960-ac2b-7313da220xx3",
+        "name": "test",
+        "username": "test",
+        "email": "test@snyk.io"
+      },
+      "tags": [],
+      "attributes": { "criticality": [], "lifecycle": [], "environment": [] },
+      "branch": "someBranch"
+    },
+    {
+      "id": "e4ccfabd-f57e-4df2-a6c6-5b515b93dxx3",
+      "name": "test/snyk-container-scan-docker:latest",
+      "created": "2021-07-16T01:42:13.470Z",
+      "origin": "docker-hub",
+      "type": "apk",
+      "readOnly": false,
+      "testFrequency": "daily",
+      "isMonitored": true,
+      "totalDependencies": 59,
+      "issueCountsBySeverity": {
+        "low": 2,
+        "high": 17,
+        "medium": 4,
+        "critical": 12
+      },
+      "imageId": "sha256:ed5b47c1d091bfc1c5bb52e0e36c7e3aa2129cf0cbbbf67a76144143c358xxx3",
+      "imageTag": "latest",
+      "imagePlatform": "linux/amd64",
+      "imageBaseImage": "python:3.6.4-alpine3.7",
+      "lastTestedDate": "2021-10-25T00:24:53.091Z",
+      "browseUrl": "https://app.snyk.io/org/antoine-playground/project/e4ccfabd-f57e-4df2-a6c6-5b515b93dxx3",
+      "owner": null,
+      "importingUser": {
+        "id": "822a3565-9b97-4960-ac2b-7313da220xx3",
+        "name": "test",
+        "username": "test",
+        "email": "test@snyk.io"
+      },
+      "tags": [],
+      "attributes": { "criticality": [], "lifecycle": [], "environment": [] },
+      "branch": null
+    },
+    {
+      "id": "73b3af82-c8a3-41d0-b301-082182e05xx3",
+      "name": "test/avast-no-project:package.json",
+      "created": "2021-09-27T09:22:29.043Z",
+      "origin": "github-enterprise",
+      "type": "yarn",
+      "readOnly": false,
+      "testFrequency": "daily",
+      "isMonitored": true,
+      "totalDependencies": 1587,
+      "issueCountsBySeverity": {
+        "low": 1,
+        "high": 25,
+        "medium": 27,
+        "critical": 1
+      },
+      "imageTag": "0.1.0",
+      "imagePlatform": "",
+      "imageBaseImage": "",
+      "lastTestedDate": "2021-10-24T21:20:43.572Z",
+      "browseUrl": "https://app.snyk.io/org/test/project/73b3af82-c8a3-41d0-b301-082182e05xx3",
+      "owner": null,
+      "importingUser": {
+        "id": "822a3565-9b97-4960-ac2b-7313da220xx3",
+        "name": "test",
+        "username": "test",
+        "email": "test@snyk.io"
+      },
+      "tags": [],
+      "attributes": { "criticality": [], "lifecycle": [], "environment": [] },
+      "branch": "master"
+    }
+  ]
+}

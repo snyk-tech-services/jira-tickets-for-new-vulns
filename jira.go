@@ -51,6 +51,7 @@ type IssueType struct {
 }
 
 func getJiraTickets(endpointAPI string, orgID string, projectID string, token string) map[string]string {
+
 	responseData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/jira-issues", token, nil)
 	if err != nil {
 		fmt.Println("Could not get the tickets")

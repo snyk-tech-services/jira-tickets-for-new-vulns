@@ -35,6 +35,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
     -labels=<IssueLabel1>,IssueLabel2                                   // Optional. Set JIRA ticket labels
     -priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold
+    -repoName=<repoName>                                                // Optional. Name of the repository to run jira-ticket-for-new-vuln against. 
 ```
 
 ### Priority is Severity

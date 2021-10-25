@@ -44,6 +44,7 @@ Open Source, so feel free to contribute !
 	labelsPtr := flag.String("labels", "", "Optional. Jira ticket labels")
 	priorityIsSeverityPtr := flag.Bool("priorityIsSeverity", false, "Use issue severity as priority")
 	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
+	repoNamePtr := flag.String("repoName", "", "Optional. The name of the repo you which to open tickets against. Works only for projects created through Snyk git integration")
 	flag.Parse()
 
 	var orgID string = *orgIDPtr
@@ -61,13 +62,15 @@ Open Source, so feel free to contribute !
 	var labels string = *labelsPtr
 	var priorityIsSeverity bool = *priorityIsSeverityPtr
 	var priorityScoreThreshold int = *priorityScorePtr
+	var repoName string = *repoNamePtr
 
 	if len(orgID) == 0 || len(apiToken) == 0 || (len(jiraProjectID) == 0 && len(jiraProjectKey) == 0) {
+		fmt.Println("Error: Missing arguments\r")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
-	projectIDs, er := getProjectsIds(projectID, endpointAPI, orgID, apiToken)
+	projectIDs, er := getProjectsIds(projectID, endpointAPI, orgID, apiToken, repoName)
 
 	if er != nil {
 		log.Fatal(er)
