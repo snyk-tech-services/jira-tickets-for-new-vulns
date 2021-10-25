@@ -33,12 +33,14 @@ Open Source, so feel free to contribute !
 	projectIDPtr := flag.String("projectID", "", "Optional. Your Project ID. Will sync all projects of your organization if not provided")
 	endpointAPIPtr := flag.String("api", "https://snyk.io/api", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
 	apiTokenPtr := flag.String("token", "", "Your API token")
-	jiraProjectIDPtr := flag.String("jiraProjectID", "", "Your JIRA projectID")
+	jiraProjectIDPtr := flag.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
+	jiraProjectKeyPtr := flag.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
 	jiraTicketTypePtr := flag.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
 	severityPtr := flag.String("severity", "low", "Optional. Your severity threshold")
 	maturityFilterPtr := flag.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
 	typePtr := flag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
-	assigneeIDPtr := flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to")
+	assigneeNamePtr := flag.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
+	assigneeIDPtr := flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
 	labelsPtr := flag.String("labels", "", "Optional. Jira ticket labels")
 	priorityIsSeverityPtr := flag.Bool("priorityIsSeverity", false, "Use issue severity as priority")
 	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
@@ -49,16 +51,18 @@ Open Source, so feel free to contribute !
 	var endpointAPI string = *endpointAPIPtr
 	var apiToken string = *apiTokenPtr
 	var jiraProjectID string = *jiraProjectIDPtr
+	var jiraProjectKey string = *jiraProjectKeyPtr
 	var jiraTicketType string = *jiraTicketTypePtr
 	var severity string = *severityPtr
 	var issueType string = *typePtr
 	var maturityFilterString string = *maturityFilterPtr
 	var assigneeID string = *assigneeIDPtr
+	var assigneeName string = *assigneeNamePtr
 	var labels string = *labelsPtr
 	var priorityIsSeverity bool = *priorityIsSeverityPtr
 	var priorityScoreThreshold int = *priorityScorePtr
 
-	if len(orgID) == 0 || len(apiToken) == 0 || len(jiraProjectID) == 0 {
+	if len(orgID) == 0 || len(apiToken) == 0 || (len(jiraProjectID) == 0 && len(jiraProjectKey) == 0) {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -69,8 +73,16 @@ Open Source, so feel free to contribute !
 		log.Fatal(er)
 	}
 
+	if jiraProjectID != "" && jiraProjectKey != "" {
+		log.Fatalf(("INPUT ERROR: You passed both jiraProjectID and jiraProjectKey in parameters\n Please, Use jiraProjectID OR jiraProjectKey, not both"))
+	}
+
 	if priorityScoreThreshold < 0 || priorityScoreThreshold > 1000 {
 		log.Fatalf("INPUT ERROR: %d is not a valid score. Must be between 0-1000.", priorityScoreThreshold)
+	}
+
+	if assigneeName != "" && assigneeID != "" {
+		log.Fatalf(("INPUT ERROR: You passed both assigneeID and assigneeName in parameters\n Please, Use assigneeID OR assigneeName, not both"))
 	}
 
 	maturityFilter := createMaturityFilter(strings.Split(maturityFilterString, ","))
@@ -85,6 +97,7 @@ Open Source, so feel free to contribute !
 
 		fmt.Println("2/4 - Getting Existing JIRA tickets")
 		tickets := getJiraTickets(endpointAPI, orgID, project, apiToken)
+		//fmt.Println(tickets)
 
 		fmt.Println("3/4 - Getting vulns")
 		vulnsPerPath := getVulnsWithoutTicket(endpointAPI, orgID, project, apiToken, severity, maturityFilter, priorityScoreThreshold, issueType, tickets)
@@ -93,7 +106,7 @@ Open Source, so feel free to contribute !
 			fmt.Println("4/4 - No new JIRA ticket required")
 		} else {
 			fmt.Println("4/4 - Opening JIRA Tickets")
-			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraTicketType, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
+			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(endpointAPI, orgID, apiToken, jiraProjectID, jiraProjectKey, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnsPerPath, priorityIsSeverity)
 
 			if jiraResponse == "" {
 				fmt.Println("Failure to create a ticket(s)")
