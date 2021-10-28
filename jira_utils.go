@@ -3,11 +3,31 @@ package main
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	bfconfluence "github.com/kentaro-m/blackfriday-confluence"
 	"github.com/michael-go/go-jsn/jsn"
 	bf "gopkg.in/russross/blackfriday.v2"
 )
+
+/***
+function getDate
+return date: string
+argument: none
+return a string containing date and time
+***/
+func getDate() string {
+
+	now := time.Now().Round(0)
+	y := fmt.Sprint(now.Year()) + "_"
+	m := fmt.Sprint(int(now.Month())) + "_"
+	d := fmt.Sprint(now.Day()) + "_"
+	h := fmt.Sprint(now.Hour()) + "_"
+	min := fmt.Sprint(now.Minute()) + "_"
+	s := fmt.Sprint(now.Second())
+
+	return y + m + d + h + min + s
+}
 
 func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 

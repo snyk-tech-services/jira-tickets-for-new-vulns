@@ -71,7 +71,49 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 	return tickRefs
 }
 
-func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool) ([]byte, error) {
+/***
+function AddToTicketFile
+argument ticket: []byte
+return void
+Add the created ticket to a text file
+	if file doesn't exist => create it and add first ticket
+	else => add new ticket at the end of the file
+File name set by default to listOfTicketCreated_date.log
+***/
+func AddToTicketFile(ticket []byte) {
+
+	// get date
+	date := getDate()
+
+	// Set filename
+	filename := "listOfTicketCreated_" + date + ".log"
+
+	// If the file doesn't exist, create it, or append to the file
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// add ticket
+	_, err = f.Write(ticket)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	f.Close()
+
+	return
+}
+
+/***
+function openJiraTicket
+argument lots
+return responseData: request response from snyk API
+return error: if request or ticket creation failure
+create a ticket for a specific vuln
+	ticket is created and send to snyk jira ticket creation API endpoint
+***/
+func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool, dryRun bool) ([]byte, error) {
 
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
 	vulnID := jsonVuln.K("id").String().Value
@@ -134,7 +176,11 @@ func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectI
 	// TODO: this needs to be a debug
 	//fmt.Println("ticket to be send: ", string(ticket))
 
-	if len(vulnID) != 0 {
+	// Add ticket to the ticketCreated.log file
+	AddToTicketFile(ticket)
+
+	// check that vulnId exist and dryRun is off
+	if len(vulnID) != 0 && !dryRun {
 		var er error
 		responseData, er := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfoId+"/issue/"+vulnID+"/jira-issue", token, ticket)
 
@@ -160,7 +206,7 @@ func displayErrorForIssue(vulnForJira interface{}, endpointAPI string) string {
 	return vulnID + "\n"
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) (int, string, string) {
+func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool, dryRun bool) (int, string, string) {
 	fullResponseDataAggregated := ""
 	fullListNotCreatedIssue := ""
 	RequestFailed := false
@@ -169,38 +215,42 @@ func openJiraTickets(endpointAPI string, orgID string, token string, jiraProject
 
 	for _, vulnForJira := range vulnsForJira {
 		RequestFailed = false
-		responseDataAggregatedByte, err := openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraProjectKey, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
+		responseDataAggregatedByte, err := openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraProjectKey, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity, dryRun)
 
-		if err != nil {
-			fmt.Printf("Request to %s failed\n", endpointAPI)
-			RequestFailed = true
-		}
+		// Don't need to do all that on dryRun
+		if !dryRun {
+			if err != nil {
+				fmt.Printf("Request to %s failed\n", endpointAPI)
+				RequestFailed = true
+			}
 
-		if RequestFailed == true {
-			for numberOfRetries := 0; numberOfRetries < MaxNumberOfRetry; numberOfRetries++ {
-				fmt.Println("Retrying with priorityIsSeverity set to false, max retry ", MaxNumberOfRetry)
-				priorityIsSeverity = false
-				responseDataAggregatedByte, err = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraProjectKey, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
-				if err != nil {
-					fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
-				} else {
-					RequestFailed = false
-					break
+			if RequestFailed == true {
+				for numberOfRetries := 0; numberOfRetries < MaxNumberOfRetry; numberOfRetries++ {
+					fmt.Println("Retrying with priorityIsSeverity set to false, max retry ", MaxNumberOfRetry)
+					priorityIsSeverity = false
+					responseDataAggregatedByte, err = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraProjectKey, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity, dryRun)
+					if err != nil {
+						fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
+					} else {
+						RequestFailed = false
+						break
+					}
 				}
 			}
-		}
-		if RequestFailed == true && strings.Contains(strings.ToLower(string(responseDataAggregatedByte)), "error") {
-			fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
-			continue
-		}
+			if RequestFailed == true && strings.Contains(strings.ToLower(string(responseDataAggregatedByte)), "error") {
+				fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
+				continue
+			}
 
-		if responseDataAggregatedByte != nil {
-			fullResponseDataAggregated += "\n" + string(responseDataAggregatedByte) + "\n"
-			issueCreated += 1
+			if responseDataAggregatedByte != nil {
+				fullResponseDataAggregated += "\n" + string(responseDataAggregatedByte) + "\n"
+				issueCreated += 1
+			}
 		}
 	}
 
-	if fullResponseDataAggregated == "" {
+	// fullResponseDataAggregated will be empty on dryRun
+	if fullResponseDataAggregated == "" && !dryRun {
 		fmt.Printf("Request response from %s is empty\n", endpointAPI)
 	}
 

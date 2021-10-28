@@ -4,7 +4,10 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/michael-go/go-jsn/jsn"
@@ -25,7 +28,7 @@ func TestOpenJiraTicketFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, false)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, false, false)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
@@ -46,7 +49,7 @@ func TestOpenJiraTicketWithProjectKeyFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "", "Key", "Bug", "", "", "", projectInfo, vulnsForJira, false)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "", "Key", "Bug", "", "", "", projectInfo, vulnsForJira, false, false)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
@@ -67,7 +70,7 @@ func TestOpenJiraTicketErrorAndRetryFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
@@ -89,7 +92,7 @@ func TestOpenJiraMultipleTicketsErrorAndRetryFunc(t *testing.T) {
 		panic(err)
 	}
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
 
 	assert.Equal("", NotCreatedIssueId)
 	fmt.Println(NumberIssueCreated)
@@ -127,7 +130,7 @@ func TestOpenJiraMultipleTicketsErrorAndRetryAndFailFunc(t *testing.T) {
 		panic(err)
 	}
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
 
 	assert.Equal(string(readFixture("./fixtures/results/NotCreatedIssueIdSingle")), NotCreatedIssueId)
 	fmt.Println(NumberIssueCreated)
@@ -166,7 +169,7 @@ func TestOpenJiraMultipleTicketsFailureFunc(t *testing.T) {
 		panic(err)
 	}
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
 
 	fmt.Println(NumberIssueCreated)
 
@@ -204,7 +207,7 @@ func TestOpenJiraTicketWithAssigneeNameFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "admin", "", "", projectInfo, vulnsForJira, false)
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "admin", "", "", projectInfo, vulnsForJira, false, false)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -229,7 +232,7 @@ func TestOpenJiraTicketWithAssigneeIDFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "12345", "", projectInfo, vulnsForJira, false)
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "12345", "", projectInfo, vulnsForJira, false, false)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -238,6 +241,74 @@ func TestOpenJiraTicketWithAssigneeIDFunc(t *testing.T) {
 	assert.Equal(NotCreatedIssueId, "")
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithoutLabelsWithAssigneeID.json")), string(mirroredResponse.Body))
 	fmt.Println("NumberIssueCreated :", numberIssueCreated)
+
+	return
+}
+
+func TestOpenJiraTicketDryRyn(t *testing.T) {
+
+	assert := assert.New(t)
+	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue", "", "")
+
+	defer server.Close()
+
+	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
+	vulnsForJira := make(map[string]interface{})
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPath.json"), &vulnsForJira)
+	if err != nil {
+		panic(err)
+	}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, false, true)
+
+	assert.Equal(jiraResponse, "")
+	assert.Equal(numberIssueCreated, 0)
+	assert.Equal(NotCreatedIssueId, "")
+
+	return
+
+}
+
+func TestAddToTicketFile(t *testing.T) {
+
+	assert := assert.New(t)
+
+	dat, err := ioutil.ReadFile("./fixtures/ticket.txt")
+	if err != nil {
+		log.Fatal()
+	}
+
+	AddToTicketFile(dat)
+
+	// list all file in the directory
+	fileInfo, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Fatal()
+	}
+
+	// Look for the one starting with listOfTicketCreated
+	path := "./"
+	for _, file := range fileInfo {
+		if !file.IsDir() {
+			if strings.HasPrefix(file.Name(), "listOfTicketCreated") {
+				path += file.Name()
+				break
+			}
+		}
+	}
+
+	assert.FileExists(path)
+
+	fileCreated, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatal()
+	}
+	assert.Equal(dat, fileCreated)
+
+	// Delete the file created for the test
+	e := os.Remove(path)
+	if e != nil {
+		log.Fatal(e)
+	}
 
 	return
 }
