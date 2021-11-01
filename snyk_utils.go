@@ -21,6 +21,7 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Add("Authorization", "token "+snykToken)
+	request.Header.Add("userAgentPrefix", "snyk-jira-tickets-for-new-vulns")
 
 	client := &http.Client{}
 	response, err := client.Do(request)
