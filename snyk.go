@@ -32,16 +32,15 @@ func getProjectsIds(projectID string, endpointAPI string, orgID string, apiToken
 
 		projects := getOrgProjects(endpointAPI, orgID, apiToken)
 
-		projectIdFound := make([]string, len(projects.K("projects").Array().Elements()))
 		for i := 0; i < len(projects.K("projects").Array().Elements()); i++ {
 			p := projects.K("projects").Array().Elements()[i]
-			projectIdFound = append(projectId, string(p.K("id").String().Value))
+			projectId = append(projectId, string(p.K("id").String().Value))
 		}
 
-		if len(projectIdFound) == 0 {
-			return projectIdFound, errors.New("Failure, Could not retrieve project ID")
+		if len(projectId) == 0 {
+			return projectId, errors.New("Failure, Could not retrieve project ID")
 		}
-		return projectIdFound, nil
+		return projectId, nil
 	}
 
 	projectId = append(projectId, projectID)

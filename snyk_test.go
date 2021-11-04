@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"log"
+	"strings"
 	"testing"
 
 	"github.com/nsf/jsondiff"
@@ -26,7 +28,6 @@ func TestGetProjectDetailsFunc(t *testing.T) {
 	return
 }
 
-
 // Test GetProjectDetails function
 func TestGetOrgProjects(t *testing.T) {
 	expectedTestURL := "/v1/org/123/projects"
@@ -41,6 +42,28 @@ func TestGetOrgProjects(t *testing.T) {
 	marshalledResp, _ := json.Marshal(response)
 	comparison, _ := jsondiff.Compare(readFixture("./fixtures/org.json"), marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
+
+	return
+}
+
+// Test getProjectsIds function
+func TestGetProjectsIdsAllProjects(t *testing.T) {
+
+	expectedTestURL := "/v1/org/123/projects"
+	assert := assert.New(t)
+	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
+
+	defer server.Close()
+
+	list, er := getProjectsIds("", server.URL, "123", "123")
+	listString := "[" + strings.Join(list, ",") + "]"
+
+	if er != nil {
+		log.Fatal()
+	}
+
+	ResultList := readFixture("./fixtures/results/projectIdsList.txt")
+	assert.Equal(string(ResultList), listString)
 
 	return
 }
