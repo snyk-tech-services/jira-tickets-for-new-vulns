@@ -23,7 +23,7 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
     --jiraProjectID <12345>                  // Jira project ID the tickets will be opened against
     --jiraTicketType <Ticket Type in jira>   // Find this in Jira
 ```
-## Script Parameters:
+## Mandatory Script Parameters:
 ```
 - To find the orgID, go to Snyk -> Settings
 
@@ -34,6 +34,9 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
 - jiraProjectID -> This is from Jira and is an integer. To find this, go to https://your-domain.atlassian.net/rest/api/3/project and under the ID key, you will see the ProjectID integer
 
 - jiraTicketType -> This is from Jira and can be found in Projects -> Project Settings -> Issue types
+
+#Optional Script Parameters:
+- To find the assigneeId, go to https://your-domain.atlassian.net/rest/api/2/issue/<Jira Ticket>/changelog (As long as that ticket is assigned to a user, you will see the assigneeId (The ID in jira for the user assigned) as "fromString": <Long string>"
 ```
 
 ## Example 
