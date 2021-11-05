@@ -23,8 +23,9 @@ Use the appropriate binary from [the release page](https://github.com/snyk-tech-
     --jiraProjectID <12345>                  // Jira project ID the tickets will be opened against
     --jiraTicketType <Ticket Type in jira>   // Find this in Jira
 ```
-## Mandatory Script Parameters:
+## Script Parameters:
 ```
+#Mandatory Script Parameters
 - To find the orgID, go to Snyk -> Settings
 
 - To find the projectID go to Snyk -> Select the desired Project -> Grab the UUID from the URL
