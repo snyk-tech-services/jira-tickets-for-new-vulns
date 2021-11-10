@@ -30,6 +30,10 @@ func TestOpenJiraTicketWithPriorityMappingFunc(t *testing.T) {
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
+
+	// Delete the file created for the test
+	removeLogFile()
+
 	fmt.Println(NumberIssueCreated)
 	assert.Equal(NotCreatedIssueId, "")
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithPriorityMapping.json")), string(mirroredResponse.Body))
@@ -55,6 +59,10 @@ func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
+
+	// Delete the file created for the test
+	removeLogFile()
+
 	fmt.Println(NumberIssueCreated)
 	assert.Equal(NotCreatedIssueId, "")
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithoutLabels.json")), string(mirroredResponse.Body))
@@ -81,6 +89,10 @@ func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
+
+	// Delete the file created for the test
+	removeLogFile()
+
 	fmt.Println(NumberIssueCreated)
 	assert.Equal(NotCreatedIssueId, "")
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithCustomPriorityMapping.json")), string(mirroredResponse.Body))

@@ -113,11 +113,16 @@ Open Source, so feel free to contribute !
 			if jiraResponse == "" && !dryRun {
 				fmt.Println("Failure to create a ticket(s)")
 			}
-			fmt.Printf("-----Summary----- \n Number of tickets created: %d for project ID: %s\n List of issueId for which the ticket could not be created: %s\n", numberIssueCreated, project, notCreatedJiraIssues)
 			if dryRun {
-				fmt.Printf("**** Dry run result can be found in .log file ****")
+				fmt.Printf("\n----------PROJECT ID %s----------\n Dry run mode: no issue were created\n-------------------------------------------------------------------\n", project)
+			} else {
+				fmt.Printf("\n----------PROJECT ID %s---------- \n Number of tickets created: %d\n List of issueId for which the ticket could not be created: %s\n-------------------------------------------------------------------\n", project, numberIssueCreated, notCreatedJiraIssues)
 			}
 		}
 	}
-
+	if dryRun {
+		fmt.Println("\n*****************************************************************")
+		fmt.Printf("\n******** Dry run list of ticket can be found in log file ********")
+		fmt.Println("\n*****************************************************************")
+	}
 }

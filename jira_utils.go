@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -27,6 +30,34 @@ func getDate() string {
 	s := fmt.Sprint(now.Second())
 
 	return y + m + d + h + min + s
+}
+
+/***
+function findProjectId
+return found: bool
+return error
+input: projectId string
+input: filename path string
+return true if the project already exist in the file
+***/
+func findProjectId(projectId string, filename string) (bool, error) {
+
+	f, err := os.Open(filename)
+	if err != nil {
+		// to do change to debug line
+		log.Println("can't find file")
+		return false, err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), projectId) {
+			return true, nil
+		}
+	}
+	return false, err
 }
 
 func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
