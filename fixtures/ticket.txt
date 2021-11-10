@@ -1,14 +1,10 @@
-- Remote Code Execution (RCE) \*\*\*\* Issue details: \*\*\*\*
+- Remote Code Execution (RCE) 
+ \*\*\*\* Issue details: \*\*\*\*
 
- pkgName: pac\-resolver
-
- pkgVersions: \[3.0.0\]
-
- cvssScore: 8.10
-
- exploitMaturity: proof\-of\-concept
-
- severity: medium
+ cvssScore:  8.10
+ exploitMaturity:  proof\-of\-concept
+ severity:  medium
+ pkgVersions: 3.0.0\]
 
 *Impacted Paths:*
 \- "snyk"@"1.228.3" => "proxy\-agent"@"3.1.0" => "pac\-proxy\-agent"@"3.0.0" => "pac\-resolver"@"3.0.0"

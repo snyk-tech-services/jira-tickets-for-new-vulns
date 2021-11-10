@@ -242,7 +242,7 @@ func HTTPResponseCheckOpenJiraMultipleTicketsFailure() *httptest.Server {
 		if r.RequestURI == "" {
 			resp = []byte("404 - url mismatch")
 		} else {
-			fmt.Println("Error")
+			//fmt.Println("Error")
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			resp = readFixture("./fixtures/singleJiraTicketOpeningErrorResponse.json")
 		}

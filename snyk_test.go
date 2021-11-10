@@ -18,7 +18,18 @@ func TestGetProjectDetailsFunc(t *testing.T) {
 
 	defer server.Close()
 
-	response := getProjectDetails(server.URL, "123", "123", "123")
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	response := getProjectDetails(Mf, "123", cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
@@ -36,7 +47,18 @@ func TestGetOrgProjects(t *testing.T) {
 
 	defer server.Close()
 
-	response := getOrgProjects(server.URL, "123", "123")
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	response := getOrgProjects(Mf, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
@@ -55,7 +77,38 @@ func TestGetProjectsIdsAllProjects(t *testing.T) {
 
 	defer server.Close()
 
-	list, er := getProjectsIds("", server.URL, "123", "123")
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	list, er := getProjectsIds(flags, cD)
 	listString := "[" + strings.Join(list, ",") + "]"
 
 	if er != nil {

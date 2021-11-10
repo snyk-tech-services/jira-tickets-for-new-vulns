@@ -2,11 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/michael-go/go-jsn/jsn"
-	"github.com/tidwall/sjson"
 )
 
 // IssuesFilter is the top level filter type of filtering Snyk response
@@ -33,7 +31,7 @@ type Filter struct {
 	Patched         bool     `json:"patched"`
 }
 
-func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, token string, severity string, maturityFilter []string, priorityScoreThreshold int, issueType string, tickets map[string]string) map[string]interface{} {
+func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug) map[string]interface{} {
 
 	body := IssuesFilter{
 		Filter{
@@ -44,10 +42,10 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 			Patched:    false,
 		},
 	}
-	if issueType != "all" && issueType != "" {
-		body.Filters.Types = []string{issueType}
+	if flags.optionalFlags.issueType != "all" && flags.optionalFlags.issueType != "" {
+		body.Filters.Types = []string{flags.optionalFlags.issueType}
 	}
-	switch severity {
+	switch flags.optionalFlags.severity {
 	case "critical":
 		body.Filters.Severities = []string{"critical"}
 	case "high":
@@ -65,8 +63,8 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 
 	body.Filters.Priority.Score.Min = 0
 	body.Filters.Priority.Score.Max = 1000
-	if priorityScoreThreshold > 0 {
-		body.Filters.Priority.Score.Min = priorityScoreThreshold
+	if flags.optionalFlags.priorityScoreThreshold > 0 {
+		body.Filters.Priority.Score.Min = flags.optionalFlags.priorityScoreThreshold
 	}
 
 	marshalledBody, err := json.Marshal(body)
@@ -75,9 +73,9 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 		log.Fatalln(err)
 	}
 
-	responseAggregatedData, err := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/aggregated-issues", token, marshalledBody)
+	responseAggregatedData, err := makeSnykAPIRequest("POST", flags.mandatoryFlags.endpointAPI+"/v1/org/"+flags.mandatoryFlags.orgID+"/project/"+projectID+"/aggregated-issues", flags.mandatoryFlags.apiToken, marshalledBody, customDebug)
 	if err != nil {
-		fmt.Printf("Could not get aggregated data from %s org %s project %s", endpointAPI, orgID, projectID)
+		log.Printf("*** ERROR *** Could not get aggregated data from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
 		log.Fatalln(err)
 	}
 
@@ -96,21 +94,21 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 				}
 				json.Unmarshal(bytes, &vulnsPerPath)
 
-				ProjectIssuePathData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", token, nil)
+				ProjectIssuePathData, err := makeSnykAPIRequest("GET", flags.mandatoryFlags.endpointAPI+"/v1/org/"+flags.mandatoryFlags.orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", flags.mandatoryFlags.apiToken, nil, customDebug)
 				if err != nil {
-					fmt.Printf("Could not get aggregated data from %s org %s project %s issue %s", endpointAPI, orgID, projectID, issueId)
+					log.Printf("*** ERROR *** Could not get aggregated data from %s org %s project %s issue %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID, issueId)
 					log.Fatalln(err)
 				}
 				ProjectIssuePathDataJson, er := jsn.NewJson(ProjectIssuePathData)
 				if er != nil {
-					fmt.Printf("Json creation failed\n")
+					log.Printf("*** ERROR *** Json creation failed\n")
 					log.Fatalln(er)
 				}
 				vulnsPerPath["from"] = ProjectIssuePathDataJson.K("paths")
 				marshalledvulnsPerPath, err := json.Marshal(vulnsPerPath)
 				vulnsWithAllPaths[issueId], err = jsn.NewJson(marshalledvulnsPerPath)
 				if er != nil {
-					fmt.Printf("Json creation failed\n")
+					log.Printf("*** ERROR *** Json creation failed\n")
 					log.Fatalln(er)
 				}
 			}
@@ -127,60 +125,25 @@ func getVulnsWithoutTicket(endpointAPI string, orgID string, projectID string, t
 				}
 				json.Unmarshal(bytes, &vulnsPerPath)
 
-				ProjectIssuePathData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", token, nil)
+				ProjectIssuePathData, err := makeSnykAPIRequest("GET", flags.mandatoryFlags.endpointAPI+"/v1/org/"+flags.mandatoryFlags.orgID+"/project/"+projectID+"/issue/"+issueId+"/paths", flags.mandatoryFlags.apiToken, nil, customDebug)
 				if err != nil {
-					fmt.Printf("Could not get aggregated data from %s org %s project %s issue %s", endpointAPI, orgID, projectID, issueId)
+					log.Printf("*** ERROR *** Could not get aggregated data from %s org %s project %s issue %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID, issueId)
 					log.Fatalln(err)
 				}
 				ProjectIssuePathDataJson, er := jsn.NewJson(ProjectIssuePathData)
 				if er != nil {
-					fmt.Printf("Json creation failed\n")
+					log.Printf("*** ERROR *** Json creation failed\n")
 					log.Fatalln(er)
 				}
 				vulnsPerPath["from"] = ProjectIssuePathDataJson.K("paths")
 				marshalledvulnsPerPath, err := json.Marshal(vulnsPerPath)
 				vulnsWithAllPaths[issueId], err = jsn.NewJson(marshalledvulnsPerPath)
 				if er != nil {
-					fmt.Printf("Json creation failed\n")
+					log.Printf("*** ERROR *** Json creation failed\n")
 					log.Fatalln(er)
 				}
 			}
 		}
-	}
-	return vulnsWithAllPaths
-}
-
-func consolidateAllPathsIntoSingleVuln(vulnsPerPath []interface{}) map[string]interface{} {
-	vulnsWithAllPaths := make(map[string]interface{})
-
-	for _, vuln := range vulnsPerPath {
-		//vuln := vulnPerPath
-		vulnJSON, _ := jsn.NewJson(vuln)
-
-		if _, found := vulnsWithAllPaths[vulnJSON.K("id").String().Value]; !found {
-			// Changing "from": ["a","b","c"] to "from": [["a","b","c"]]
-			fmt.Println("id found is: ", vulnJSON.K("id").String().Value)
-			var vulnJSONPaths [][]string
-			var vulnJSONPath []string
-			for _, value := range vulnJSON.K("from").Array().Elements() {
-				vulnJSONPath = append(vulnJSONPath, value.Stringify())
-			}
-			fmt.Println("path found is: ", vulnJSONPath)
-			vulnJSONPaths = append(vulnJSONPaths, vulnJSONPath)
-			// Modify json with the "from" array change
-			vuln, _ = sjson.Set(vulnJSON.Stringify(), "from", vulnJSONPaths)
-
-		} else {
-			var vulnJSONPath []string
-			for _, value := range vulnJSON.K("from").Array().Elements() {
-				vulnJSONPath = append(vulnJSONPath, value.Stringify())
-			}
-			vulnToAddPathTo, _ := jsn.NewJson(vulnsWithAllPaths[vulnJSON.K("id").String().Value])
-			// from.-1 appends to the end of the array
-			vuln, _ = sjson.Set(vulnToAddPathTo.Stringify(), "from.-1", vulnJSONPath)
-		}
-		// Update the vuln with changes
-		vulnsWithAllPaths[vulnJSON.K("id").String().Value] = vuln
 	}
 	return vulnsWithAllPaths
 }
@@ -201,7 +164,7 @@ func createMaturityFilter(filtersArray []string) []string {
 			MaturityFilter = append(MaturityFilter, filter)
 		case "":
 		default:
-			log.Fatalf("INPUT ERROR: %s is not a valid maturity level. Levels are Must be one of [no-data,no-known-exploit,proof-of-concept,mature]", filter)
+			log.Fatalf("*** ERROR ***: %s is not a valid maturity level. Levels are Must be one of [no-data,no-known-exploit,proof-of-concept,mature]", filter)
 		}
 	}
 	return MaturityFilter

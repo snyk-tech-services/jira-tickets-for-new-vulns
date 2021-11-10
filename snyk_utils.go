@@ -3,13 +3,12 @@ package main
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
-func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body []byte) ([]byte, error) {
+func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body []byte, customDebug debug) ([]byte, error) {
 
 	bodyBuffer := bytes.NewBuffer(nil)
 
@@ -27,29 +26,35 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 	response, err := client.Do(request)
 
 	if err != nil {
-		fmt.Printf("Request on endpoint '%s' failed with error %s\n", endpointURL, err.Error())
+		customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s\n", endpointURL, err.Error())
 		return nil, errors.New("Request failed")
+	}
+
+	customDebug.Debugf("*** INFO *** Sending %s request to %s", verb, endpointURL)
+	if body != nil {
+		customDebug.Debug("*** INFO *** Body : ", string(body))
 	}
 
 	responseData, err := ioutil.ReadAll(response.Body)
 
 	if response.StatusCode == 404 {
-		fmt.Printf("Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
 		return nil, errors.New("Request failed")
 	} else if response.StatusCode == 422 {
-		fmt.Printf("Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
-		fmt.Printf("Details : %s\n", string(responseData))
+		customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		customDebug.Debugf("*** INFO *** Details : %s\n", string(responseData))
+
 		return nil, errors.New("Request failed")
 	} else if response.StatusCode > 400 {
-		fmt.Printf("Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
-		fmt.Printf("Details : %s\n", string(responseData))
+		customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		customDebug.Debugf("*** INFO *** Details : %s\n", string(responseData))
 		return nil, errors.New("Request failed")
 	}
 
 	if err != nil {
 		if strings.Contains(strings.ToLower(string(responseData)), "error") {
-			fmt.Println(err)
-			fmt.Println("Retrying without the priority field")
+			customDebug.Debug(err)
+			customDebug.Debug("*** INFO *** Retrying without the priority field")
 		}
 		return nil, errors.New("Request failed")
 	}
