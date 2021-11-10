@@ -47,7 +47,10 @@ func TestMakeSnykRequestFunc(t *testing.T) {
 
 	defer server.Close()
 
-	response, err := makeSnykAPIRequest(expectedPOSTMethod, server.URL+expectedTestURL, expectedToken, dummyBodyMarshalled)
+	cD := debug{}
+	cD.setDebug(false)
+
+	response, err := makeSnykAPIRequest(expectedPOSTMethod, server.URL+expectedTestURL, expectedToken, dummyBodyMarshalled, cD)
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +66,7 @@ func TestMakeSnykRequestFunc(t *testing.T) {
 
 	defer server.Close()
 
-	response, err = makeSnykAPIRequest(expectedGETMethod, server.URL+expectedTestURL, expectedToken, nil)
+	response, err = makeSnykAPIRequest(expectedGETMethod, server.URL+expectedTestURL, expectedToken, nil, cD)
 	if err != nil {
 		panic(err)
 	}

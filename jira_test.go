@@ -27,10 +27,39 @@ func TestOpenJiraTicketFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, false, false)
 
-	// Delete the file created for the test
-	removeLogFile()
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
@@ -51,10 +80,39 @@ func TestOpenJiraTicketWithProjectKeyFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "", "Key", "Bug", "", "", "", projectInfo, vulnsForJira, false, false)
 
-	// Delete the file created for the test
-	removeLogFile()
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = ""
+	Mf.jiraProjectKey = "Key"
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
@@ -75,10 +133,39 @@ func TestOpenJiraTicketErrorAndRetryFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
 
-	// Delete the file created for the test
-	removeLogFile()
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = true
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
@@ -100,7 +187,38 @@ func TestOpenJiraMultipleTicketsErrorAndRetryFunc(t *testing.T) {
 		panic(err)
 	}
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = true
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	assert.Equal("", NotCreatedIssueId)
 	fmt.Println(NumberIssueCreated)
@@ -141,7 +259,38 @@ func TestOpenJiraMultipleTicketsErrorAndRetryAndFailFunc(t *testing.T) {
 		panic(err)
 	}
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = true
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	assert.Equal(string(readFixture("./fixtures/results/NotCreatedIssueIdSingle")), NotCreatedIssueId)
 	fmt.Println(NumberIssueCreated)
@@ -183,7 +332,39 @@ func TestOpenJiraMultipleTicketsFailureFunc(t *testing.T) {
 		panic(err)
 	}
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = true
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	//endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	fmt.Println(NumberIssueCreated)
 
@@ -224,7 +405,39 @@ func TestOpenJiraTicketWithAssigneeNameFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "admin", "", "", projectInfo, vulnsForJira, false, false)
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = "admin"
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -253,7 +466,39 @@ func TestOpenJiraTicketWithAssigneeIDFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "12345", "", projectInfo, vulnsForJira, false, false)
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = "12345"
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -283,7 +528,38 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, false, true)
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = "12345"
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = true
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	// Delete the file created for the test
 	removeLogFile()
@@ -308,8 +584,11 @@ func TestAddToTicketFile(t *testing.T) {
 	if err != nil {
 		log.Fatal()
 	}
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
 
-	AddToTicketFile(dat, []byte("123"))
+	AddToTicketFile(dat, []byte("123"), cD)
 
 	// Find logfile created
 	path, found := findLogFile()

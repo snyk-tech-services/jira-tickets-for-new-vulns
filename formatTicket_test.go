@@ -32,7 +32,7 @@ func TestFormatJiraTicketFunc(t *testing.T) {
 
 	for scanner.Scan() {
 		compare := strings.Contains(ticket, scanner.Text())
-		fmt.Println(scanner.Text())
+		//fmt.Println(scanner.Text())
 		assert.Equal(t, compare, true)
 	}
 
