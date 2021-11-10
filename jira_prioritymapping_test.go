@@ -24,12 +24,16 @@ func TestOpenJiraTicketWithPriorityMappingFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
+
+	// Delete the file created for the test
+	removeLogFile()
+
 	fmt.Println(NumberIssueCreated)
 	assert.Equal(NotCreatedIssueId, "")
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithPriorityMapping.json")), string(mirroredResponse.Body))
@@ -49,12 +53,16 @@ func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, false)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, false, false)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
+
+	// Delete the file created for the test
+	removeLogFile()
+
 	fmt.Println(NumberIssueCreated)
 	assert.Equal(NotCreatedIssueId, "")
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithoutLabels.json")), string(mirroredResponse.Body))
@@ -75,12 +83,16 @@ func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 		panic(err)
 	}
 	os.Setenv("SNYK_JIRA_PRIORITY_FOR_MEDIUM_VULN", "not too bad")
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
+
+	// Delete the file created for the test
+	removeLogFile()
+
 	fmt.Println(NumberIssueCreated)
 	assert.Equal(NotCreatedIssueId, "")
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithCustomPriorityMapping.json")), string(mirroredResponse.Body))

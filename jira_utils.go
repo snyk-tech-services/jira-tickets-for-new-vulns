@@ -1,13 +1,64 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"log"
+	"os"
 	"strings"
+	"time"
 
 	bfconfluence "github.com/kentaro-m/blackfriday-confluence"
 	"github.com/michael-go/go-jsn/jsn"
 	bf "gopkg.in/russross/blackfriday.v2"
 )
+
+/***
+function getDate
+return date: string
+argument: none
+return a string containing date and time
+***/
+func getDate() string {
+
+	now := time.Now().Round(0)
+	y := fmt.Sprint(now.Year()) + "_"
+	m := fmt.Sprint(int(now.Month())) + "_"
+	d := fmt.Sprint(now.Day()) + "_"
+	h := fmt.Sprint(now.Hour()) + "_"
+	min := fmt.Sprint(now.Minute()) + "_"
+	s := fmt.Sprint(now.Second())
+
+	return y + m + d + h + min + s
+}
+
+/***
+function findProjectId
+return found: bool
+return error
+input: projectId string
+input: filename path string
+return true if the project already exist in the file
+***/
+func findProjectId(projectId string, filename string) (bool, error) {
+
+	f, err := os.Open(filename)
+	if err != nil {
+		// to do change to debug line
+		log.Println("can't find file")
+		return false, err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), projectId) {
+			return true, nil
+		}
+	}
+	return false, err
+}
 
 func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 

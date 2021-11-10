@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 )
 
@@ -15,6 +16,58 @@ type mirroredResponse struct {
 	Method string `json:"method"`
 	Token  string `json:"token"`
 	Body   []byte `json:"body"`
+}
+
+/***
+function removeLogFile
+input: none
+return path : string
+find log file and return path
+***/
+func findLogFile() (string, bool) {
+
+	// list all file in the directory
+	fileInfo, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Fatal()
+	}
+
+	// Look for the one starting with listOfTicketCreated
+	path := "./"
+	found := false
+	for _, file := range fileInfo {
+		if !file.IsDir() {
+			if strings.HasPrefix(file.Name(), "listOfTicketCreated") {
+				path += file.Name()
+				found = true
+				break
+			}
+		}
+	}
+
+	return path, found
+}
+
+/***
+function removeLogFile
+input: none
+return none
+clean logs after test
+***/
+func removeLogFile() {
+
+	// Find log file
+	path, found := findLogFile()
+
+	if found {
+		// Delete the file created for the test
+		e := os.Remove(path)
+		if e != nil {
+			log.Fatal(e)
+		}
+	}
+
+	return
 }
 
 // HTTPResponseStubAndMirrorRequest Stubbing HTTP response
