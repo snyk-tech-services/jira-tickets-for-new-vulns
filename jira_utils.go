@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -66,12 +65,11 @@ input: projectId string
 input: filename path string
 return true if the project already exist in the file
 ***/
-func findProjectId(projectId string, filename string) (bool, error) {
+func findProjectId(projectId string, filename string, customDebug debug) (bool, error) {
 
 	f, err := os.Open(filename)
 	if err != nil {
-		// to do change to debug line
-		log.Println("can't find file")
+		customDebug.Debugf("*** ERROR *** couldn't find log file")
 		return false, err
 	}
 	defer f.Close()
