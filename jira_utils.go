@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 
 	bfconfluence "github.com/kentaro-m/blackfriday-confluence"
@@ -55,33 +53,6 @@ func getJiraTicketId(responseData []byte) *JiraDetailForTicket {
 	}
 
 	return jiraIssueDetails
-}
-
-/***
-function findProjectId
-return found: bool
-return error
-input: projectId string
-input: filename path string
-return true if the project already exist in the file
-***/
-func findProjectId(projectId string, filename string, customDebug debug) (bool, error) {
-
-	f, err := os.Open(filename)
-	if err != nil {
-		customDebug.Debugf("*** ERROR *** couldn't find log file")
-		return false, err
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-
-	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), projectId) {
-			return true, nil
-		}
-	}
-	return false, err
 }
 
 func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
