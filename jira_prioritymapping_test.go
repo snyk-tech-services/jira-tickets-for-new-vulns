@@ -56,7 +56,10 @@ func TestOpenJiraTicketWithPriorityMappingFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -117,8 +120,11 @@ func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
 	//endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -180,8 +186,11 @@ func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
 	//endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {

@@ -56,6 +56,9 @@ Open Source, so feel free to contribute !
 	notCreatedJiraIssues := ""
 	jiraResponse := ""
 
+	// Create the log file for the current run
+	filename := CreateLogFile(customDebug)
+
 	for _, project := range projectIDs {
 
 		log.Println("*** INFO *** 1/4 - Retrieving Project", project)
@@ -75,7 +78,7 @@ Open Source, so feel free to contribute !
 			log.Println("*** INFO *** 4/4 - No new JIRA ticket required")
 		} else {
 			log.Println("*** INFO *** 4/4 - Opening JIRA Tickets")
-			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(options, projectInfo, vulnsPerPath, customDebug)
+			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(options, projectInfo, vulnsPerPath, customDebug, filename)
 			if jiraResponse == "" && !options.optionalFlags.dryRun {
 				log.Println("*** ERROR *** Failure to create a ticket(s)")
 			}
@@ -87,8 +90,8 @@ Open Source, so feel free to contribute !
 		}
 	}
 	if options.optionalFlags.dryRun {
-		fmt.Println("\n*****************************************************************")
-		fmt.Printf("\n******** Dry run list of ticket can be found in log file ********")
-		fmt.Println("\n*****************************************************************")
+		fmt.Println("\n*****************************************************************************************************")
+		fmt.Printf("\n******** Dry run list of ticket can be found in log file %s ********", filename)
+		fmt.Println("\n*****************************************************************************************************")
 	}
 }

@@ -59,7 +59,10 @@ func TestOpenJiraTicketFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
@@ -112,7 +115,10 @@ func TestOpenJiraTicketWithProjectKeyFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
@@ -165,7 +171,10 @@ func TestOpenJiraTicketErrorAndRetryFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
@@ -218,7 +227,10 @@ func TestOpenJiraMultipleTicketsErrorAndRetryFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	assert.Equal("", NotCreatedIssueId)
 	fmt.Println(NumberIssueCreated)
@@ -290,7 +302,10 @@ func TestOpenJiraMultipleTicketsErrorAndRetryAndFailFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	assert.Equal(string(readFixture("./fixtures/results/NotCreatedIssueIdSingle")), NotCreatedIssueId)
 	fmt.Println(NumberIssueCreated)
@@ -363,8 +378,11 @@ func TestOpenJiraMultipleTicketsFailureFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
 	//endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	fmt.Println(NumberIssueCreated)
 
@@ -437,7 +455,10 @@ func TestOpenJiraTicketWithAssigneeNameFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -498,7 +519,10 @@ func TestOpenJiraTicketWithAssigneeIDFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
+
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -559,38 +583,18 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 	// setting debug
 	cD := debug{}
 	cD.setDebug(false)
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
-	// Delete the file created for the test
-	removeLogFile()
+	// Create a logFile
+	logFilename := CreateLogFile(cD)
 
-	assert.Equal(jiraResponse, "")
-	assert.Equal(numberIssueCreated, 0)
-	assert.Equal(NotCreatedIssueId, "")
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD, logFilename)
 
-	return
-}
-
-func TestAddToTicketFile(t *testing.T) {
-
-	assert := assert.New(t)
-
-	dat, err := ioutil.ReadFile("./fixtures/ticketJson.json")
+	// Checking the log file
+	expectedResult, err := ioutil.ReadFile("./fixtures/results/logFileFixture.json")
 	if err != nil {
 		log.Fatal()
 	}
 
-	expectedResult, err := ioutil.ReadFile("./fixtures/results/logFile.log")
-	if err != nil {
-		log.Fatal()
-	}
-	// setting debug
-	cD := debug{}
-	cD.setDebug(false)
-
-	AddToTicketFile(dat, []byte("123"), cD)
-
-	// Find logfile created
 	path, found := findLogFile()
 
 	assert.FileExists(path)
@@ -605,6 +609,10 @@ func TestAddToTicketFile(t *testing.T) {
 
 	// Delete the file created for the test
 	removeLogFile()
+
+	assert.Equal(jiraResponse, "")
+	assert.Equal(numberIssueCreated, 0)
+	assert.Equal(NotCreatedIssueId, "")
 
 	return
 }

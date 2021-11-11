@@ -189,3 +189,28 @@ func (flags *flags) checkFlags() {
 		log.Fatalf(("*** ERROR *** You passed both assigneeID and assigneeName in parameters\n Please, Use assigneeID OR assigneeName, not both"))
 	}
 }
+
+/***
+function CreateLogFile
+return filename: string
+argument: debug
+Check if the file exist if not create it
+***/
+func CreateLogFile(customDebug debug) string {
+
+	// Get date
+	date := getDate()
+
+	// Set filename
+	filename := "listOfTicketCreated_" + date + ".json"
+
+	// If the file doesn't exist, create it, or append to the file
+	_, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		// Do not fail the tool if file cannot be created print a warning instead
+		customDebug.Debug("*** ERROR *** Could not create log file")
+		customDebug.Debug(err.Error())
+	}
+
+	return filename
+}

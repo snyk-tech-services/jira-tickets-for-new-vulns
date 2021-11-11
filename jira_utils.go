@@ -1,9 +1,11 @@
 package main
 
 import (
-	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
+	"path"
+	"runtime"
 	"strings"
 	"time"
 
@@ -11,6 +13,11 @@ import (
 	"github.com/michael-go/go-jsn/jsn"
 	bf "gopkg.in/russross/blackfriday.v2"
 )
+
+type Tickets struct {
+	Summary     string
+	Description string
+}
 
 /***
 function getDate
@@ -32,30 +39,41 @@ func getDate() string {
 }
 
 /***
-function findProjectId
-return found: bool
-return error
-input: projectId string
-input: filename path string
-return true if the project already exist in the file
+function writeLogFile
+return date: string
+input: map[string]interface{} logFile: details of the ticket to be written in the file
+input: string filename: name of the file created in the main function
+input: customDebug debug
+Write the logFile in the file. Details are append to the file per project ID
 ***/
-func findProjectId(projectId string, filename string, customDebug debug) (bool, error) {
+func writeLogFile(logFile map[string]interface{}, filename string, customDebug debug) {
 
-	f, err := os.Open(filename)
+	// write to file
+	file, _ := json.MarshalIndent(logFile, "", "")
+
+	// Find log file path
+	_, b, _, _ := runtime.Caller(1)
+	var d []string
+	d = append(d, path.Join(path.Dir(b)))
+	filenamePathArray := append(d, filename)
+	// find os separator
+	separator := string(os.PathSeparator)
+	// build filename path
+	filenamePath := strings.Join(filenamePathArray, separator)
+
+	// If the file doesn't exist => exit, append to the file otherwise
+	f, err := os.OpenFile(filenamePath, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		customDebug.Debugf("*** ERROR *** couldn't find log file")
-		return false, err
+		customDebug.Debug("*** ERROR *** Could not open file")
 	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-
-	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), projectId) {
-			return true, nil
-		}
+	if _, err := f.Write(file); err != nil {
+		customDebug.Debug("*** ERROR *** Could not open file")
 	}
-	return false, err
+	if err := f.Close(); err != nil {
+		customDebug.Debug("*** ERROR ***  Could not open file")
+	}
+
+	return
 }
 
 func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
