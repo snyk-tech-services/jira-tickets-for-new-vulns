@@ -19,7 +19,18 @@ func TestGetJiraTicketFunc(t *testing.T) {
 
 	defer server.Close()
 
-	response := getJiraTickets(server.URL, "123", "123", "123")
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	response := getJiraTickets(Mf, "123", cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
@@ -42,7 +53,39 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "Label1,Label2", projectInfo, vulnsForJira, false, false)
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = true
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = "Label1,Label2"
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -71,7 +114,39 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, false, false)
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {

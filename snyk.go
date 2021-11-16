@@ -2,16 +2,15 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/michael-go/go-jsn/jsn"
 )
 
-func getOrgProjects(endpointAPI string, orgID string, token string) jsn.Json {
-	responseData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/projects", token, nil)
+func getOrgProjects(Mf MandatoryFlags, customDebug debug) jsn.Json {
+	responseData, err := makeSnykAPIRequest("GET", Mf.endpointAPI+"/v1/org/"+Mf.orgID+"/projects", Mf.apiToken, nil, customDebug)
 	if err != nil {
-		fmt.Printf("Could not get the Project(s) for endpoint %s\n", endpointAPI)
+		log.Printf("*** ERROR *** Could not get the Project(s) for endpoint %s\n", Mf.endpointAPI)
 		log.Fatal(err)
 	}
 
@@ -21,16 +20,15 @@ func getOrgProjects(endpointAPI string, orgID string, token string) jsn.Json {
 	}
 
 	return project
-
 }
 
-func getProjectsIds(projectID string, endpointAPI string, orgID string, apiToken string) ([]string, error) {
+func getProjectsIds(options flags, customDebug debug) ([]string, error) {
 
 	var projectId []string
-	if len(projectID) == 0 {
-		fmt.Println("Project ID not specified - importing all projects")
+	if len(options.optionalFlags.projectID) == 0 {
+		log.Println("*** INFO *** Project ID not specified - importing all projects")
 
-		projects := getOrgProjects(endpointAPI, orgID, apiToken)
+		projects := getOrgProjects(options.mandatoryFlags, customDebug)
 
 		for i := 0; i < len(projects.K("projects").Array().Elements()); i++ {
 			p := projects.K("projects").Array().Elements()[i]
@@ -43,15 +41,15 @@ func getProjectsIds(projectID string, endpointAPI string, orgID string, apiToken
 		return projectId, nil
 	}
 
-	projectId = append(projectId, projectID)
+	projectId = append(projectId, options.optionalFlags.projectID)
 
 	return projectId, nil
 }
 
-func getProjectDetails(endpointAPI string, orgID string, projectID string, token string) jsn.Json {
-	responseData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID, token, nil)
+func getProjectDetails(Mf MandatoryFlags, projectID string, customDebug debug) jsn.Json {
+	responseData, err := makeSnykAPIRequest("GET", Mf.endpointAPI+"/v1/org/"+Mf.orgID+"/project/"+projectID, Mf.apiToken, nil, customDebug)
 	if err != nil {
-		fmt.Printf("Could not get the Project(s) for endpoint %s\n", endpointAPI)
+		log.Printf("*** ERROR *** Could not get the Project(s) for endpoint %s\n", Mf.endpointAPI)
 		log.Fatal(err)
 	}
 
@@ -61,5 +59,4 @@ func getProjectDetails(endpointAPI string, orgID string, projectID string, token
 	}
 
 	return project
-
 }

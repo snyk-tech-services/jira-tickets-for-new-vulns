@@ -18,6 +18,8 @@ func TestEndToEndFunc(t *testing.T) {
 	os.Args = append(os.Args, "-token=123")
 	os.Args = append(os.Args, "-jiraProjectID=123")
 	os.Args = append(os.Args, "-api="+server.URL)
+	// Keeping the line below => useful for debug but print too much things
+	// os.Args = append(os.Args, "-debug=true")
 
 	// Get the console output
 	rescueStdout := os.Stdout
@@ -37,7 +39,6 @@ func TestEndToEndFunc(t *testing.T) {
 	compare := strings.Contains(string(out), "Number of tickets created: 3")
 
 	assert.Equal(t, compare, true)
-
 }
 
 // comment for now, error with the arguments that are redefined
