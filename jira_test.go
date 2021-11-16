@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/michael-go/go-jsn/jsn"
@@ -30,6 +29,9 @@ func TestOpenJiraTicketFunc(t *testing.T) {
 	}
 	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, false, false)
 
+	// Delete the file created for the test
+	removeLogFile()
+
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
 	fmt.Println("NumberIssueCreated :", NumberIssueCreated)
@@ -51,6 +53,9 @@ func TestOpenJiraTicketWithProjectKeyFunc(t *testing.T) {
 	}
 	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "", "Key", "Bug", "", "", "", projectInfo, vulnsForJira, false, false)
 
+	// Delete the file created for the test
+	removeLogFile()
+
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
 	fmt.Println("NumberIssueCreated :", NumberIssueCreated)
@@ -71,6 +76,9 @@ func TestOpenJiraTicketErrorAndRetryFunc(t *testing.T) {
 		panic(err)
 	}
 	NumberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, true, false)
+
+	// Delete the file created for the test
+	removeLogFile()
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketsOpeningResults")), jiraResponse)
@@ -114,6 +122,9 @@ func TestOpenJiraMultipleTicketsErrorAndRetryFunc(t *testing.T) {
 		panic(err)
 	}
 
+	// Delete the file created for the test
+	removeLogFile()
+
 	return
 }
 
@@ -151,6 +162,9 @@ func TestOpenJiraMultipleTicketsErrorAndRetryAndFailFunc(t *testing.T) {
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}
+
+	// Delete the file created for the test
+	removeLogFile()
 
 	return
 }
@@ -190,6 +204,9 @@ func TestOpenJiraMultipleTicketsFailureFunc(t *testing.T) {
 		panic(err)
 	}
 
+	// Delete the file created for the test
+	removeLogFile()
+
 	assert.Equal("", jiraResponse)
 
 	return
@@ -213,6 +230,10 @@ func TestOpenJiraTicketWithAssigneeNameFunc(t *testing.T) {
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
+
+	// Delete the file created for the test
+	removeLogFile()
+
 	assert.Equal(NotCreatedIssueId, "")
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithoutLabelsWithAssigneeName.json")), string(mirroredResponse.Body))
 	fmt.Println("NumberIssueCreated :", numberIssueCreated)
@@ -238,6 +259,10 @@ func TestOpenJiraTicketWithAssigneeIDFunc(t *testing.T) {
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
+
+	// Delete the file created for the test
+	removeLogFile()
+
 	assert.Equal(NotCreatedIssueId, "")
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithoutLabelsWithAssigneeID.json")), string(mirroredResponse.Body))
 	fmt.Println("NumberIssueCreated :", numberIssueCreated)
@@ -260,55 +285,47 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 	}
 	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(server.URL, "123", "123", "123", "", "Bug", "", "", "", projectInfo, vulnsForJira, false, true)
 
+	// Delete the file created for the test
+	removeLogFile()
+
 	assert.Equal(jiraResponse, "")
 	assert.Equal(numberIssueCreated, 0)
 	assert.Equal(NotCreatedIssueId, "")
 
 	return
-
 }
 
 func TestAddToTicketFile(t *testing.T) {
 
 	assert := assert.New(t)
 
-	dat, err := ioutil.ReadFile("./fixtures/ticket.txt")
+	dat, err := ioutil.ReadFile("./fixtures/ticketJson.json")
 	if err != nil {
 		log.Fatal()
 	}
 
-	AddToTicketFile(dat)
-
-	// list all file in the directory
-	fileInfo, err := ioutil.ReadDir(".")
+	expectedResult, err := ioutil.ReadFile("./fixtures/results/logFile.log")
 	if err != nil {
 		log.Fatal()
 	}
 
-	// Look for the one starting with listOfTicketCreated
-	path := "./"
-	for _, file := range fileInfo {
-		if !file.IsDir() {
-			if strings.HasPrefix(file.Name(), "listOfTicketCreated") {
-				path += file.Name()
-				break
-			}
-		}
-	}
+	AddToTicketFile(dat, []byte("123"))
+
+	// Find logfile created
+	path, found := findLogFile()
 
 	assert.FileExists(path)
+	assert.True(found)
 
 	fileCreated, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Fatal()
 	}
-	assert.Equal(dat, fileCreated)
+
+	assert.Equal(expectedResult, fileCreated)
 
 	// Delete the file created for the test
-	e := os.Remove(path)
-	if e != nil {
-		log.Fatal(e)
-	}
+	removeLogFile()
 
 	return
 }

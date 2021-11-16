@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
+	"runtime"
 	"strings"
 
 	"github.com/michael-go/go-jsn/jsn"
@@ -73,16 +75,20 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 
 /***
 function AddToTicketFile
-argument ticket: []byte
+input ticket to send []byte
+input projectId to which the issue is linked []byte
 return void
 Add the created ticket to a text file
-	if file doesn't exist => create it and add first ticket
+	if file doesn't exist =>
+		- create it
+		- check if the project id is already in the file, if not => new project => add it
+		- add the list of ticket
 	else => add new ticket at the end of the file
 File name set by default to listOfTicketCreated_date.log
 ***/
-func AddToTicketFile(ticket []byte) {
+func AddToTicketFile(ticket []byte, projectId []byte) {
 
-	// get date
+	// Get date
 	date := getDate()
 
 	// Set filename
@@ -91,13 +97,42 @@ func AddToTicketFile(ticket []byte) {
 	// If the file doesn't exist, create it, or append to the file
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		log.Fatal(err)
+		// todo add better debug
+		// Do not fail the tool if file cannot be created print a warning instead
+		log.Printf(err.Error())
 	}
 
-	// add ticket
-	_, err = f.Write(ticket)
+	// find root path
+	_, b, _, _ := runtime.Caller(1)
+	var d []string
+	d = append(d, path.Join(path.Dir(b)))
+	filenamePathArray := append(d, filename)
+	// find os separator
+	separator := string(os.PathSeparator)
+	// build filename path
+	filenamePath := strings.Join(filenamePathArray, separator)
+
+	// Add project ID if needed
+	projectIdString := fmt.Sprintf(" ***** list of ticket for project %s ***** ", string(projectId))
+	projectIdFound, err := findProjectId(projectIdString, filenamePath)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("could not open file")
+		return
+	}
+	projectIdString = "\n" + projectIdString + "\n"
+
+	if !projectIdFound {
+		// This append the project ID string the beginning of the ticket
+		ticket = append([]byte(projectIdString), ticket...)
+	}
+
+	// Add ticket
+	_, err = f.Write(ticket)
+	_, err = f.Write([]byte("\n"))
+	if err != nil {
+		// todo add better debug
+		// Do not fail the tool if file cannot be created print a warning instead
+		log.Printf(err.Error())
 	}
 
 	f.Close()
@@ -177,7 +212,10 @@ func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectI
 	//fmt.Println("ticket to be send: ", string(ticket))
 
 	// Add ticket to the ticketCreated.log file
-	AddToTicketFile(ticket)
+	// test is dryRun, if not log only what's have been created
+	if dryRun {
+		AddToTicketFile(ticket, []byte(projectInfoId))
+	}
 
 	// check that vulnId exist and dryRun is off
 	if len(vulnID) != 0 && !dryRun {
@@ -193,6 +231,11 @@ func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectI
 			fmt.Printf("Request response from %s is empty\n", endpointAPI)
 			return nil, errors.New("Failure, Failure to create ticket(s)")
 		}
+
+		// Add ticket to the ticketCreated.log file
+		// log only what's have been created
+		AddToTicketFile(ticket, []byte(projectInfoId))
+
 		return responseData, nil
 	}
 	return nil, errors.New("Failure to create ticket, vuln ID is empty")

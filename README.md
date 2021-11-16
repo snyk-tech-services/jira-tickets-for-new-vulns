@@ -35,6 +35,8 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
     -labels=<IssueLabel1>,IssueLabel2                                   // Optional. Set JIRA ticket labels
     -priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold
+    -dryRun=<true|false>                                                // Optional. Result can be found in the json file at the root of the project
+    -debug=<true|false>                                                 // Optional. Enable debug mode                                          
 ```
 
 ### Priority is Severity
