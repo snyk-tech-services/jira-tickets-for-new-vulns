@@ -1,6 +1,11 @@
 # Golang CircleCI 2.0 configuration file
 #
 # Check https://circleci.com/docs/2.0/language-go/ for more details
+# make sure the circle project key is a read/write key (on circleCI project settings -> key -> add user key)
+# .goreleaser.yml needed next to the main function
+# svu is tool that automatically generate tags https://github.com/caarlos0/svu
+# doc: https://goreleaser.com/quick-start/
+
 version: 2.1
 orbs:
   snyk: snyk/snyk@0.0.8
@@ -53,17 +58,18 @@ jobs:
           password: $GCLOUD_GCR_SNYK_TS_READER
     steps:
       - checkout
-      - attach_workspace:
-          at: .
-      - run: sha256sum dist/snyk-jira-sync-linux > dist/snyk-jira-sync-linux.sha256
-      - run: sha256sum dist/snyk-jira-sync-macos > dist/snyk-jira-sync-macos.sha256
-      - run: sha256sum dist/snyk-jira-sync-win.exe > dist/snyk-jira-sync-win.exe.sha256
-      - run:
-          name: "Publish Release on GitHub"
-          command: |    
-            VERSIONJUMP=$(git log --oneline -1 --pretty=%B | cat | grep -E 'minor|major|patch' | awk -F ':' '{print $1}')   
-            VERSION=$(/workdir/nextver.sh "$VERSIONJUMP")
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${VERSION} dist/
+      - run: go build
+      - run: echo 'deb [trusted=yes] https://apt.fury.io/caarlos0/ /' | sudo tee /etc/apt/sources.list.d/caarlos0.list
+      - run: sudo apt update
+      - run: sudo apt install svu 
+      - run: git tag "$(svu next)"
+      - run: git push --tags
+      - run: echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | sudo tee /etc/apt/sources.list.d/goreleaser.list
+      - run: sudo apt update
+      - run: rm simpleGoProject
+      - run: rm -rf /dist
+      - run: sudo apt install goreleaser
+      - run: goreleaser --rm-dist 
 
 workflows:
   version: 2.1
