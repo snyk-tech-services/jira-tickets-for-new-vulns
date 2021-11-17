@@ -4,6 +4,7 @@
 # use 'goreleaser check' to chekc the yaml file 
 # user 'goreleaser init' to generate a new yaml file
 
+
 project_name: snyk-jira-sync
 
 before:
@@ -13,24 +14,20 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - id: "{{ project_name }}_{{ .Os }}"
-    binary: snyk-jira-sync
-    env:
+  - env:
       - CGO_ENABLED=0
     goos:
       - linux
       - windows
       - darwin
-    targets:
-        - linux_amd64
-        - darwin_arm64
-        - linux_arm_6
+universal_binaries:
+  - replace: true
+    name_template: "{{.ProjectName}}-macos"
 archives:
-    - format: binary
+  - format: binary
+    name_template: "{{.ProjectName}}_{{ .Os }}_{{ .Arch }}"
 checksum:
   name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ project_name }}_{{ .Os }}"
 changelog:
   sort: asc
   filters:
