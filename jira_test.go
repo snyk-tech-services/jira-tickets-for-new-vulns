@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"testing"
 
@@ -617,8 +616,6 @@ func TestOpenJiraMultipleTicketsIsUpgradableFunc(t *testing.T) {
 	cD.setDebug(false)
 
 	NumberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
-
-	log.Println(jiraResponse)
 
 	assert.NotNil(tickets)
 	assert.Equal("", NotCreatedIssueId)
