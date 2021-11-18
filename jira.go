@@ -198,6 +198,14 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 
 	for _, vulnForJira := range vulnsForJira {
 
+		// skip ticket creating if the vuln is not upgradable
+		if flags.optionalFlags.ifUpgradeAvailableOnly {
+			jsonVuln, _ := jsn.NewJson(vulnForJira)
+			if jsonVuln.K("fixInfo").K("isUpgradable").Bool().Value == false {
+				continue
+			}
+		}
+
 		RequestFailed = false
 
 		customDebug.Debug("*** INFO *** Trying to open ticket for vuln", vulnForJira)

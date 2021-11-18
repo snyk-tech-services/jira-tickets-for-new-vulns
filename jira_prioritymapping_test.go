@@ -47,6 +47,7 @@ func TestOpenJiraTicketWithPriorityMappingFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -106,6 +107,7 @@ func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -167,6 +169,7 @@ func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
