@@ -137,7 +137,7 @@
       "isPatched": false,
       "isIgnored": false,
       "fixInfo": {
-        "isUpgradable": true,
+        "isUpgradable": false,
         "isPinnable": false,
         "isPatchable": false,
         "isPartiallyFixable": false,

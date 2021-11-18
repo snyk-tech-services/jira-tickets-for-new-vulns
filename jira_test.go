@@ -48,6 +48,7 @@ func TestOpenJiraTicketFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -102,6 +103,7 @@ func TestOpenJiraTicketWithProjectKeyFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -156,6 +158,7 @@ func TestOpenJiraTicketErrorAndRetryFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -210,6 +213,7 @@ func TestOpenJiraMultipleTicketsErrorAndRetryFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -280,6 +284,7 @@ func TestOpenJiraMultipleTicketsErrorAndRetryAndFailFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -351,6 +356,7 @@ func TestOpenJiraMultipleTicketsFailureFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -423,6 +429,7 @@ func TestOpenJiraTicketWithAssigneeNameFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -482,6 +489,7 @@ func TestOpenJiraTicketWithAssigneeIDFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -542,6 +550,7 @@ func TestOpenJiraTicketDryRun(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = true
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -557,6 +566,80 @@ func TestOpenJiraTicketDryRun(t *testing.T) {
 	assert.Equal(jiraResponse, "")
 	assert.Equal(numberIssueCreated, 0)
 	assert.Equal(NotCreatedIssueId, "")
+
+	return
+}
+
+func TestOpenJiraMultipleTicketsIsUpgradableFunc(t *testing.T) {
+	assert := assert.New(t)
+	server := HTTPResponseCheckOpenJiraMultipleTickets()
+
+	defer server.Close()
+
+	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
+	vulnsForJira := make(map[string]interface{})
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPathList.json"), &vulnsForJira)
+	if err != nil {
+		panic(err)
+	}
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = true
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = true
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+
+	assert.NotNil(tickets)
+	assert.Equal("", NotCreatedIssueId)
+	assert.Equal(NumberIssueCreated, 1)
+
+	// Read fixture file line by line
+	file, err := os.Open("./fixtures/results/jiraMultipleTicketsOpeningResultsIsUpgradable")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	// assert if the line is not in the jira response
+	for scanner.Scan() {
+		assert.Contains(jiraResponse, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
+
+	// Delete the file created for the test
+	removeLogFile()
 
 	return
 }

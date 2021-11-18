@@ -204,6 +204,24 @@ func HTTPResponseCheckOpenJiraMultipleTicketsWithError() *httptest.Server {
 	}))
 }
 
+func HTTPResponseCheckOpenJiraMultipleTickets() *httptest.Server {
+	var resp []byte
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if r.RequestURI == "/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue" {
+			fmt.Println("Working case")
+			w.WriteHeader(http.StatusAccepted)
+			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse.json")
+		} else if r.RequestURI == "/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559766/jira-issue" {
+			fmt.Println("Working case")
+			w.WriteHeader(http.StatusAccepted)
+			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse3.json")
+		}
+
+		w.Write(resp)
+	}))
+}
+
 func HTTPResponseCheckOpenJiraMultipleTicketsWithErrorTwice() *httptest.Server {
 	var resp []byte
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

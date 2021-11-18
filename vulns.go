@@ -29,6 +29,7 @@ type Filter struct {
 	Types           []string `json:"types"`
 	Ignored         bool     `json:"ignored"`
 	Patched         bool     `json:"patched"`
+	isUpgradable    bool     `json:"isUpgradable"`
 }
 
 func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug) map[string]interface{} {

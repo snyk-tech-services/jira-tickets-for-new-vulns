@@ -89,6 +89,7 @@ type optionalFlags struct {
 	priorityScoreThreshold int
 	debug                  bool
 	dryRun                 bool
+	ifUpgradeAvailableOnly bool
 }
 
 /***
@@ -113,7 +114,7 @@ set the optional flags structure
 func (Of *optionalFlags) setoptionalFlags(projectIDPtr *string, jiraTicketTypePtr *string, severityPtr *string,
 	maturityFilterPtr *string, typePtr *string, assigneeIDPtr *string,
 	assigneeNamePtr *string, labelsPtr *string, priorityIsSeverityPtr *bool,
-	priorityScorePtr *int, debugPtr *bool, dryRunPtr *bool) {
+	priorityScorePtr *int, debugPtr *bool, dryRunPtr *bool, ifUpgradeAvailableOnlyPtr *bool) {
 
 	Of.projectID = *projectIDPtr
 	Of.jiraTicketType = *jiraTicketTypePtr
@@ -127,6 +128,7 @@ func (Of *optionalFlags) setoptionalFlags(projectIDPtr *string, jiraTicketTypePt
 	Of.priorityScoreThreshold = *priorityScorePtr
 	Of.debug = *debugPtr
 	Of.dryRun = *dryRunPtr
+	Of.ifUpgradeAvailableOnly = *ifUpgradeAvailableOnlyPtr
 }
 
 /***
@@ -153,12 +155,13 @@ func (opt *flags) setOption() {
 	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	debugPtr := flag.Bool("debug", false, "Optional. enable debug mode")
 	dryRunPtr := flag.Bool("dryRun", false, "Optional. create a file with all the tickets without open them on jira")
+	ifUpgradeAvailableOnlyPtr := flag.Bool("ifUpgradeAvailableOnly", false, "Optional. Open tickets only for upgradable issues")
 
 	flag.Parse()
 
 	opt.mandatoryFlags.setMandatoryFlags(orgIDPtr, endpointAPIPtr, apiTokenPtr, jiraProjectIDPtr, jiraProjectKeyPtr)
 	opt.optionalFlags.setoptionalFlags(projectIDPtr, jiraTicketTypePtr, severityPtr, maturityFilterPtr,
-		typePtr, assigneeNamePtr, assigneeIDPtr, labelsPtr, priorityIsSeverityPtr, priorityScorePtr, debugPtr, dryRunPtr)
+		typePtr, assigneeNamePtr, assigneeIDPtr, labelsPtr, priorityIsSeverityPtr, priorityScorePtr, debugPtr, dryRunPtr, ifUpgradeAvailableOnlyPtr)
 
 }
 

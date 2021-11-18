@@ -41,6 +41,7 @@ func TestGetVulnsWithoutTicketFunc(t *testing.T) {
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
 	Of.maturityFilterString = ""
+	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
