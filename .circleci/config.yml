@@ -69,7 +69,7 @@ jobs:
       - run: rm simpleGoProject
       - run: rm -rf /dist
       - run: sudo apt install goreleaser
-      - run: goreleaser --rm-dist 
+      - run: goreleaser --rm-dist
 
 workflows:
   version: 2.1
