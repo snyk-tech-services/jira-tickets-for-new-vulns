@@ -245,6 +245,7 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 				issueCreated += 1
 			}
 		}
+
 		// add only existing ticket to the array
 		if ticket != nil {
 			ticketArray = append(ticketArray, *ticket)

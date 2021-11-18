@@ -247,9 +247,6 @@ func TestOpenJiraMultipleTicketsErrorAndRetryFunc(t *testing.T) {
 		panic(err)
 	}
 
-	// Delete the file created for the test
-	removeLogFile()
-
 	return
 }
 
@@ -320,9 +317,6 @@ func TestOpenJiraMultipleTicketsErrorAndRetryAndFailFunc(t *testing.T) {
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}
-
-	// Delete the file created for the test
-	removeLogFile()
 
 	return
 }
@@ -395,9 +389,6 @@ func TestOpenJiraMultipleTicketsFailureFunc(t *testing.T) {
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}
-
-	// Delete the file created for the test
-	removeLogFile()
 
 	assert.Equal("", jiraResponse)
 
