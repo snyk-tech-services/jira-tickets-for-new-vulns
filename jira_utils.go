@@ -1,61 +1,58 @@
 package main
 
 import (
-	"bufio"
+	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
-	"time"
 
 	bfconfluence "github.com/kentaro-m/blackfriday-confluence"
 	"github.com/michael-go/go-jsn/jsn"
 	bf "gopkg.in/russross/blackfriday.v2"
 )
 
-/***
-function getDate
-return date: string
-argument: none
-return a string containing date and time
-***/
-func getDate() string {
-
-	now := time.Now().Round(0)
-	y := fmt.Sprint(now.Year()) + "_"
-	m := fmt.Sprint(int(now.Month())) + "_"
-	d := fmt.Sprint(now.Day()) + "_"
-	h := fmt.Sprint(now.Hour()) + "_"
-	min := fmt.Sprint(now.Minute()) + "_"
-	s := fmt.Sprint(now.Second())
-
-	return y + m + d + h + min + s
+type JiraIssueForTicket struct {
+	Id  string `json:Id,omitempty"`
+	Key string `json:Key,omitempty"`
 }
 
-/***
-function findProjectId
-return found: bool
-return error
-input: projectId string
-input: filename path string
-return true if the project already exist in the file
-***/
-func findProjectId(projectId string, filename string, customDebug debug) (bool, error) {
+type JiraDetailForTicket struct {
+	JiraIssue *JiraIssueForTicket `json:jiraIssue,omitempty"`
+	IssueId   string              `json:IssueId,omitempty"`
+}
 
-	f, err := os.Open(filename)
-	if err != nil {
-		customDebug.Debugf("*** ERROR *** couldn't find log file")
-		return false, err
-	}
-	defer f.Close()
+type Tickets struct {
+	Summary         string               `json:Summary`
+	Description     string               `json:Description`
+	JiraIssueDetail *JiraDetailForTicket `json:JiraIssueDetail,omitempty"`
+}
 
-	scanner := bufio.NewScanner(f)
+type LogFile struct {
+	Projects map[string]interface{} `json:projects`
+}
 
-	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), projectId) {
-			return true, nil
+func getJiraTicketId(responseData []byte) *JiraDetailForTicket {
+
+	var responseDataUnMarshal map[string][]interface{}
+	var jiraIssueDetails *JiraDetailForTicket
+	json.Unmarshal(responseData, &responseDataUnMarshal)
+
+	for index, element := range responseDataUnMarshal {
+
+		for _, jiraIssueEl := range element {
+			jsonJiraIssueEl, _ := jsn.NewJson(jiraIssueEl)
+			jiraIssueForTicket := &JiraIssueForTicket{
+				Id:  jsonJiraIssueEl.K("jiraIssue").K("id").String().Value,
+				Key: jsonJiraIssueEl.K("jiraIssue").K("key").String().Value,
+			}
+
+			jiraIssueDetails = &JiraDetailForTicket{
+				JiraIssue: jiraIssueForTicket,
+				IssueId:   index,
+			}
 		}
 	}
-	return false, err
+
+	return jiraIssueDetails
 }
 
 func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {

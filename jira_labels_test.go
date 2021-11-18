@@ -85,18 +85,16 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
 
-	// Delete the file created for the test
-	removeLogFile()
-
 	assert.Equal(NotCreatedIssueId, "")
 	fmt.Println(numberIssueCreated)
+	assert.NotNil(tickets)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithLabels.json")), string(mirroredResponse.Body))
 
 	return
@@ -146,18 +144,16 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	numberIssueCreated, jiraResponse, NotCreatedIssueId := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
 		panic(err)
 	}
 
-	// Delete the file created for the test
-	removeLogFile()
-
 	assert.Equal(NotCreatedIssueId, "")
 	fmt.Println(numberIssueCreated)
+	assert.NotNil(tickets)
 	assert.Equal(string(readFixture("./fixtures/results/jiraTicketWithoutLabels.json")), string(mirroredResponse.Body))
 
 	return

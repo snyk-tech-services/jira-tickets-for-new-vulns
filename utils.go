@@ -1,9 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"os"
+	"path"
+	"runtime"
+	"strings"
+	"time"
 )
 
 // Debug
@@ -188,4 +194,86 @@ func (flags *flags) checkFlags() {
 	if flags.optionalFlags.assigneeName != "" && flags.optionalFlags.assigneeID != "" {
 		log.Fatalf(("*** ERROR *** You passed both assigneeID and assigneeName in parameters\n Please, Use assigneeID OR assigneeName, not both"))
 	}
+}
+
+/***
+function CreateLogFile
+return filename: string
+argument: debug
+Check if the file exist if not create it
+***/
+func CreateLogFile(customDebug debug) string {
+
+	// Get date
+	date := getDate()
+
+	// Set filename
+	filename := "listOfTicketCreated_" + date + ".json"
+
+	// If the file doesn't exist, create it, or append to the file
+	_, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		// Do not fail the tool if file cannot be created print a warning instead
+		customDebug.Debug("*** ERROR *** Could not create log file")
+		customDebug.Debug(err.Error())
+	}
+
+	return filename
+}
+
+/***
+function getDate
+return date: string
+argument: none
+return a string containing date and time
+***/
+func getDate() string {
+
+	now := time.Now().Round(0)
+	y := fmt.Sprint(now.Year()) + "_"
+	m := fmt.Sprint(int(now.Month())) + "_"
+	d := fmt.Sprint(now.Day()) + "_"
+	h := fmt.Sprint(now.Hour()) + "_"
+	min := fmt.Sprint(now.Minute()) + "_"
+	s := fmt.Sprint(now.Second())
+
+	return y + m + d + h + min + s
+}
+
+/***
+function writeLogFile
+return date: string
+input: map[string]interface{} logFile: details of the ticket to be written in the file
+input: string filename: name of the file created in the main function
+input: customDebug debug
+Write the logFile in the file. Details are append to the file per project ID
+***/
+func writeLogFile(logFile map[string]map[string]interface{}, filename string, customDebug debug) {
+
+	// Find log file path
+	_, b, _, _ := runtime.Caller(1)
+	var d []string
+	d = append(d, path.Join(path.Dir(b)))
+	filenamePathArray := append(d, filename)
+	// find os separator
+	separator := string(os.PathSeparator)
+	// build filename path
+	filenamePath := strings.Join(filenamePathArray, separator)
+
+	// If the file doesn't exist => exit, append to the file otherwise
+	f, err := os.OpenFile(filenamePath, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		customDebug.Debug("*** ERROR *** Could not open file")
+	}
+
+	file, _ := json.MarshalIndent(logFile, "", "")
+
+	if _, err := f.Write(file); err != nil {
+		customDebug.Debug("*** ERROR *** Could not open file")
+	}
+	if err := f.Close(); err != nil {
+		customDebug.Debug("*** ERROR ***  Could not open file")
+	}
+
+	return
 }

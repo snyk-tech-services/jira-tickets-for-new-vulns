@@ -55,6 +55,11 @@ Open Source, so feel free to contribute !
 	numberIssueCreated := 0
 	notCreatedJiraIssues := ""
 	jiraResponse := ""
+	var projectsTickets map[string]interface{}
+	logFile := make(map[string]map[string]interface{})
+
+	// Create the log file for the current run
+	filename := CreateLogFile(customDebug)
 
 	for _, project := range projectIDs {
 
@@ -75,7 +80,7 @@ Open Source, so feel free to contribute !
 			log.Println("*** INFO *** 4/4 - No new JIRA ticket required")
 		} else {
 			log.Println("*** INFO *** 4/4 - Opening JIRA Tickets")
-			numberIssueCreated, jiraResponse, notCreatedJiraIssues = openJiraTickets(options, projectInfo, vulnsPerPath, customDebug)
+			numberIssueCreated, jiraResponse, notCreatedJiraIssues, projectsTickets = openJiraTickets(options, projectInfo, vulnsPerPath, customDebug)
 			if jiraResponse == "" && !options.optionalFlags.dryRun {
 				log.Println("*** ERROR *** Failure to create a ticket(s)")
 			}
@@ -84,11 +89,35 @@ Open Source, so feel free to contribute !
 			} else {
 				fmt.Printf("\n----------PROJECT ID %s---------- \n Number of tickets created: %d\n List of issueId for which the ticket could not be created: %s\n-------------------------------------------------------------------\n", project, numberIssueCreated, notCreatedJiraIssues)
 			}
+
+			// Adding new project tickets detail to logfile struct
+			// need to merge the map{string}interface{}
+			// the new project one with the one containing all the
+			// projects (could not find a better way for now)
+			if projectsTickets != nil {
+				newLogFile := make(map[string]interface{})
+				for k, v := range projectsTickets {
+					if _, ok := projectsTickets[k]; ok {
+						newLogFile[k] = v
+					}
+				}
+
+				for k, v := range logFile["projects"] {
+					if _, ok := logFile["projects"][k]; ok {
+						newLogFile[k] = v
+					}
+				}
+				logFile["projects"] = newLogFile
+			}
 		}
 	}
+
+	// writing into the file
+	writeLogFile(logFile, filename, customDebug)
+
 	if options.optionalFlags.dryRun {
-		fmt.Println("\n*****************************************************************")
-		fmt.Printf("\n******** Dry run list of ticket can be found in log file ********")
-		fmt.Println("\n*****************************************************************")
+		fmt.Println("\n*****************************************************************************************************")
+		fmt.Printf("\n******** Dry run list of ticket can be found in log file %s ********", filename)
+		fmt.Println("\n*****************************************************************************************************")
 	}
 }
