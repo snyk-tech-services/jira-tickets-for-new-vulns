@@ -50,10 +50,10 @@ type IssueType struct {
 	Name string `json:"name"`
 }
 
-func getJiraTickets(endpointAPI string, orgID string, projectID string, token string) map[string]string {
-	responseData, err := makeSnykAPIRequest("GET", endpointAPI+"/v1/org/"+orgID+"/project/"+projectID+"/jira-issues", token, nil)
+func getJiraTickets(Mf MandatoryFlags, projectID string, customDebug debug) map[string]string {
+	responseData, err := makeSnykAPIRequest("GET", Mf.endpointAPI+"/v1/org/"+Mf.orgID+"/project/"+projectID+"/jira-issues", Mf.apiToken, nil, customDebug)
 	if err != nil {
-		fmt.Println("Could not get the tickets")
+		customDebug.Debug("*** ERROR *** Could not get the tickets")
 		log.Fatal(err)
 	}
 
@@ -71,42 +71,51 @@ func getJiraTickets(endpointAPI string, orgID string, projectID string, token st
 	return tickRefs
 }
 
-func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool) ([]byte, error) {
+/***
+function openJiraTicket
+argument lots
+return responseData: request response from snyk API
+return error: if request or ticket creation failure
+create a ticket for a specific vuln
+	ticket is created and send to snyk jira ticket creation API endpoint
+***/
+func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, customDebug debug) ([]byte, *Tickets, error) {
 
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
 	vulnID := jsonVuln.K("id").String().Value
+	var ticketFile *Tickets
 
 	jiraTicket := formatJiraTicket(jsonVuln, projectInfo)
 
-	if jiraProjectKey != "" {
-		jiraTicket.Fields.Projects.Key = jiraProjectKey
-	} else if jiraProjectID != "" {
-		jiraTicket.Fields.Projects.ID = jiraProjectID
+	if flags.mandatoryFlags.jiraProjectKey != "" {
+		jiraTicket.Fields.Projects.Key = flags.mandatoryFlags.jiraProjectKey
+	} else if flags.mandatoryFlags.jiraProjectID != "" {
+		jiraTicket.Fields.Projects.ID = flags.mandatoryFlags.jiraProjectID
 	}
 
-	jiraTicket.Fields.IssueTypes.Name = jiraTicketType
+	jiraTicket.Fields.IssueTypes.Name = flags.optionalFlags.jiraTicketType
 
 	projectInfoId := projectInfo.K("id").String().Value
 
 	if projectInfoId == "" {
-		return nil, errors.New("Failure, Could not retrieve project ID")
+		return nil, nil, errors.New("Failure, Could not retrieve project ID")
 	}
 
-	if labels != "" {
-		jiraTicket.Fields.Labels = strings.Split(labels, ",")
+	if flags.optionalFlags.labels != "" {
+		jiraTicket.Fields.Labels = strings.Split(flags.optionalFlags.labels, ",")
 	}
 
-	if assigneeName != "" {
+	if flags.optionalFlags.assigneeName != "" {
 		var assignee Assignee
-		assignee.Name = assigneeName
+		assignee.Name = flags.optionalFlags.assigneeName
 		jiraTicket.Fields.Assignees = &assignee
-	} else if assigneeID != "" {
+	} else if flags.optionalFlags.assigneeID != "" {
 		var assignee Assignee
-		assignee.AccountId = assigneeID
+		assignee.AccountId = flags.optionalFlags.assigneeID
 		jiraTicket.Fields.Assignees = &assignee
 	}
 
-	if priorityIsSeverity {
+	if flags.optionalFlags.priorityIsSeverity {
 		var priority PriorityType
 		jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN", strings.ToUpper(jsonVuln.K("issueData").K("severity").String().Value))
 		val, present := os.LookupEnv(jiraMappingEnvVarName)
@@ -127,82 +136,133 @@ func openJiraTicket(endpointAPI string, orgID string, token string, jiraProjectI
 
 	ticket, err := json.Marshal(jiraTicket)
 	if err != nil {
-		fmt.Println("Error while creating the ticket")
-		return nil, errors.New("Failure, Failure to create ticket(s)")
+		customDebug.Debug("*** ERROR *** Error while creating the ticket")
+		return nil, nil, errors.New("Failure, Failure to create ticket(s)")
 	}
 
-	// TODO: this needs to be a debug
-	//fmt.Println("ticket to be send: ", string(ticket))
+	customDebug.Debugf("*** INFO *** Ticket to be send %s", string(ticket))
 
-	if len(vulnID) != 0 {
+	// create ticket struct to dd in the logfile
+	// test is dryRun, if not log only what's have been created
+	if flags.optionalFlags.dryRun == true {
+		ticketFile = &Tickets{
+			Summary:     jiraTicket.Fields.Summary,
+			Description: jiraTicket.Fields.Description,
+		}
+	}
+
+	// check that vulnId exist and dryRun is off
+	if len(vulnID) != 0 && !flags.optionalFlags.dryRun {
 		var er error
-		responseData, er := makeSnykAPIRequest("POST", endpointAPI+"/v1/org/"+orgID+"/project/"+projectInfoId+"/issue/"+vulnID+"/jira-issue", token, ticket)
+		responseData, er := makeSnykAPIRequest("POST", flags.mandatoryFlags.endpointAPI+"/v1/org/"+flags.mandatoryFlags.orgID+"/project/"+projectInfoId+"/issue/"+vulnID+"/jira-issue", flags.mandatoryFlags.apiToken, ticket, customDebug)
 
 		if er != nil {
-			fmt.Println("Request failed")
-			return nil, errors.New("Failure, Failure to create ticket(s)")
+			customDebug.Debug("*** ERROR *** Request failed")
+			return nil, nil, errors.New("Failure, Failure to create ticket(s)")
 		}
 
 		if bytes.Equal(responseData, nil) {
-			fmt.Printf("Request response from %s is empty\n", endpointAPI)
-			return nil, errors.New("Failure, Failure to create ticket(s)")
+			customDebug.Debugf("*** ERROR *** Request response from %s is empty\n", flags.mandatoryFlags.endpointAPI)
+			return nil, nil, errors.New("Failure, Failure to create ticket(s)")
 		}
-		return responseData, nil
+
+		// create ticket struct to add in the json logfile
+		// log only what's have been created
+		ticketFile = &Tickets{
+			Summary:         jiraTicket.Fields.Summary,
+			Description:     jiraTicket.Fields.Description,
+			JiraIssueDetail: getJiraTicketId(responseData),
+		}
+
+		return responseData, ticketFile, nil
 	}
-	return nil, errors.New("Failure to create ticket, vuln ID is empty")
+	return nil, ticketFile, errors.New("*** ERROR *** Failure to create ticket, vuln ID is empty")
 }
 
-func displayErrorForIssue(vulnForJira interface{}, endpointAPI string) string {
+func displayErrorForIssue(vulnForJira interface{}, endpointAPI string, customDebug debug) string {
 
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
 	vulnID := jsonVuln.K("id").String().Value
-	fmt.Printf("Request to %s failed too many time\n Ticket cannot be created for this issue: %s\n", endpointAPI, vulnID)
+	customDebug.Debugf("*** ERROR *** Request to %s failed too many time\n Ticket cannot be created for this issue: %s\n", endpointAPI, vulnID)
+
 	return vulnID + "\n"
 }
 
-func openJiraTickets(endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnsForJira map[string]interface{}, priorityIsSeverity bool) (int, string, string) {
+func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]interface{}, customDebug debug) (int, string, string, map[string]interface{}) {
 	fullResponseDataAggregated := ""
 	fullListNotCreatedIssue := ""
 	RequestFailed := false
 	issueCreated := 0
 	MaxNumberOfRetry := 1
+	var ticketArray []Tickets
 
 	for _, vulnForJira := range vulnsForJira {
-		RequestFailed = false
-		responseDataAggregatedByte, err := openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraProjectKey, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
 
+		// skip ticket creating if the vuln is not upgradable
+		if flags.optionalFlags.ifUpgradeAvailableOnly {
+			jsonVuln, _ := jsn.NewJson(vulnForJira)
+			if jsonVuln.K("fixInfo").K("isUpgradable").Bool().Value == false {
+				continue
+			}
+		}
+
+		RequestFailed = false
+
+		customDebug.Debug("*** INFO *** Trying to open ticket for vuln", vulnForJira)
+
+		responseDataAggregatedByte, ticket, err := openJiraTicket(flags, projectInfo, vulnForJira, customDebug)
 		if err != nil {
-			fmt.Printf("Request to %s failed\n", endpointAPI)
+			customDebug.Debugf("*** ERROR *** opening jira ticket failed endpoint %s\n", flags.mandatoryFlags.endpointAPI)
 			RequestFailed = true
 		}
 
-		if RequestFailed == true {
-			for numberOfRetries := 0; numberOfRetries < MaxNumberOfRetry; numberOfRetries++ {
-				fmt.Println("Retrying with priorityIsSeverity set to false, max retry ", MaxNumberOfRetry)
-				priorityIsSeverity = false
-				responseDataAggregatedByte, err = openJiraTicket(endpointAPI, orgID, token, jiraProjectID, jiraProjectKey, jiraTicketType, assigneeName, assigneeID, labels, projectInfo, vulnForJira, priorityIsSeverity)
-				if err != nil {
-					fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
-				} else {
-					RequestFailed = false
-					break
+		// Don't need to do all that on dryRun
+		if !flags.optionalFlags.dryRun {
+
+			if RequestFailed == true {
+				for numberOfRetries := 0; numberOfRetries < MaxNumberOfRetry; numberOfRetries++ {
+
+					customDebug.Debug("*** INFO *** Retrying with priorityIsSeverity set to false, max retry ", MaxNumberOfRetry)
+
+					flags.optionalFlags.priorityIsSeverity = false
+					responseDataAggregatedByte, ticket, err = openJiraTicket(flags, projectInfo, vulnForJira, customDebug)
+					if err != nil {
+						fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, flags.mandatoryFlags.endpointAPI, customDebug)
+					} else {
+						RequestFailed = false
+						break
+					}
 				}
 			}
-		}
-		if RequestFailed == true && strings.Contains(strings.ToLower(string(responseDataAggregatedByte)), "error") {
-			fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, endpointAPI)
-			continue
+			if RequestFailed == true && strings.Contains(strings.ToLower(string(responseDataAggregatedByte)), "error") {
+				fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, flags.mandatoryFlags.endpointAPI, customDebug)
+				continue
+			}
+
+			if responseDataAggregatedByte != nil {
+				// increment the number of ticket created adn response
+				fullResponseDataAggregated += "\n" + string(responseDataAggregatedByte) + "\n"
+				issueCreated += 1
+			}
 		}
 
-		if responseDataAggregatedByte != nil {
-			fullResponseDataAggregated += "\n" + string(responseDataAggregatedByte) + "\n"
-			issueCreated += 1
+		// add only existing ticket to the array
+		if ticket != nil {
+			ticketArray = append(ticketArray, *ticket)
 		}
 	}
 
-	if fullResponseDataAggregated == "" {
-		fmt.Printf("Request response from %s is empty\n", endpointAPI)
+	// getting project ID and associate the ticket list to it
+	projectIdString := projectInfo.K("id").String().Value
+
+	project := make(map[string]interface{})
+	project[projectIdString] = ticketArray
+
+	if fullResponseDataAggregated == "" && !flags.optionalFlags.dryRun {
+		log.Printf("*** ERROR *** Request response from %s is empty\n", flags.mandatoryFlags.endpointAPI)
 	}
 
-	return issueCreated, fullResponseDataAggregated, fullListNotCreatedIssue
+	customDebug.Debugf("*** INFO *** %d issueCreated, fullResponseDataAggregated: %s", issueCreated, fullResponseDataAggregated)
+
+	return issueCreated, fullResponseDataAggregated, fullListNotCreatedIssue, project
 }

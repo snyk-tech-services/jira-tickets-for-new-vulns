@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 )
 
@@ -15,6 +16,58 @@ type mirroredResponse struct {
 	Method string `json:"method"`
 	Token  string `json:"token"`
 	Body   []byte `json:"body"`
+}
+
+/***
+function removeLogFile
+input: none
+return path : string
+find log file and return path
+***/
+func findLogFile() (string, bool) {
+
+	// list all file in the directory
+	fileInfo, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Fatal()
+	}
+
+	// Look for the one starting with listOfTicketCreated
+	path := "./"
+	found := false
+	for _, file := range fileInfo {
+		if !file.IsDir() {
+			if strings.HasPrefix(file.Name(), "listOfTicketCreated") {
+				path += file.Name()
+				found = true
+				break
+			}
+		}
+	}
+
+	return path, found
+}
+
+/***
+function removeLogFile
+input: none
+return none
+clean logs after test
+***/
+func removeLogFile() {
+
+	// Find log file
+	path, found := findLogFile()
+
+	if found {
+		// Delete the file created for the test
+		e := os.Remove(path)
+		if e != nil {
+			log.Fatal(e)
+		}
+	}
+
+	return
 }
 
 // HTTPResponseStubAndMirrorRequest Stubbing HTTP response
@@ -151,6 +204,24 @@ func HTTPResponseCheckOpenJiraMultipleTicketsWithError() *httptest.Server {
 	}))
 }
 
+func HTTPResponseCheckOpenJiraMultipleTickets() *httptest.Server {
+	var resp []byte
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if r.RequestURI == "/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue" {
+			fmt.Println("Working case")
+			w.WriteHeader(http.StatusAccepted)
+			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse.json")
+		} else if r.RequestURI == "/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559766/jira-issue" {
+			fmt.Println("Working case")
+			w.WriteHeader(http.StatusAccepted)
+			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse3.json")
+		}
+
+		w.Write(resp)
+	}))
+}
+
 func HTTPResponseCheckOpenJiraMultipleTicketsWithErrorTwice() *httptest.Server {
 	var resp []byte
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -189,7 +260,7 @@ func HTTPResponseCheckOpenJiraMultipleTicketsFailure() *httptest.Server {
 		if r.RequestURI == "" {
 			resp = []byte("404 - url mismatch")
 		} else {
-			fmt.Println("Error")
+			//fmt.Println("Error")
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			resp = readFixture("./fixtures/singleJiraTicketOpeningErrorResponse.json")
 		}

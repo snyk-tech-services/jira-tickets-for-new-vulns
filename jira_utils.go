@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -8,6 +9,51 @@ import (
 	"github.com/michael-go/go-jsn/jsn"
 	bf "gopkg.in/russross/blackfriday.v2"
 )
+
+type JiraIssueForTicket struct {
+	Id  string `json:Id,omitempty"`
+	Key string `json:Key,omitempty"`
+}
+
+type JiraDetailForTicket struct {
+	JiraIssue *JiraIssueForTicket `json:jiraIssue,omitempty"`
+	IssueId   string              `json:IssueId,omitempty"`
+}
+
+type Tickets struct {
+	Summary         string               `json:Summary`
+	Description     string               `json:Description`
+	JiraIssueDetail *JiraDetailForTicket `json:JiraIssueDetail,omitempty"`
+}
+
+type LogFile struct {
+	Projects map[string]interface{} `json:projects`
+}
+
+func getJiraTicketId(responseData []byte) *JiraDetailForTicket {
+
+	var responseDataUnMarshal map[string][]interface{}
+	var jiraIssueDetails *JiraDetailForTicket
+	json.Unmarshal(responseData, &responseDataUnMarshal)
+
+	for index, element := range responseDataUnMarshal {
+
+		for _, jiraIssueEl := range element {
+			jsonJiraIssueEl, _ := jsn.NewJson(jiraIssueEl)
+			jiraIssueForTicket := &JiraIssueForTicket{
+				Id:  jsonJiraIssueEl.K("jiraIssue").K("id").String().Value,
+				Key: jsonJiraIssueEl.K("jiraIssue").K("key").String().Value,
+			}
+
+			jiraIssueDetails = &JiraDetailForTicket{
+				JiraIssue: jiraIssueForTicket,
+				IssueId:   index,
+			}
+		}
+	}
+
+	return jiraIssueDetails
+}
 
 func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 
@@ -21,7 +67,6 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 
 		for count_, j := range e.Array().Elements() {
 			name := fmt.Sprintf("%s@%s", j.K("name").Stringify(), j.K("version").Stringify())
-
 			newPathArray[count_] = name
 		}
 
@@ -31,22 +76,22 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 			paths += "- ... [" + fmt.Sprintf("%d", len(jsonVuln.K("from").Array().Elements())-count) + " more paths](" + projectInfo.K("browseUrl").String().Value + ")"
 			break
 		}
+		paths += "\r"
+	}
+
+	var pkgVersionsArray []string
+	// jsonVuln.K("pkgVersions").Array().Elements() is []jsn.json
+	// Need to build a []string to use Join()
+	for _, e := range jsonVuln.K("pkgVersions").Array().Elements() {
+		pkgVersionsArray = append(pkgVersionsArray, fmt.Sprintf(e.String().Value))
 	}
 
 	snykBreadcrumbs := "\n[See this issue on Snyk](" + projectInfo.K("browseUrl").String().Value + ")\n"
 	moreAboutThisIssue := "\n\n[More About this issue](" + issueData.K("url").String().Value + ")\n"
-	vulnCvssScore := "\n cvssScore: " + fmt.Sprintf("%.2f", issueData.K("cvssScore").Float64().Value) + "\n"
-	exploitMaturity := "\n exploitMaturity: " + issueData.K("exploitMaturity").String().Value + "\n"
-	severity := "\n severity: " + issueData.K("severity").String().Value + "\n"
-	pkgName := "\n pkgName: " + jsonVuln.K("pkgName").String().Value + "\n"
-	pkgVersions := "\n pkgVersions: ["
-	for count, e := range jsonVuln.K("pkgVersions").Array().Elements() {
-		pkgVersions += fmt.Sprintf(e.String().Value)
-		if count < len(jsonVuln.K("pkgVersions").Array().Elements())-1 {
-			pkgVersions += ","
-		}
-	}
-	pkgVersions += "]\n"
+
+	pkgVersions := "\n pkgVersions: "
+	pkgVersions += strings.Join(pkgVersionsArray, ",")
+	pkgVersions += "]\n\r"
 
 	descriptionFromIssue := ""
 
@@ -55,7 +100,18 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 								Refer to the Reporting tab for possible instructions from your legal team.`
 	}
 
-	descriptionBody := markdownToConfluenceWiki("\n **** Issue details: ****\n" + "\r" + pkgName + "\r" + pkgVersions + "\r" + vulnCvssScore + "\r" + exploitMaturity + "\r" + severity + "\r" + paths + "\r" + snykBreadcrumbs + "\n" + descriptionFromIssue + "\n" + moreAboutThisIssue)
+	issueDetails := []string{"\r\n **** Issue details: ****\n\r",
+		"\n cvssScore: ", fmt.Sprintf("%.2f", issueData.K("cvssScore").Float64().Value),
+		"\n exploitMaturity: ", issueData.K("exploitMaturity").String().Value,
+		"\n severity: ", issueData.K("severity").String().Value,
+		pkgVersions,
+		paths,
+		snykBreadcrumbs,
+		descriptionFromIssue,
+		moreAboutThisIssue,
+	}
+
+	descriptionBody := markdownToConfluenceWiki(strings.Join(issueDetails, " "))
 	descriptionBody = strings.ReplaceAll(descriptionBody, "{{", "{code}")
 	descriptionBody = strings.ReplaceAll(descriptionBody, "}}", "{code}")
 
