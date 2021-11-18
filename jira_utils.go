@@ -3,77 +3,56 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
-	"path"
-	"runtime"
 	"strings"
-	"time"
 
 	bfconfluence "github.com/kentaro-m/blackfriday-confluence"
 	"github.com/michael-go/go-jsn/jsn"
 	bf "gopkg.in/russross/blackfriday.v2"
 )
 
+type JiraIssueForTicket struct {
+	Id  string `json:Id,omitempty"`
+	Key string `json:Key,omitempty"`
+}
+
+type JiraDetailForTicket struct {
+	JiraIssue *JiraIssueForTicket `json:jiraIssue,omitempty"`
+	IssueId   string              `json:IssueId,omitempty"`
+}
+
 type Tickets struct {
-	Summary     string
-	Description string
+	Summary         string               `json:Summary`
+	Description     string               `json:Description`
+	JiraIssueDetail *JiraDetailForTicket `json:JiraIssueDetail,omitempty"`
 }
 
-/***
-function getDate
-return date: string
-argument: none
-return a string containing date and time
-***/
-func getDate() string {
-
-	now := time.Now().Round(0)
-	y := fmt.Sprint(now.Year()) + "_"
-	m := fmt.Sprint(int(now.Month())) + "_"
-	d := fmt.Sprint(now.Day()) + "_"
-	h := fmt.Sprint(now.Hour()) + "_"
-	min := fmt.Sprint(now.Minute()) + "_"
-	s := fmt.Sprint(now.Second())
-
-	return y + m + d + h + min + s
+type LogFile struct {
+	Projects map[string]interface{} `json:projects`
 }
 
-/***
-function writeLogFile
-return date: string
-input: map[string]interface{} logFile: details of the ticket to be written in the file
-input: string filename: name of the file created in the main function
-input: customDebug debug
-Write the logFile in the file. Details are append to the file per project ID
-***/
-func writeLogFile(logFile map[string]interface{}, filename string, customDebug debug) {
+func getJiraTicketId(responseData []byte) *JiraDetailForTicket {
 
-	// write to file
-	file, _ := json.MarshalIndent(logFile, "", "")
+	var responseDataUnMarshal map[string][]interface{}
+	var jiraIssueDetails *JiraDetailForTicket
+	json.Unmarshal(responseData, &responseDataUnMarshal)
 
-	// Find log file path
-	_, b, _, _ := runtime.Caller(1)
-	var d []string
-	d = append(d, path.Join(path.Dir(b)))
-	filenamePathArray := append(d, filename)
-	// find os separator
-	separator := string(os.PathSeparator)
-	// build filename path
-	filenamePath := strings.Join(filenamePathArray, separator)
+	for index, element := range responseDataUnMarshal {
 
-	// If the file doesn't exist => exit, append to the file otherwise
-	f, err := os.OpenFile(filenamePath, os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		customDebug.Debug("*** ERROR *** Could not open file")
-	}
-	if _, err := f.Write(file); err != nil {
-		customDebug.Debug("*** ERROR *** Could not open file")
-	}
-	if err := f.Close(); err != nil {
-		customDebug.Debug("*** ERROR ***  Could not open file")
+		for _, jiraIssueEl := range element {
+			jsonJiraIssueEl, _ := jsn.NewJson(jiraIssueEl)
+			jiraIssueForTicket := &JiraIssueForTicket{
+				Id:  jsonJiraIssueEl.K("jiraIssue").K("id").String().Value,
+				Key: jsonJiraIssueEl.K("jiraIssue").K("key").String().Value,
+			}
+
+			jiraIssueDetails = &JiraDetailForTicket{
+				JiraIssue: jiraIssueForTicket,
+				IssueId:   index,
+			}
+		}
 	}
 
-	return
+	return jiraIssueDetails
 }
 
 func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {

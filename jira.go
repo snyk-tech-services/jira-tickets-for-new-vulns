@@ -79,7 +79,7 @@ return error: if request or ticket creation failure
 create a ticket for a specific vuln
 	ticket is created and send to snyk jira ticket creation API endpoint
 ***/
-func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, customDebug debug, filename string) ([]byte, *Tickets, error) {
+func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, customDebug debug) ([]byte, *Tickets, error) {
 
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
 	vulnID := jsonVuln.K("id").String().Value
@@ -169,8 +169,9 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 		// create ticket struct to add in the json logfile
 		// log only what's have been created
 		ticketFile = &Tickets{
-			Summary:     jiraTicket.Fields.Summary,
-			Description: jiraTicket.Fields.Description,
+			Summary:         jiraTicket.Fields.Summary,
+			Description:     jiraTicket.Fields.Description,
+			JiraIssueDetail: getJiraTicketId(responseData),
 		}
 
 		return responseData, ticketFile, nil
@@ -187,7 +188,7 @@ func displayErrorForIssue(vulnForJira interface{}, endpointAPI string, customDeb
 	return vulnID + "\n"
 }
 
-func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]interface{}, customDebug debug, filename string) (int, string, string) {
+func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]interface{}, customDebug debug) (int, string, string, map[string]interface{}) {
 	fullResponseDataAggregated := ""
 	fullListNotCreatedIssue := ""
 	RequestFailed := false
@@ -201,7 +202,7 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 
 		customDebug.Debug("*** INFO *** Trying to open ticket for vuln", vulnForJira)
 
-		responseDataAggregatedByte, ticket, err := openJiraTicket(flags, projectInfo, vulnForJira, customDebug, filename)
+		responseDataAggregatedByte, ticket, err := openJiraTicket(flags, projectInfo, vulnForJira, customDebug)
 		if err != nil {
 			customDebug.Debugf("*** ERROR *** opening jira ticket failed endpoint %s\n", flags.mandatoryFlags.endpointAPI)
 			RequestFailed = true
@@ -216,7 +217,7 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 					customDebug.Debug("*** INFO *** Retrying with priorityIsSeverity set to false, max retry ", MaxNumberOfRetry)
 
 					flags.optionalFlags.priorityIsSeverity = false
-					responseDataAggregatedByte, ticket, err = openJiraTicket(flags, projectInfo, vulnForJira, customDebug, filename)
+					responseDataAggregatedByte, ticket, err = openJiraTicket(flags, projectInfo, vulnForJira, customDebug)
 					if err != nil {
 						fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, flags.mandatoryFlags.endpointAPI, customDebug)
 					} else {
@@ -231,10 +232,12 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 			}
 
 			if responseDataAggregatedByte != nil {
+				// increment the number of ticket created adn response
 				fullResponseDataAggregated += "\n" + string(responseDataAggregatedByte) + "\n"
 				issueCreated += 1
 			}
 		}
+
 		// add only existing ticket to the array
 		if ticket != nil {
 			ticketArray = append(ticketArray, *ticket)
@@ -244,11 +247,8 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 	// getting project ID and associate the ticket list to it
 	projectIdString := projectInfo.K("id").String().Value
 
-	logFile := make(map[string]interface{})
-	logFile[projectIdString] = ticketArray
-
-	// write the projects tickets in the log file
-	writeLogFile(logFile, filename, customDebug)
+	project := make(map[string]interface{})
+	project[projectIdString] = ticketArray
 
 	if fullResponseDataAggregated == "" && !flags.optionalFlags.dryRun {
 		log.Printf("*** ERROR *** Request response from %s is empty\n", flags.mandatoryFlags.endpointAPI)
@@ -256,5 +256,5 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 
 	customDebug.Debugf("*** INFO *** %d issueCreated, fullResponseDataAggregated: %s", issueCreated, fullResponseDataAggregated)
 
-	return issueCreated, fullResponseDataAggregated, fullListNotCreatedIssue
+	return issueCreated, fullResponseDataAggregated, fullListNotCreatedIssue, project
 }

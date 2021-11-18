@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -32,6 +33,21 @@ func TestEndToEndFunc(t *testing.T) {
 	w.Close()
 	out, _ := ioutil.ReadAll(r)
 	os.Stdout = rescueStdout
+
+	// Checking the log file
+	path, found := findLogFile()
+
+	assert.FileExists(t, path)
+	assert.True(t, found)
+
+	// check if the json is valid
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+
+	var unmarshalledFile interface{}
+	assert.Equal(t, json.Unmarshal(file, &unmarshalledFile), nil)
 
 	// Delete the file created for the test
 	removeLogFile()
