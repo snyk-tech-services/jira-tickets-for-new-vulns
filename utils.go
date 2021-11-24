@@ -6,9 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
-	"runtime"
-	"strings"
 	"time"
 )
 
@@ -253,29 +250,23 @@ Write the logFile in the file. Details are append to the file per project ID
 ***/
 func writeLogFile(logFile map[string]map[string]interface{}, filename string, customDebug debug) {
 
-	// Find log file path
-	_, b, _, _ := runtime.Caller(1)
-	var d []string
-	d = append(d, path.Join(path.Dir(b)))
-	filenamePathArray := append(d, filename)
-	// find os separator
-	separator := string(os.PathSeparator)
-	// build filename path
-	filenamePath := strings.Join(filenamePathArray, separator)
-
 	// If the file doesn't exist => exit, append to the file otherwise
-	f, err := os.OpenFile(filenamePath, os.O_APPEND|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		customDebug.Debug("*** ERROR *** Could not open file")
+		customDebug.Debug("*** ERROR *** Could not open file ", filename)
+		return
 	}
 
 	file, _ := json.MarshalIndent(logFile, "", "")
 
 	if _, err := f.Write(file); err != nil {
-		customDebug.Debug("*** ERROR *** Could not open file")
+		customDebug.Debug("*** ERROR *** Could write in file")
+		return
 	}
+
 	if err := f.Close(); err != nil {
-		customDebug.Debug("*** ERROR ***  Could not open file")
+		customDebug.Debug("*** ERROR ***  Could not close file")
+		return
 	}
 
 	return
