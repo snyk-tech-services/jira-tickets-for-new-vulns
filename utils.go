@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 // Debug
@@ -89,12 +92,48 @@ type optionalFlags struct {
 	ifUpgradeAvailableOnly bool
 }
 
+type snyk struct {
+	orgID                  string
+	severity               string
+	maturityFilter         string
+	jiraTicketType         string
+	priorityScoreThreshold int
+	remoteUrl              string
+	snykProjectId          string
+	ifUpgradeAvailableOnly bool
+}
+
+type jira struct {
+	jiraTicketType string
+	jiraProjectID  string
+	jiraProjectKey string
+	assigneeId     string
+	assigneeName   string
+
+	labels string
+
+	// labels:
+	//    - <IssueLabel1>
+	//    - <IssueLabel2>
+	priorityIsSeverity bool
+	// severityToPriorityMapping:
+	//     critical: "Highest"
+	//     high: "High"
+	//     medium: "Medium"
+	//     low: "Low"
+}
+
+type config struct {
+	Snyk snyk
+	Jira jira
+}
+
 /***
 Function setOption
 set the mandatory flags structure
 ***/
 func (Mf *MandatoryFlags) setMandatoryFlags(orgIDPtr *string, endpointAPIPtr *string, apiTokenPtr *string,
-	jiraProjectIDPtr *string, jiraProjectKeyPtr *string) {
+	jiraProjectIDPtr *string, jiraProjectKeyPtr *string, config *config) {
 
 	Mf.orgID = *orgIDPtr
 	Mf.endpointAPI = *endpointAPIPtr
@@ -111,7 +150,7 @@ set the optional flags structure
 func (Of *optionalFlags) setoptionalFlags(projectIDPtr *string, jiraTicketTypePtr *string, severityPtr *string,
 	maturityFilterPtr *string, typePtr *string, assigneeIDPtr *string,
 	assigneeNamePtr *string, labelsPtr *string, priorityIsSeverityPtr *bool,
-	priorityScorePtr *int, debugPtr *bool, dryRunPtr *bool, ifUpgradeAvailableOnlyPtr *bool) {
+	priorityScorePtr *int, debugPtr *bool, dryRunPtr *bool, ifUpgradeAvailableOnlyPtr *bool, config *config) {
 
 	Of.projectID = *projectIDPtr
 	Of.jiraTicketType = *jiraTicketTypePtr
@@ -153,12 +192,20 @@ func (opt *flags) setOption() {
 	debugPtr := flag.Bool("debug", false, "Optional. enable debug mode")
 	dryRunPtr := flag.Bool("dryRun", false, "Optional. create a file with all the tickets without open them on jira")
 	ifUpgradeAvailableOnlyPtr := flag.Bool("ifUpgradeAvailableOnly", false, "Optional. Open tickets only for upgradable issues")
+	configFilePtr := flag.Bool("configFile", false, "Optional. Use jira.yaml file to set parameters")
 
 	flag.Parse()
 
-	opt.mandatoryFlags.setMandatoryFlags(orgIDPtr, endpointAPIPtr, apiTokenPtr, jiraProjectIDPtr, jiraProjectKeyPtr)
+	configFile := *configFilePtr
+	var config *config
+	if configFile {
+		config = parseConfigFile()
+	}
+
+	opt.mandatoryFlags.setMandatoryFlags(orgIDPtr, endpointAPIPtr, apiTokenPtr, jiraProjectIDPtr, jiraProjectKeyPtr, config)
 	opt.optionalFlags.setoptionalFlags(projectIDPtr, jiraTicketTypePtr, severityPtr, maturityFilterPtr,
-		typePtr, assigneeNamePtr, assigneeIDPtr, labelsPtr, priorityIsSeverityPtr, priorityScorePtr, debugPtr, dryRunPtr, ifUpgradeAvailableOnlyPtr)
+		typePtr, assigneeNamePtr, assigneeIDPtr, labelsPtr, priorityIsSeverityPtr, priorityScorePtr,
+		debugPtr, dryRunPtr, ifUpgradeAvailableOnlyPtr, config)
 
 }
 
@@ -270,4 +317,27 @@ func writeLogFile(logFile map[string]map[string]interface{}, filename string, cu
 	}
 
 	return
+}
+
+/***
+function parseConfigFile
+return: none
+input: flags
+Parse the config file to set the flags
+***/
+func parseConfigFile() *config {
+
+	var config *config
+
+	//parse config file to extract values
+	yamlFile, err := ioutil.ReadFile("jira.yaml")
+	if err != nil {
+		log.Printf("yamlFile.Get err   #%v ", err)
+	}
+	err = yaml.Unmarshal(yamlFile, config)
+	if err != nil {
+		log.Printf("Unmarshal: %v", err)
+	}
+
+	return config
 }

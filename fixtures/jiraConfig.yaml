@@ -1,0 +1,22 @@
+schema: 1
+snyk: 
+    orgID: <a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513>
+    severity: <critical|high|medium|low> #threshold for jira ticket creation
+    maturityFilter: <mature|proof-of-concept|no-known-exploit|no-data>
+    type: <all|vuln|license> #what snyk issue types should we consider to ticket
+    priorityScoreThreshold: <[0-1000]>
+    remoteUrl: <github.com/owner/repo> # URL to the remote repository (when not detected)
+jira:
+    jiraTicketType: <Task|Bug|etc..>
+    jiraProjectID: <12345>
+    assigneeId: <123abc456def789>
+    assigneeName: <AccountName>
+    labels: 
+       - <IssueLabel1>
+       - <IssueLabel2>
+    priorityIsSeverity: <true|false>
+    severityToPriorityMapping:
+        critical: "Highest"
+        high: "High"
+        medium: "Medium"
+        low: "Low"
