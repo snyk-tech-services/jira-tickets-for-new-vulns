@@ -58,19 +58,17 @@ jobs:
           password: $GCLOUD_GCR_SNYK_TS_READER
     steps:
       - checkout
-      - run: apt install golang-go
-      - run: go build
-      - run: echo 'deb [trusted=yes] https://apt.fury.io/caarlos0/ /' | sudo tee /etc/apt/sources.list.d/caarlos0.list
-      - run: apt update
-      - run: apt install svu 
-      - run: git tag "$(svu next)"
-      - run: git push --tags
-      - run: echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | sudo tee /etc/apt/sources.list.d/goreleaser.list
-      - run: apt update
-      - run: rm ira-tickets-for-new-vulns
-      - run: rm -rf /dist
-      - run: apt install goreleaser
-      - run: goreleaser --rm-dist
+      - attach_workspace:
+          at: .
+      - run: sha256sum dist/snyk-jira-sync-linux > dist/snyk-jira-sync-linux.sha256
+      - run: sha256sum dist/snyk-jira-sync-macos > dist/snyk-jira-sync-macos.sha256
+      - run: sha256sum dist/snyk-jira-sync-win.exe > dist/snyk-jira-sync-win.exe.sha256
+      - run:
+          name: "Publish Release on GitHub"
+          command: |    
+            VERSIONJUMP=$(git log --oneline -1 --pretty=%B | cat | grep -E 'minor|major|patch' | awk -F ':' '{print $1}')   
+            VERSION=$(/workdir/nextver.sh "$VERSIONJUMP")
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${VERSION} dist/
 
 workflows:
   version: 2.1
