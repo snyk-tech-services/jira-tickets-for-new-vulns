@@ -58,6 +58,7 @@ jobs:
           password: $GCLOUD_GCR_SNYK_TS_READER
     steps:
       - checkout
+      - run: sudo apt install golang-go
       - run: go build
       - run: echo 'deb [trusted=yes] https://apt.fury.io/caarlos0/ /' | sudo tee /etc/apt/sources.list.d/caarlos0.list
       - run: sudo apt update
@@ -66,7 +67,7 @@ jobs:
       - run: git push --tags
       - run: echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | sudo tee /etc/apt/sources.list.d/goreleaser.list
       - run: sudo apt update
-      - run: rm simpleGoProject
+      - run: rm ira-tickets-for-new-vulns
       - run: rm -rf /dist
       - run: sudo apt install goreleaser
       - run: goreleaser --rm-dist
