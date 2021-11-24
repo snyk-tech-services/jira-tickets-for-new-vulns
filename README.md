@@ -37,7 +37,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold
     -dryRun=<true|false>                                                // Optional. result can be found in a json file were the tool is run
     -debug=<true|false>                                                 // Optional. enable debug mode
-    -ifUpgradeAvailableOnly                                             // Optional. create ticket only for upgradable issues
+    -ifUpgradeAvailableOnly=<true|false>                                // Optional. create ticket only for upgradable issues
 ```
 
 ### Priority is Severity
