@@ -38,6 +38,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -dryRun=<true|false>                                                // Optional. result can be found in a json file were the tool is run
     -debug=<true|false>                                                 // Optional. enable debug mode
     -ifUpgradeAvailableOnly=<true|false>                                // Optional. create ticket only for upgradable issues
+    -configFile=<true|false>                                            // Optional. Use jira.yaml to set the config
 ```
 
 ### Priority is Severity
@@ -103,3 +104,37 @@ A logFile listing all the tickets created can be found where the tool has been r
   }
 }
 ```
+
+## Jira.yaml
+
+Example of config file structure
+
+'''
+schema: 1
+snyk: 
+    orgID: a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513 # <SNYK_ORG_ID> 
+    projectID: a1b2c3de-99b1-4f3f-bfdb-6ee4b4990514 # <SNYK_PROJECT_ID>
+    severity: critical # <critical|high|medium|low>
+    maturityFilter: mature # <mature,proof-of-concept,no-known-exploit,no-data>
+    type: all # <all|vuln|license>
+    priorityScoreThreshold: 10
+    api: https://myapi # <API endpoint> default to 
+    ifUpgradeAvailableOnly: false # <true|false>
+jira:
+    jiraTicketType: Task # <Task|Bug|....>
+    jiraProjectID: 12345
+    assigneeId: 123abc456def789
+    assigneeName: AccountName
+    priorityIsSeverity: true # <true|false>
+    label: label1 # <IssueLabel1>,<IssueLabel2>
+    jiraProjectKey: testProject
+    priorityIsSeverity: false # <true|false> (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
+'''
+Notes: 
+  - The token is not expected present in the config file
+  - Command line arguments override the config file. IE: 
+      Using the config file above, running ./snyk-jira-sync-macOs -Org=1234 -configFile=true -token=123
+      the org ID used by the tool will be 1234 and not a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513
+  - See 'Extended options' for default values 
+
+
