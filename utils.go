@@ -106,7 +106,7 @@ Function setOption
 get the arguments
 set the flags structures
 ***/
-func (opt *flags) setOption() {
+func (opt *flags) setOption(args []string) {
 
 	var apiTokenPtr *string
 	var debug bool
@@ -114,60 +114,66 @@ func (opt *flags) setOption() {
 	var configFilePtr *string
 	v := viper.New()
 
+	// pflag uses a default global, shared FlagSet stored in the var `pflag.CommandLine`.
+	// Each test will use this FlagSet unless we use create a one explicitly. I personally almost
+	// always try to avoid globals, except when registering code (ie. Cobra)
+	// https://github.com/spf13/pflag/blob/v1.0.5/flag.go#L1188
+	fs := pflag.NewFlagSet("test", pflag.ContinueOnError)
+
 	// flags are all setup at the same time so if one is all of them should be
-	if pflag.Lookup("token") == nil {
-		pflag.String("orgID", "", "Your Snyk Organization ID (check under Settings)")
-		pflag.String("projectID", "", "Optional. Your Project ID. Will sync all projects Of your organization if not provided")
-		pflag.String("api", "https://snyk.io/api", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
-		apiTokenPtr = pflag.String("token", "", "Your API token")
-		pflag.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
-		pflag.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
-		pflag.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
-		pflag.String("severity", "low", "Optional. Your severity threshold")
-		pflag.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
-		pflag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
-		pflag.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
-		pflag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
-		pflag.String("labels", "", "Optional. Jira ticket labels")
-		pflag.Bool("priorityIsSeverity", false, "Boolean. Use issue severity as priority")
-		pflag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
-		debugPtr := pflag.Bool("debug", false, "Optional. Boolean. enable debug mode")
+	if pflag.Lookup("token") == nil { // this will always return nil as the flag has not been defined yet
+		fs.String("orgID", "", "Your Snyk Organization ID (check under Settings)")
+		fs.String("projectID", "", "Optional. Your Project ID. Will sync all projects Of your organization if not provided")
+		fs.String("api", "https://snyk.io/api", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
+		apiTokenPtr = fs.String("token", "", "Your API token")
+		fs.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
+		fs.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
+		fs.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
+		fs.String("severity", "low", "Optional. Your severity threshold")
+		fs.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
+		fs.String("type", "all", "Optional. Your issue type (all|vuln|license)")
+		fs.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
+		fs.String("assigneeId", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
+		fs.String("labels", "", "Optional. Jira ticket labels")
+		fs.Bool("priorityIsSeverity", false, "Boolean. Use issue severity as priority")
+		fs.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
+		debugPtr := fs.Bool("debug", false, "Optional. Boolean. enable debug mode")
 		debug = *debugPtr
-		dryRunPtr := pflag.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
+		dryRunPtr := fs.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
 		dryRun = *dryRunPtr
-		pflag.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Open tickets only for upgradable issues")
-		configFilePtr = pflag.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
-		pflag.Parse()
+		fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Open tickets only for upgradable issues")
+		configFilePtr = fs.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
+		fs.Parse(args)
 
 	} else {
-		pflag.Parse()
-		apiToken := pflag.Lookup("token").Value.String()
+		fs.Parse(args)
+		apiToken := fs.Lookup("token").Value.String()
 		apiTokenPtr = &apiToken
 		debug = false
 		dryRun = false
-		configFileVal := pflag.Lookup("configFile").Value.String()
+		configFileVal := fs.Lookup("configFile").Value.String()
 		configFilePtr = &configFileVal
-		pflag.VisitAll(func(f *pflag.Flag) {
-			pflag.Lookup(f.Name).Value.Set(f.Value.String())
+		fs.VisitAll(func(f *pflag.Flag) {
+			fs.Lookup(f.Name).Value.Set(f.Value.String())
 		})
 	}
 
-	v.BindPFlag("snyk.orgID", pflag.Lookup("orgID"))
-	v.BindPFlag("snyk.api", pflag.Lookup("api"))
-	v.BindPFlag("jira.jiraProjectID", pflag.Lookup("jiraProjectID"))
-	v.BindPFlag("jira.jiraProjectKey", pflag.Lookup("jiraProjectKey"))
+	v.BindPFlag("snyk.orgID", fs.Lookup("orgID"))
+	v.BindPFlag("snyk.api", fs.Lookup("api"))
+	v.BindPFlag("jira.jiraProjectID", fs.Lookup("jiraProjectID"))
+	v.BindPFlag("jira.jiraProjectKey", fs.Lookup("jiraProjectKey"))
 
-	v.BindPFlag("snyk.projectID", pflag.Lookup("projectID"))
-	v.BindPFlag("jira.jiraTicketType", pflag.Lookup("jiraTicketType"))
-	v.BindPFlag("snyk.severity", pflag.Lookup("severity"))
-	v.BindPFlag("snyk.type", pflag.Lookup("type"))
-	v.BindPFlag("snyk.maturityFilter", pflag.Lookup("maturityFilter"))
-	v.BindPFlag("jira.assigneeID", pflag.Lookup("assigneeId"))
-	v.BindPFlag("jira.assigneeName", pflag.Lookup("assigneeName"))
-	v.BindPFlag("jira.labels", pflag.Lookup("labels"))
-	v.BindPFlag("jira.priorityIsSeverity", pflag.Lookup("priorityIsSeverity"))
-	v.BindPFlag("snyk.priorityScoreThreshold", pflag.Lookup("priorityScoreThreshold"))
-	v.BindPFlag("snyk.ifUpgradeAvailableOnly", pflag.Lookup("ifUpgradeAvailableOnly"))
+	v.BindPFlag("snyk.projectID", fs.Lookup("projectID"))
+	v.BindPFlag("jira.jiraTicketType", fs.Lookup("jiraTicketType"))
+	v.BindPFlag("snyk.severity", fs.Lookup("severity"))
+	v.BindPFlag("snyk.type", fs.Lookup("type"))
+	v.BindPFlag("snyk.maturityFilter", fs.Lookup("maturityFilter"))
+	v.BindPFlag("jira.assigneeID", fs.Lookup("assigneeId"))
+	v.BindPFlag("jira.assigneeName", fs.Lookup("assigneeName"))
+	v.BindPFlag("jira.labels", fs.Lookup("labels"))
+	v.BindPFlag("jira.priorityIsSeverity", fs.Lookup("priorityIsSeverity"))
+	v.BindPFlag("snyk.priorityScoreThreshold", fs.Lookup("priorityScoreThreshold"))
+	v.BindPFlag("snyk.ifUpgradeAvailableOnly", fs.Lookup("ifUpgradeAvailableOnly"))
 
 	v.SetConfigName("jira") // config file name without extension
 	v.SetConfigType("yaml")
