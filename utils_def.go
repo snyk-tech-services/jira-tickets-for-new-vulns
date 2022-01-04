@@ -15,7 +15,7 @@ type flags struct {
 
 type MandatoryFlags struct {
 	orgID          string
-	endpointAPI    string
+	endpointAPI    string `default:"test"`
 	apiToken       string
 	jiraProjectID  string
 	jiraProjectKey string

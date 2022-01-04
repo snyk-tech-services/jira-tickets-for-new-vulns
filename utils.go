@@ -9,6 +9,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 )
 
@@ -57,64 +59,35 @@ func (m *debug) Printf(format string, args ...interface{}) {
 Function setOption
 set the mandatory flags structure
 ***/
-func (Mf *MandatoryFlags) setMandatoryFlags(orgIDPtr *string, endpointAPIPtr *string, apiTokenPtr *string,
-	jiraProjectIDPtr *string, jiraProjectKeyPtr *string, config *config) {
+func (Mf *MandatoryFlags) setMandatoryFlags(apiTokenPtr *string, v viper.Viper) {
 
-	if config != nil {
-		Mf.orgID = IfThenElseString((*orgIDPtr != ""), orgIDPtr, &config.Snyk.OrgID, "")
-		Mf.endpointAPI = IfThenElseString((*endpointAPIPtr != ""), endpointAPIPtr, &config.Snyk.EndpointAPI, "https://snyk.io/api")
-		Mf.apiToken = *apiTokenPtr
-		Mf.jiraProjectID = IfThenElseString((*jiraProjectIDPtr != ""), jiraProjectIDPtr, &config.Jira.JiraProjectID, "")
-		Mf.jiraProjectKey = IfThenElseString((*jiraProjectKeyPtr != ""), jiraProjectKeyPtr, &config.Jira.JiraProjectKey, "")
-	} else {
-		emptyString := ""
-		Mf.orgID = *orgIDPtr
-		Mf.endpointAPI = IfThenElseString((*endpointAPIPtr != ""), endpointAPIPtr, &emptyString, "https://snyk.io/api")
-		Mf.apiToken = *apiTokenPtr
-		Mf.jiraProjectID = *jiraProjectIDPtr
-		Mf.jiraProjectKey = *jiraProjectKeyPtr
-	}
+	Mf.orgID = v.GetString("snyk.orgID")
+	Mf.endpointAPI = v.GetString("snyk.api")
+	Mf.apiToken = *apiTokenPtr
+	Mf.jiraProjectID = v.GetString("jira.jiraProjectID")
+	Mf.jiraProjectKey = v.GetString("jira.jiraProjectKey")
 }
 
 /***
 Function setOption
 set the optional flags structure
 ***/
-func (Of *optionalFlags) setoptionalFlags(projectIDPtr *string, jiraTicketTypePtr *string, severityPtr *string,
-	maturityFilterPtr *string, typePtr *string, assigneeNamePtr *string,
-	assigneeIDPtr *string, labelsPtr *string, priorityIsSeverityPtr *bool,
-	priorityScorePtr *int, debugPtr *bool, dryRunPtr *bool, ifUpgradeAvailableOnlyPtr *bool, config *config) {
+func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper.Viper) {
 
-	if config != nil {
-		Of.projectID = IfThenElseString((*projectIDPtr != ""), projectIDPtr, &config.Snyk.ProjectID, "")
-		Of.jiraTicketType = IfThenElseString((*jiraTicketTypePtr != ""), jiraTicketTypePtr, &config.Jira.JiraTicketType, "Bug")
-		Of.severity = IfThenElseString((*severityPtr != ""), severityPtr, &config.Snyk.Severity, "low")
-		Of.issueType = IfThenElseString((*typePtr != ""), typePtr, &config.Snyk.IssueType, "all")
-		Of.maturityFilterString = IfThenElseString((*maturityFilterPtr != ""), maturityFilterPtr, &config.Snyk.MaturityFilter, "")
-		Of.assigneeID = IfThenElseString((*assigneeIDPtr != ""), assigneeIDPtr, &config.Jira.AssigneeId, "")
-		Of.assigneeName = IfThenElseString((*assigneeNamePtr != ""), assigneeNamePtr, &config.Jira.AssigneeName, "")
-		Of.labels = IfThenElseString((*labelsPtr != ""), labelsPtr, &config.Jira.Labels, "")
-		Of.priorityIsSeverity = IfThenElseBool((*priorityIsSeverityPtr != false), priorityIsSeverityPtr, &config.Jira.PriorityIsSeverity)
-		Of.priorityScoreThreshold = IfThenElseInt((*priorityScorePtr != 0), priorityScorePtr, &config.Snyk.PriorityScoreThreshold)
-		Of.debug = *debugPtr
-		Of.dryRun = *dryRunPtr
-		Of.ifUpgradeAvailableOnly = IfThenElseBool((*ifUpgradeAvailableOnlyPtr != false), ifUpgradeAvailableOnlyPtr, &config.Snyk.IfUpgradeAvailableOnly)
-	} else {
-		emptyString := ""
-		Of.projectID = *projectIDPtr
-		Of.jiraTicketType = IfThenElseString((*jiraTicketTypePtr != ""), jiraTicketTypePtr, &emptyString, "Bug")
-		Of.severity = IfThenElseString((*severityPtr != ""), severityPtr, &emptyString, "low")
-		Of.issueType = IfThenElseString((*typePtr != ""), typePtr, &emptyString, "all")
-		Of.maturityFilterString = *maturityFilterPtr
-		Of.assigneeID = *assigneeIDPtr
-		Of.assigneeName = *assigneeNamePtr
-		Of.labels = *labelsPtr
-		Of.priorityIsSeverity = *priorityIsSeverityPtr
-		Of.priorityScoreThreshold = *priorityScorePtr
-		Of.debug = *debugPtr
-		Of.dryRun = *dryRunPtr
-		Of.ifUpgradeAvailableOnly = *ifUpgradeAvailableOnlyPtr
-	}
+	Of.projectID = v.GetString("snyk.projectID")
+	Of.jiraTicketType = v.GetString("jira.jiraTicketType")
+	Of.severity = v.GetString("snyk.severity")
+	Of.issueType = v.GetString("snyk.type")
+	Of.maturityFilterString = v.GetString("snyk.maturityFilter")
+	Of.assigneeID = v.GetString("jira.assigneeID")
+	Of.assigneeName = v.GetString("jira.assigneeName")
+	Of.labels = v.GetString("jira.labels")
+	Of.priorityIsSeverity = v.GetBool("jira.priorityIsSeverity")
+	Of.priorityScoreThreshold = v.GetInt("snyk.priorityScoreThreshold")
+	Of.debug = debugPtr
+	Of.dryRun = dryRunPtr
+	Of.ifUpgradeAvailableOnly = v.GetBool("snyk.ifUpgradeAvailableOnly")
+
 }
 
 /***
@@ -123,29 +96,9 @@ reset commands line flags
 ***/
 func resetFlag() {
 
-	flag.Lookup("token").Value.Set("")
-	flag.Lookup("orgID").Value.Set("")
-	flag.Lookup("configFile").Value.Set("")
-	flag.Lookup("projectID").Value.Set("")
-	flag.Lookup("api").Value.Set("")
-	flag.Lookup("jiraProjectID").Value.Set("")
-	flag.Lookup("jiraProjectKey").Value.Set("")
-	flag.Lookup("jiraTicketType").Value.Set("")
-
-	flag.Lookup("severity").Value.Set("")
-	flag.Lookup("maturityFilter").Value.Set("")
-	flag.Lookup("type").Value.Set("")
-	flag.Lookup("assigneeName").Value.Set("")
-	flag.Lookup("assigneeId").Value.Set("")
-
-	flag.Lookup("labels").Value.Set("")
-	flag.Lookup("priorityIsSeverity").Value.Set("")
-	flag.Lookup("priorityScoreThreshold").Value.Set("")
-	flag.Lookup("debug").Value.Set("")
-	flag.Lookup("dryRun").Value.Set("")
-	flag.Lookup("ifUpgradeAvailableOnly").Value.Set("")
-	flag.Lookup("configFile").Value.Set("")
-
+	pflag.VisitAll(func(f *pflag.Flag) {
+		pflag.Lookup(f.Name).Value.Set(f.DefValue)
+	})
 }
 
 /***
@@ -155,102 +108,150 @@ set the flags structures
 ***/
 func (opt *flags) setOption() {
 
-	var orgIDPtr *string
-	var projectIDPtr *string
-	var endpointAPIPtr *string
 	var apiTokenPtr *string
-	var jiraProjectIDPtr *string
-	var jiraProjectKeyPtr *string
-	var jiraTicketTypePtr *string
-	var severityPtr *string
-	var maturityFilterPtr *string
-	var typePtr *string
-	var assigneeNamePtr *string
-	var assigneeIDPtr *string
-	var labelsPtr *string
-	var priorityIsSeverityPtr *bool
-	var priorityScorePtr *int
-	var debugPtr *bool
-	var dryRunPtr *bool
-	var ifUpgradeAvailableOnlyPtr *bool
+	var debug bool
+	var dryRun bool
 	var configFilePtr *string
-	var config *config
+	v := viper.New()
 
-	// flags are all setup at the same tme so if one is all of them should be
-	if flag.Lookup("token") == nil {
-		orgIDPtr = flag.String("orgID", "", "Your Snyk Organization ID (check under Settings)")
-		projectIDPtr = flag.String("projectID", "", "Optional. Your Project ID. Will sync all projects Of your organization if not provided")
-		endpointAPIPtr = flag.String("api", "", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
-		apiTokenPtr = flag.String("token", "", "Your API token")
-		jiraProjectIDPtr = flag.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
-		jiraProjectKeyPtr = flag.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
-		jiraTicketTypePtr = flag.String("jiraTicketType", "", "Optional. Chosen JIRA ticket type")
-		severityPtr = flag.String("severity", "", "Optional. Your severity threshold")
-		maturityFilterPtr = flag.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
-		typePtr = flag.String("type", "", "Optional. Your issue type (all|vuln|license)")
-		assigneeNamePtr = flag.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
-		assigneeIDPtr = flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
-		labelsPtr = flag.String("labels", "", "Optional. Jira ticket labels")
-		priorityIsSeverityPtr = flag.Bool("priorityIsSeverity", false, "Boolean. Use issue severity as priority")
-		priorityScorePtr = flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
-		debugPtr = flag.Bool("debug", false, "Optional. Boolean. enable debug mode")
-		dryRunPtr = flag.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
-		ifUpgradeAvailableOnlyPtr = flag.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Open tickets only for upgradable issues")
-		configFilePtr = flag.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
-		flag.Parse()
+	// flags are all setup at the same time so if one is all of them should be
+	if pflag.Lookup("token") == nil {
+		pflag.String("orgID", "", "Your Snyk Organization ID (check under Settings)")
+		pflag.String("projectID", "", "Optional. Your Project ID. Will sync all projects Of your organization if not provided")
+		pflag.String("api", "https://snyk.io/api", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
+		apiTokenPtr = pflag.String("token", "", "Your API token")
+		pflag.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
+		pflag.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
+		pflag.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
+		pflag.String("severity", "low", "Optional. Your severity threshold")
+		pflag.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
+		pflag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
+		pflag.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
+		pflag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
+		pflag.String("labels", "", "Optional. Jira ticket labels")
+		pflag.Bool("priorityIsSeverity", false, "Boolean. Use issue severity as priority")
+		pflag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
+		debugPtr := pflag.Bool("debug", false, "Optional. Boolean. enable debug mode")
+		debug = *debugPtr
+		dryRunPtr := pflag.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
+		dryRun = *dryRunPtr
+		pflag.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Open tickets only for upgradable issues")
+		configFilePtr = pflag.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
+		pflag.Parse()
+
 	} else {
-		// parse and then get the new value of the already existing flag to set pointer
-		flag.Parse()
-		apiTokenString := flag.Lookup("token").Value.(flag.Getter).Get().(string)
-		apiTokenPtr = &apiTokenString
-		configFileString := flag.Lookup("configFile").Value.(flag.Getter).Get().(string)
-		configFilePtr = &configFileString
-		orgIDString := flag.Lookup("orgID").Value.(flag.Getter).Get().(string)
-		orgIDPtr = &orgIDString
-		projectIDString := flag.Lookup("projectID").Value.(flag.Getter).Get().(string)
-		projectIDPtr = &projectIDString
-		endpointAPIString := flag.Lookup("api").Value.(flag.Getter).Get().(string)
-		endpointAPIPtr = &endpointAPIString
-		jiraProjectIDString := flag.Lookup("jiraProjectID").Value.(flag.Getter).Get().(string)
-		jiraProjectIDPtr = &jiraProjectIDString
-		jiraProjectKeyString := flag.Lookup("jiraProjectKey").Value.(flag.Getter).Get().(string)
-		jiraProjectKeyPtr = &jiraProjectKeyString
-		jiraTicketTypeString := flag.Lookup("jiraTicketType").Value.(flag.Getter).Get().(string)
-		jiraTicketTypePtr = &jiraTicketTypeString
-		severityString := flag.Lookup("severity").Value.(flag.Getter).Get().(string)
-		severityPtr = &severityString
-		maturityFilterString := flag.Lookup("maturityFilter").Value.(flag.Getter).Get().(string)
-		maturityFilterPtr = &maturityFilterString
-		typeString := flag.Lookup("type").Value.(flag.Getter).Get().(string)
-		typePtr = &typeString
-		assigneeNameString := flag.Lookup("assigneeName").Value.(flag.Getter).Get().(string)
-		assigneeNamePtr = &assigneeNameString
-		assigneeIDString := flag.Lookup("assigneeId").Value.(flag.Getter).Get().(string)
-		assigneeIDPtr = &assigneeIDString
-		labelsString := flag.Lookup("labels").Value.(flag.Getter).Get().(string)
-		labelsPtr = &labelsString
-		priorityIsSeverityBool := flag.Lookup("priorityIsSeverity").Value.(flag.Getter).Get().(bool)
-		priorityIsSeverityPtr = &priorityIsSeverityBool
-		priorityScoreInt := flag.Lookup("priorityScoreThreshold").Value.(flag.Getter).Get().(int)
-		priorityScorePtr = &priorityScoreInt
-		debugBool := flag.Lookup("debug").Value.(flag.Getter).Get().(bool)
-		debugPtr = &debugBool
-		dryRunBool := flag.Lookup("dryRun").Value.(flag.Getter).Get().(bool)
-		dryRunPtr = &dryRunBool
-		ifUpgradeAvailableOnlyBool := flag.Lookup("ifUpgradeAvailableOnly").Value.(flag.Getter).Get().(bool)
-		ifUpgradeAvailableOnlyPtr = &ifUpgradeAvailableOnlyBool
+		pflag.Parse()
+		apiToken := pflag.Lookup("token").Value.String()
+		apiTokenPtr = &apiToken
+		debug = false
+		dryRun = false
+		configFileVal := pflag.Lookup("configFile").Value.String()
+		configFilePtr = &configFileVal
+		pflag.VisitAll(func(f *pflag.Flag) {
+			pflag.Lookup(f.Name).Value.Set(f.Value.String())
+		})
 	}
+
+	v.BindPFlag("snyk.orgID", pflag.Lookup("orgID"))
+	v.BindPFlag("snyk.api", pflag.Lookup("api"))
+	v.BindPFlag("jira.jiraProjectID", pflag.Lookup("jiraProjectID"))
+	v.BindPFlag("jira.jiraProjectKey", pflag.Lookup("jiraProjectKey"))
+
+	v.BindPFlag("snyk.projectID", pflag.Lookup("projectID"))
+	v.BindPFlag("jira.jiraTicketType", pflag.Lookup("jiraTicketType"))
+	v.BindPFlag("snyk.severity", pflag.Lookup("severity"))
+	v.BindPFlag("snyk.type", pflag.Lookup("type"))
+	v.BindPFlag("snyk.maturityFilter", pflag.Lookup("maturityFilter"))
+	v.BindPFlag("jira.assigneeID", pflag.Lookup("assigneeId"))
+	v.BindPFlag("jira.assigneeName", pflag.Lookup("assigneeName"))
+	v.BindPFlag("jira.labels", pflag.Lookup("labels"))
+	v.BindPFlag("jira.priorityIsSeverity", pflag.Lookup("priorityIsSeverity"))
+	v.BindPFlag("snyk.priorityScoreThreshold", pflag.Lookup("priorityScoreThreshold"))
+	v.BindPFlag("snyk.ifUpgradeAvailableOnly", pflag.Lookup("ifUpgradeAvailableOnly"))
+
+	v.SetConfigName("jira") // config file name without extension
+	v.SetConfigType("yaml")
+	v.AddConfigPath(".")
 
 	if configFilePtr != nil {
-		config = parseConfigFile(*configFilePtr)
+		v.AddConfigPath(*configFilePtr)
+	} else {
+		v.AddConfigPath(".")
 	}
 
-	opt.mandatoryFlags.setMandatoryFlags(orgIDPtr, endpointAPIPtr, apiTokenPtr, jiraProjectIDPtr, jiraProjectKeyPtr, config)
-	opt.optionalFlags.setoptionalFlags(projectIDPtr, jiraTicketTypePtr, severityPtr, maturityFilterPtr,
-		typePtr, assigneeNamePtr, assigneeIDPtr, labelsPtr, priorityIsSeverityPtr, priorityScorePtr,
-		debugPtr, dryRunPtr, ifUpgradeAvailableOnlyPtr, config)
+	if err := v.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			fmt.Println("error no file")
+		} else {
+			fmt.Println("error ")
+		}
+	}
 
-	resetFlag()
+	log.Println("snyk.orgID: ", v.ConfigFileUsed())
+	log.Println("snyk.orgID: ", v.AllSettings())
+
+	// if configFilePtr != nil {
+	// 	config = parseConfigFile(*configFilePtr)
+	// }
+
+	//log.Println("config.Snyk.EndpointAPI: ", config.Snyk.EndpointAPI)
+	// 	// parse and then get the new value of the already existing *flag to set pointer
+	// 	flag.Parse()
+
+	// 	flag.VisitAll(func(f *flag.Flag) {
+	// 		tmp := flag.Lookup(f.Name).Value.(flag.Getter).Get().(string)
+	// 		//flagPtrName := f.Name + "Ptr"
+	// 		for i = 1:N
+	// 			config(i). = tmp ;
+	// 		end
+
+	// 	})
+
+	// 	apiTokenString := flag.Lookup("token").Value.(flag.Getter).Get().(string)
+	// 	apiTokenPtr = &apiTokenString
+	// 	configFileString := flag.Lookup("configFile").Value.(flag.Getter).Get().(string)
+	// 	configFilePtr = &configFileString
+	// 	orgIDString := flag.Lookup("orgID").Value.(flag.Getter).Get().(string)
+	// 	orgIDPtr = &orgIDString
+	// 	projectIDString := flag.Lookup("projectID").Value.(flag.Getter).Get().(string)
+	// 	projectIDPtr = &projectIDString
+	// 	endpointAPIString := flag.Lookup("api").Value.(flag.Getter).Get().(string)
+	// 	endpointAPIPtr = &endpointAPIString
+	// 	jiraProjectIDString := flag.Lookup("jiraProjectID").Value.(flag.Getter).Get().(string)
+	// 	jiraProjectIDPtr = &jiraProjectIDString
+	// 	jiraProjectKeyString := flag.Lookup("jiraProjectKey").Value.(flag.Getter).Get().(string)
+	// 	jiraProjectKeyPtr = &jiraProjectKeyString
+	// 	jiraTicketTypeString := flag.Lookup("jiraTicketType").Value.(flag.Getter).Get().(string)
+	// 	jiraTicketTypePtr = &jiraTicketTypeString
+	// 	severityString := flag.Lookup("severity").Value.(flag.Getter).Get().(string)
+	// 	severityPtr = &severityString
+	// 	maturityFilterString := flag.Lookup("maturityFilter").Value.(flag.Getter).Get().(string)
+	// 	maturityFilterPtr = &maturityFilterString
+	// 	typeString := flag.Lookup("type").Value.(flag.Getter).Get().(string)
+	// 	typePtr = &typeString
+	// 	assigneeNameString := flag.Lookup("assigneeName").Value.(flag.Getter).Get().(string)
+	// 	assigneeNamePtr = &assigneeNameString
+	// 	assigneeIDString := flag.Lookup("assigneeId").Value.(flag.Getter).Get().(string)
+	// 	assigneeIDPtr = &assigneeIDString
+	// 	labelsString := flag.Lookup("labels").Value.(flag.Getter).Get().(string)
+	// 	labelsPtr = &labelsString
+	// 	priorityIsSeverityBool := flag.Lookup("priorityIsSeverity").Value.(flag.Getter).Get().(bool)
+	// 	priorityIsSeverityPtr = &priorityIsSeverityBool
+	// 	priorityScoreInt := flag.Lookup("priorityScoreThreshold").Value.(flag.Getter).Get().(int)
+	// 	priorityScorePtr = &priorityScoreInt
+	// 	debugBool := flag.Lookup("debug").Value.(flag.Getter).Get().(bool)
+	// 	debugPtr = &debugBool
+	// 	dryRunBool := flag.Lookup("dryRun").Value.(flag.Getter).Get().(bool)
+	// 	dryRunPtr = &dryRunBool
+	// 	ifUpgradeAvailableOnlyBool := flag.Lookup("ifUpgradeAvailableOnly").Value.(flag.Getter).Get().(bool)
+	// 	ifUpgradeAvailableOnlyPtr = &ifUpgradeAvailableOnlyBool
+	// }
+
+	opt.mandatoryFlags.setMandatoryFlags(apiTokenPtr, *v)
+	opt.optionalFlags.setoptionalFlags(debug, dryRun, *v)
+
+	viper.Reset()
+	//resetFlag()
 }
 
 /***

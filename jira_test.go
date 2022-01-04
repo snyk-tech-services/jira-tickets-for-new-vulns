@@ -702,33 +702,33 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 }
 
 /// test read config file
-func TestParseConfigFileFunc(t *testing.T) {
+// func TestParseConfigFileFunc(t *testing.T) {
 
-	assert := assert.New(t)
+// 	assert := assert.New(t)
 
-	config := parseConfigFile("./fixtures/jiraConfig.yaml")
+// 	config := parseConfigFile("./fixtures/jiraConfig.yaml")
 
-	snykConfResult := &snyk{
-		OrgID:                  "a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513",
-		Severity:               "critical",
-		MaturityFilter:         "mature",
-		IssueType:              "all",
-		PriorityScoreThreshold: 10,
-		RemoteUrl:              "github.com/owner/repo",
-		EndpointAPI:            "https://api",
-	}
+// 	snykConfResult := &snyk{
+// 		OrgID:                  "a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513",
+// 		Severity:               "critical",
+// 		MaturityFilter:         "mature",
+// 		IssueType:              "all",
+// 		PriorityScoreThreshold: 10,
+// 		RemoteUrl:              "github.com/owner/repo",
+// 		EndpointAPI:            "https://api",
+// 	}
 
-	jiraConfResult := &jira{
-		JiraTicketType:     "Task",
-		JiraProjectID:      "12345",
-		AssigneeId:         "123abc456def789",
-		AssigneeName:       "AccountName",
-		PriorityIsSeverity: true,
-	}
+// 	jiraConfResult := &jira{
+// 		JiraTicketType:     "Task",
+// 		JiraProjectID:      "12345",
+// 		AssigneeId:         "123abc456def789",
+// 		AssigneeName:       "AccountName",
+// 		PriorityIsSeverity: true,
+// 	}
 
-	assert.Equal(snykConfResult, &config.Snyk)
-	assert.Equal(jiraConfResult, &config.Jira)
-}
+// 	assert.Equal(snykConfResult, &config.Snyk)
+// 	assert.Equal(jiraConfResult, &config.Jira)
+// }
 
 /// test setting flags
 func TestSetOptionFunc(t *testing.T) {
@@ -739,8 +739,8 @@ func TestSetOptionFunc(t *testing.T) {
 	oldArgs := os.Args
 	defer func() { os.Args = oldArgs }()
 
-	os.Args = append(os.Args, "-token=123")
-	os.Args = append(os.Args, "-configFile=./fixtures/jiraConfigV2.yaml")
+	os.Args = append(os.Args, "--token=123")
+	os.Args = append(os.Args, "--configFile=./fixtures")
 
 	options := flags{}
 	options.setOption()
@@ -780,11 +780,11 @@ func TestSetOptionMixFunc(t *testing.T) {
 	oldArgs := os.Args
 	defer func() { os.Args = oldArgs }()
 
-	os.Args = append(os.Args, "-token=123")
-	os.Args = append(os.Args, "-type=license")
-	os.Args = append(os.Args, "-assigneeId=654")
-	os.Args = append(os.Args, "-api=http://snyk.io/api")
-	os.Args = append(os.Args, "-configFile=./fixtures/jiraConfigV2.yaml")
+	os.Args = append(os.Args, "--token=123")
+	os.Args = append(os.Args, "--type=license")
+	os.Args = append(os.Args, "--assigneeId=654")
+	os.Args = append(os.Args, "--api=http://snyk.io/api")
+	os.Args = append(os.Args, "--configFile=./fixtures")
 
 	options := flags{}
 	options.setOption()
@@ -811,6 +811,7 @@ func TestSetOptionMixFunc(t *testing.T) {
 		severity:               "critical",
 	}
 
-	assert.Equal(optionalResult, &options.optionalFlags)
 	assert.Equal(mandatoryResult, &options.mandatoryFlags)
+	assert.Equal(optionalResult, &options.optionalFlags)
+
 }
