@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -29,7 +30,7 @@ Open Source, so feel free to contribute !
 
 	// set Flags
 	options := flags{}
-	options.setOption()
+	options.setOption(os.Args[1:])
 
 	// enable debug
 	customDebug := debug{}
