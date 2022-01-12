@@ -129,6 +129,21 @@ func HTTPResponseCheckAndStub_() *httptest.Server {
 	}))
 }
 
+// HTTPResponseCheckAndStub Check url match and Stubbing HTTP response
+func HTTPResponseCheckAndStubNoVulnOrLicense() *httptest.Server {
+	var resp []byte
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if "/v1/org/123/project/123/aggregated-issues" == r.RequestURI {
+			resp = readFixture("./fixtures/projectAggregatedIssuesPerPathnoVulnOrLicenseIssue.json")
+		} else {
+			resp = []byte("404 - url mismatch")
+		}
+
+		w.Write(resp)
+	}))
+}
+
 // HTTPResponseStub Stubbing HTTP response
 func HTTPResponseCheckOpenJiraTickets(url string) *httptest.Server {
 	var resp []byte

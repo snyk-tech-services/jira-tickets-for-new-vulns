@@ -1,0 +1,80 @@
+{
+  "issues": [
+    {
+      "issueType": "configuration",
+      "pkgName": "",
+      "pkgVersions": [],
+      "introducedThrough": [],
+      "isPatched": false,
+      "fixInfo": {
+        "isUpgradable": false,
+        "isPinnable": false,
+        "isPatchable": false,
+        "isFixable": false,
+        "isPartiallyFixable": false,
+        "nearestFixedInVersion": ""
+      },
+      "id": "523736043",
+      "issueData": {
+        "id": "523736043",
+        "title": "Container is running without root user control",
+        "severity": "medium",
+        "originalSeverity": "medium",
+        "url": "https://snyk.io/security-rules/SNYK-CC-K8S-10",
+        "description": "Container is running without root user control",
+        "disclosureTime": "2021-12-31T08:23:34+00:00",
+        "path": "[DocId: 0].input.spec.template.spec.containers[zecs].securityContext.runAsNonRoot",
+        "violatedPolicyPublicId": "SNYK-CC-K8S-10",
+        "CVSSv3": "",
+        "credit": [],
+        "identifiers": {},
+        "language": "",
+        "nearestFixedInVersion": "",
+        "patches": [],
+        "semver": { "vulnerable": "" },
+        "cvssScore": null,
+        "exploitMaturity": null,
+        "publicationTime": null
+      },
+      "isIgnored": false
+    },
+    {
+      "issueType": "configuration",
+      "pkgName": "",
+      "pkgVersions": [],
+      "introducedThrough": [],
+      "isPatched": false,
+      "fixInfo": {
+        "isUpgradable": false,
+        "isPinnable": false,
+        "isPatchable": false,
+        "isFixable": false,
+        "isPartiallyFixable": false,
+        "nearestFixedInVersion": ""
+      },
+      "id": "523736042",
+      "issueData": {
+        "id": "523736042",
+        "title": "Container does not drop all default capabilities",
+        "severity": "medium",
+        "originalSeverity": "medium",
+        "url": "https://snyk.io/security-rules/SNYK-CC-K8S-6",
+        "description": "All default capabilities are not explicitly dropped",
+        "disclosureTime": "2021-12-31T08:23:34+00:00",
+        "path": "[DocId: 0].input.spec.template.spec.containers[zecs].securityContext.capabilities.drop",
+        "violatedPolicyPublicId": "SNYK-CC-K8S-6",
+        "CVSSv3": "",
+        "credit": [],
+        "identifiers": {},
+        "language": "",
+        "nearestFixedInVersion": "",
+        "patches": [],
+        "semver": { "vulnerable": "" },
+        "cvssScore": null,
+        "exploitMaturity": null,
+        "publicationTime": null
+      },
+      "isIgnored": false
+    }
+  ]
+}
