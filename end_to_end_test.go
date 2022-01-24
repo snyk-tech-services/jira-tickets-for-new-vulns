@@ -15,10 +15,15 @@ func TestEndToEndFunc(t *testing.T) {
 	server := HTTPResponseEndToEnd()
 	defer server.Close()
 
-	os.Args = append(os.Args, "-orgID=123")
-	os.Args = append(os.Args, "-token=123")
-	os.Args = append(os.Args, "-jiraProjectID=123")
-	os.Args = append(os.Args, "-api="+server.URL)
+	// reset command line arg
+	oldArgs := os.Args
+	defer func() { os.Args = oldArgs }()
+
+	os.Args = append(os.Args, "--orgID=123")
+	os.Args = append(os.Args, "--token=123")
+	os.Args = append(os.Args, "--jiraProjectID=123")
+	os.Args = append(os.Args, "--api="+server.URL)
+
 	// Keeping the line below => useful for debug but print too much things
 	// os.Args = append(os.Args, "-debug=true")
 
@@ -51,6 +56,8 @@ func TestEndToEndFunc(t *testing.T) {
 
 	// Delete the file created for the test
 	removeLogFile()
+
+	os.Args = oldArgs
 
 	compare := strings.Contains(string(out), "Number of tickets created: 3")
 
