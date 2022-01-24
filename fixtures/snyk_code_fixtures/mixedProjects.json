@@ -1,0 +1,66 @@
+{
+  "org": { "name": "test", "id": "123" },
+  "projects": [
+    {
+      "id": "123",
+      "name": "snyk-test/typescript:package.json",
+      "created": "2020-03-19T14:26:38.906Z",
+      "origin": "github",
+      "type": "yarn",
+      "readOnly": false,
+      "testFrequency": "daily",
+      "isMonitored": true,
+      "totalDependencies": 106,
+      "issueCountsBySeverity": {
+        "low": 2,
+        "high": 17,
+        "medium": 17,
+        "critical": 3
+      },
+      "imageTag": "0.1.0",
+      "imagePlatform": "",
+      "imageBaseImage": "",
+      "lastTestedDate": "2022-01-16T17:48:43.826Z",
+      "browseUrl": "https://app.snyk.io/org/playground/project/123",
+      "owner": null,
+      "importingUser": {
+        "id": "123",
+        "name": "someone",
+        "username": "someone",
+        "email": "someone@snyk.io"
+      },
+      "tags": [],
+      "attributes": { "criticality": [], "lifecycle": [], "environment": [] },
+      "branch": "master"
+    },
+    {
+      "id": "456",
+      "name": "snyk-other-project/code",
+      "created": "2021-02-13T05:05:20.752Z",
+      "origin": "github",
+      "type": "sast",
+      "readOnly": false,
+      "testFrequency": "weekly",
+      "isMonitored": true,
+      "totalDependencies": null,
+      "issueCountsBySeverity": {
+        "low": 0,
+        "high": 1,
+        "medium": 0,
+        "critical": 0
+      },
+      "lastTestedDate": "2022-01-15T20:17:34.131Z",
+      "browseUrl": "https://app.snyk.io/org/playground/project/456",
+      "owner": null,
+      "importingUser": {
+        "id": "789",
+        "name": "someone",
+        "username": "someone",
+        "email": "someone@snyk.io"
+      },
+      "tags": [],
+      "attributes": { "criticality": [], "lifecycle": [], "environment": [] },
+      "branch": "develop"
+    }
+  ]
+}

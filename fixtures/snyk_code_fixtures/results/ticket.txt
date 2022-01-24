@@ -1,0 +1,19 @@
+- Server-Side Request Forgery (SSRF) 
+ \*\*\*\* Issue details: \*\*\*\*
+
+ Title:  Server\-Side Request Forgery \(SSRF\)
+ Summary:  Unsanitized input from data from a remote resource flows into the url argument of request, where it is used as an URL to perform a request. This may result in a Server\-Side Request Forgery vulnerability.
+ Severity:  high
+ PriorityScore:  850
+ PriorityScoreFactors:
+  \- Found in multiple code flows
+  \- Has fix examples available 
+ *_Impacted file:_*
+   src/snykExample.ts
+  \- startLine: 54
+  \- startColumn: 9
+  \- endLine: 54
+  \- endColumn: 11
+
+[See this issue on Snyk|https://app.snyk.io/org/playground/project/12345678-1234-1234-1234-123456789012]
+

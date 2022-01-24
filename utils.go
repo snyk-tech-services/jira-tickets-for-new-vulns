@@ -271,3 +271,8 @@ func writeLogFile(logFile map[string]map[string]interface{}, filename string, cu
 
 	return
 }
+
+// Check if we are running tests
+func IsTestRun() bool {
+	return os.Getenv("EXECUTION_ENVIRONMENT") == "test"
+}

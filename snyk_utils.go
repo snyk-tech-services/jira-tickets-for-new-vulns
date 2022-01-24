@@ -38,15 +38,14 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 	responseData, err := ioutil.ReadAll(response.Body)
 
 	if response.StatusCode == 404 {
-		customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
-		return nil, errors.New("Request failed")
+		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		return nil, errors.New("Not found, Request failed")
 	} else if response.StatusCode == 422 {
-		customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
 		customDebug.Debugf("*** INFO *** Details : %s\n", string(responseData))
-
-		return nil, errors.New("Request failed")
+		return nil, errors.New("Unprocessable Entity, Request failed")
 	} else if response.StatusCode > 400 {
-		customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
 		customDebug.Debugf("*** INFO *** Details : %s\n", string(responseData))
 		return nil, errors.New("Request failed")
 	}
