@@ -38,7 +38,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     -dryRun=<true|false>                                                // Optional. result can be found in a json file were the tool is run
     -debug=<true|false>                                                 // Optional. enable debug mode
     -ifUpgradeAvailableOnly=<true|false>                                // Optional. create ticket only for upgradable issues
-    -configFile=<true|false>                                            // Optional. Use jira.yaml to set the config
+    -configFile                                                         // Optional. path the jira.yaml if not root 
 ```
 
 ### Priority is Severity
@@ -107,7 +107,7 @@ A logFile listing all the tickets created can be found where the tool has been r
 
 ## Jira.yaml
 
-Example of config file structure
+Example of config file structure. 
 
 '''
 schema: 1
