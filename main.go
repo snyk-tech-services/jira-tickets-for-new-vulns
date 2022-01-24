@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -29,7 +30,7 @@ Open Source, so feel free to contribute !
 
 	// set Flags
 	options := flags{}
-	options.setOption()
+	options.setOption(os.Args[1:])
 
 	// enable debug
 	customDebug := debug{}
@@ -115,8 +116,8 @@ Open Source, so feel free to contribute !
 	writeLogFile(logFile, filename, customDebug)
 
 	if options.optionalFlags.dryRun {
-		fmt.Println("\n*****************************************************************************************************")
+		fmt.Println("\n*************************************************************************************************************")
 		fmt.Printf("\n******** Dry run list of ticket can be found in log file %s ********", filename)
-		fmt.Println("\n*****************************************************************************************************")
+		fmt.Println("\n*************************************************************************************************************")
 	}
 }
