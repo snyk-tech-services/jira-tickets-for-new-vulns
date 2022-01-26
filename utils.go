@@ -300,6 +300,16 @@ func writeLogFile(logFile map[string]map[string]interface{}, filename string, cu
 }
 
 /***
+function IsTestRun
+return: none
+input: boolean
+check is the EXECUTION_ENVIRONMENT env is set
+***/
+func IsTestRun() bool {
+	return os.Getenv("EXECUTION_ENVIRONMENT") == "test"
+}
+
+/***
 function parseConfigFile
 return: none
 input: flags

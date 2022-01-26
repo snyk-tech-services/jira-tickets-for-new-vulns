@@ -12,6 +12,8 @@ import (
 
 func TestEndToEndFunc(t *testing.T) {
 
+	os.Setenv("EXECUTION_ENVIRONMENT", "test")
+
 	server := HTTPResponseEndToEnd()
 	defer server.Close()
 

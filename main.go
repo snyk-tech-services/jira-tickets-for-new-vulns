@@ -46,8 +46,7 @@ Open Source, so feel free to contribute !
 		log.Fatal(er)
 	}
 
-	customDebug.Debug("*** INFO *** options.optionalFlags", options.optionalFlags)
-	customDebug.Debug("*** INFO *** options.MandatoryFlags", options.mandatoryFlags)
+	customDebug.Debug("*** INFO *** options.optionalFlags ", options.optionalFlags)
 
 	// check flags are set according to rules
 	options.checkFlags()

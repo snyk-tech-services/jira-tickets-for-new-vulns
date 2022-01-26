@@ -136,3 +136,51 @@ func markdownToConfluenceWiki(textToConvert string) string {
 	output := renderer.Render(ast)
 	return string(output)
 }
+
+func formatCodeJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
+
+	issueData := jsonVuln.K("data")
+
+	var priorityScoreFactorsArray []string
+	for _, e := range issueData.K("attributes").K("priorityScoreFactors").Array().Elements() {
+		priorityScoreFactorsArray = append(priorityScoreFactorsArray, fmt.Sprintf(e.String().Value))
+	}
+
+	priorityScoreFactors := "\n PriorityScoreFactors: \n  - "
+	priorityScoreFactors += strings.Join(priorityScoreFactorsArray, " \n  - ")
+
+	files := "\r\n ***Impacted file:***\n\r"
+	files += "   " + issueData.K("attributes").K("primaryFilePath").String().Value + "\n  - startLine: "
+	files += fmt.Sprint(issueData.K("attributes").K("primaryRegion").K("startLine").Int().Value) + "\n  - startColumn: "
+	files += fmt.Sprint(issueData.K("attributes").K("primaryRegion").K("startColumn").Int().Value) + "\n  - endLine: "
+	files += fmt.Sprint(issueData.K("attributes").K("primaryRegion").K("endLine").Int().Value) + "\n  - endColumn: "
+	files += fmt.Sprint(issueData.K("attributes").K("primaryRegion").K("endColumn").Int().Value) + "\n"
+
+	snykBreadcrumbs := "\n[See this issue on Snyk](" + projectInfo.K("browseUrl").String().Value + ")\n"
+
+	issueDetails := []string{"\r\n **** Issue details: ****\n\r",
+		"\n Title: ", jsonVuln.K("title").String().Value,
+		"\n Summary: ", issueData.K("attributes").K("title").String().Value,
+		"\n Severity: ", issueData.K("attributes").K("severity").String().Value,
+		"\n PriorityScore: ", fmt.Sprintf("%d", issueData.K("attributes").K("priorityScore").Int().Value),
+		priorityScoreFactors,
+		files,
+		snykBreadcrumbs,
+	}
+
+	descriptionBody := markdownToConfluenceWiki(strings.Join(issueDetails, " "))
+	descriptionBody = strings.ReplaceAll(descriptionBody, "{{", "{code}")
+	descriptionBody = strings.ReplaceAll(descriptionBody, "}}", "{code}")
+
+	// Sanitizing known issue where JIRA FW doesn't like this string....
+	descriptionBody = strings.ReplaceAll(descriptionBody, "/etc/passwd", "")
+
+	jiraTicket := &JiraIssue{
+		Field{
+			Summary:     projectInfo.K("name").String().Value + " - " + jsonVuln.K("title").String().Value,
+			Description: descriptionBody,
+		},
+	}
+
+	return jiraTicket
+}
