@@ -700,3 +700,94 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 	return
 
 }
+
+/// test flags setting
+func TestSetOptionFunc(t *testing.T) {
+
+	assert := assert.New(t)
+
+	// reset command line arg
+	oldArgs := os.Args
+	defer func() { os.Args = oldArgs }()
+
+	args := []string{
+		"--token=123",
+		"--configFile=./fixtures",
+	}
+
+	options := flags{}
+	options.setOption(args)
+
+	mandatoryResult := &MandatoryFlags{
+		orgID:         "456",
+		apiToken:      "123",
+		jiraProjectID: "15698",
+		endpointAPI:   "https://snyk.io/api",
+	}
+
+	optionalResult := &optionalFlags{
+		assigneeID:             "1238769",
+		assigneeName:           "",
+		debug:                  false,
+		dryRun:                 false,
+		issueType:              "vuln",
+		jiraTicketType:         "Task",
+		labels:                 "",
+		maturityFilterString:   "proof-of-concept",
+		priorityIsSeverity:     true,
+		priorityScoreThreshold: 20,
+		projectID:              "",
+		severity:               "critical",
+	}
+
+	assert.Equal(optionalResult, &options.optionalFlags)
+	assert.Equal(mandatoryResult, &options.mandatoryFlags)
+}
+
+//checking that the option override the configFile
+func TestSetOptionMixFunc(t *testing.T) {
+
+	assert := assert.New(t)
+
+	// reset command line arg
+	oldArgs := os.Args
+	defer func() { os.Args = oldArgs }()
+
+	args := []string{
+		"--token=123",
+		"--type=license",
+		"--assigneeId=654",
+		"--api=http://snyk.io/api",
+		"--configFile=./fixtures",
+		"--orgID=456",
+		"--jiraProjectID=15699",
+	}
+
+	options := flags{}
+	options.setOption(args)
+
+	mandatoryResult := &MandatoryFlags{
+		orgID:         "456",
+		apiToken:      "123",
+		jiraProjectID: "15699",
+		endpointAPI:   "http://snyk.io/api",
+	}
+
+	optionalResult := &optionalFlags{
+		assigneeID:             "654",
+		assigneeName:           "",
+		debug:                  false,
+		dryRun:                 false,
+		issueType:              "license",
+		jiraTicketType:         "Task",
+		labels:                 "",
+		maturityFilterString:   "proof-of-concept",
+		priorityIsSeverity:     true,
+		priorityScoreThreshold: 20,
+		projectID:              "",
+		severity:               "critical",
+	}
+
+	assert.Equal(optionalResult, &options.optionalFlags)
+	assert.Equal(mandatoryResult, &options.mandatoryFlags)
+}

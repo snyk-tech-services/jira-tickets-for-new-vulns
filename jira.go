@@ -82,10 +82,17 @@ create a ticket for a specific vuln
 func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, customDebug debug) ([]byte, *Tickets, error) {
 
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
+	issueType := jsonVuln.K("data").K("attributes").K("issueType").String().Value
 	vulnID := jsonVuln.K("id").String().Value
 	var ticketFile *Tickets
+	var jiraTicket *JiraIssue
 
-	jiraTicket := formatJiraTicket(jsonVuln, projectInfo)
+	if issueType == "code" {
+		jiraTicket = formatCodeJiraTicket(jsonVuln, projectInfo)
+		vulnID = jsonVuln.K("data").K("id").String().Value
+	} else {
+		jiraTicket = formatJiraTicket(jsonVuln, projectInfo)
+	}
 
 	if flags.mandatoryFlags.jiraProjectKey != "" {
 		jiraTicket.Fields.Projects.Key = flags.mandatoryFlags.jiraProjectKey
@@ -117,16 +124,22 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 
 	if flags.optionalFlags.priorityIsSeverity {
 		var priority PriorityType
-		jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN", strings.ToUpper(jsonVuln.K("issueData").K("severity").String().Value))
+
+		severity := jsonVuln.K("issueData").K("severity").String().Value
+		if issueType == "code" {
+			severity = jsonVuln.K("data").K("attributes").K("severity").String().Value
+		}
+
+		jiraMappingEnvVarName := fmt.Sprintf("SNYK_JIRA_PRIORITY_FOR_%s_VULN", strings.ToUpper(severity))
 		val, present := os.LookupEnv(jiraMappingEnvVarName)
 		if present {
 			priority.Name = val
 		} else {
-			if jsonVuln.K("issueData").K("severity").String().Value == "critical" {
+			if severity == "critical" {
 				priority.Name = "Highest"
 			} else {
 
-				priority.Name = strings.Title(jsonVuln.K("issueData").K("severity").String().Value)
+				priority.Name = strings.Title(severity)
 
 			}
 

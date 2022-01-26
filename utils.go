@@ -2,19 +2,14 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"os"
 	"time"
+
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
-
-// Debug
-
-// structure containing the debug flag to check on
-type debug struct {
-	PrintDebug bool
-}
 
 /***
 Function setDebug and getDebug
@@ -57,75 +52,55 @@ func (m *debug) Printf(format string, args ...interface{}) {
 	log.Printf(format, args...)
 }
 
-// Flags
-// flags structures
-// separated in 2 structure because some function needs only the mandatory
-type flags struct {
-	mandatoryFlags MandatoryFlags
-	optionalFlags  optionalFlags
-}
-
-type MandatoryFlags struct {
-	orgID          string
-	endpointAPI    string
-	apiToken       string
-	jiraProjectID  string
-	jiraProjectKey string
-}
-
-type optionalFlags struct {
-	projectID              string
-	jiraTicketType         string
-	severity               string
-	issueType              string
-	maturityFilterString   string
-	assigneeID             string
-	assigneeName           string
-	labels                 string
-	priorityIsSeverity     bool
-	priorityScoreThreshold int
-	debug                  bool
-	dryRun                 bool
-	ifUpgradeAvailableOnly bool
-}
-
 /***
 Function setOption
 set the mandatory flags structure
 ***/
-func (Mf *MandatoryFlags) setMandatoryFlags(orgIDPtr *string, endpointAPIPtr *string, apiTokenPtr *string,
-	jiraProjectIDPtr *string, jiraProjectKeyPtr *string) {
+func (Mf *MandatoryFlags) setMandatoryFlags(apiTokenPtr *string, v viper.Viper) {
 
-	Mf.orgID = *orgIDPtr
-	Mf.endpointAPI = *endpointAPIPtr
+	Mf.orgID = v.GetString("snyk.orgID")
+	Mf.endpointAPI = v.GetString("snyk.api")
 	Mf.apiToken = *apiTokenPtr
-	Mf.jiraProjectID = *jiraProjectIDPtr
-	Mf.jiraProjectKey = *jiraProjectKeyPtr
+	Mf.jiraProjectID = v.GetString("jira.jiraProjectID")
+	Mf.jiraProjectKey = v.GetString("jira.jiraProjectKey")
 
+	// Checking flag exist
+	// pflag required function does not work with viper
+	Mf.checkMandatoryAreSet()
 }
 
 /***
 Function setOption
 set the optional flags structure
 ***/
-func (Of *optionalFlags) setoptionalFlags(projectIDPtr *string, jiraTicketTypePtr *string, severityPtr *string,
-	maturityFilterPtr *string, typePtr *string, assigneeIDPtr *string,
-	assigneeNamePtr *string, labelsPtr *string, priorityIsSeverityPtr *bool,
-	priorityScorePtr *int, debugPtr *bool, dryRunPtr *bool, ifUpgradeAvailableOnlyPtr *bool) {
+func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper.Viper) {
 
-	Of.projectID = *projectIDPtr
-	Of.jiraTicketType = *jiraTicketTypePtr
-	Of.severity = *severityPtr
-	Of.issueType = *typePtr
-	Of.maturityFilterString = *maturityFilterPtr
-	Of.assigneeID = *assigneeIDPtr
-	Of.assigneeName = *assigneeNamePtr
-	Of.labels = *labelsPtr
-	Of.priorityIsSeverity = *priorityIsSeverityPtr
-	Of.priorityScoreThreshold = *priorityScorePtr
-	Of.debug = *debugPtr
-	Of.dryRun = *dryRunPtr
-	Of.ifUpgradeAvailableOnly = *ifUpgradeAvailableOnlyPtr
+	Of.projectID = v.GetString("snyk.projectID")
+	Of.jiraTicketType = v.GetString("jira.jiraTicketType")
+	Of.severity = v.GetString("snyk.severity")
+	Of.issueType = v.GetString("snyk.type")
+	Of.maturityFilterString = v.GetString("snyk.maturityFilter")
+	Of.assigneeID = v.GetString("jira.assigneeID")
+	Of.assigneeName = v.GetString("jira.assigneeName")
+	Of.labels = v.GetString("jira.labels")
+	Of.priorityIsSeverity = v.GetBool("jira.priorityIsSeverity")
+	Of.priorityScoreThreshold = v.GetInt("snyk.priorityScoreThreshold")
+	Of.debug = debugPtr
+	Of.dryRun = dryRunPtr
+	Of.ifUpgradeAvailableOnly = v.GetBool("snyk.ifUpgradeAvailableOnly")
+
+}
+
+/***
+Function resetFlag
+reset commands line flags
+***/
+func resetFlag() {
+
+	pflag.VisitAll(func(f *pflag.Flag) {
+		pflag.Lookup(f.Name).Value.Set(f.DefValue)
+	})
+
 }
 
 /***
@@ -133,33 +108,85 @@ Function setOption
 get the arguments
 set the flags structures
 ***/
-func (opt *flags) setOption() {
+func (opt *flags) setOption(args []string) {
 
-	orgIDPtr := flag.String("orgID", "", "Your Snyk Organization ID (check under Settings)")
-	projectIDPtr := flag.String("projectID", "", "Optional. Your Project ID. Will sync all projects Of your organization if not provided")
-	endpointAPIPtr := flag.String("api", "https://snyk.io/api", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
-	apiTokenPtr := flag.String("token", "", "Your API token")
-	jiraProjectIDPtr := flag.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
-	jiraProjectKeyPtr := flag.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
-	jiraTicketTypePtr := flag.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
-	severityPtr := flag.String("severity", "low", "Optional. Your severity threshold")
-	maturityFilterPtr := flag.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
-	typePtr := flag.String("type", "all", "Optional. Your issue type (all|vuln|license)")
-	assigneeNamePtr := flag.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
-	assigneeIDPtr := flag.String("assigneeId", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
-	labelsPtr := flag.String("labels", "", "Optional. Jira ticket labels")
-	priorityIsSeverityPtr := flag.Bool("priorityIsSeverity", false, "Use issue severity as priority")
-	priorityScorePtr := flag.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
-	debugPtr := flag.Bool("debug", false, "Optional. enable debug mode")
-	dryRunPtr := flag.Bool("dryRun", false, "Optional. create a file with all the tickets without open them on jira")
-	ifUpgradeAvailableOnlyPtr := flag.Bool("ifUpgradeAvailableOnly", false, "Optional. Open tickets only for upgradable issues")
+	var apiTokenPtr *string
+	var debug bool
+	var dryRun bool
+	var configFilePtr *string
 
-	flag.Parse()
+	// Using viper to bind config file and flags
+	v := viper.New()
 
-	opt.mandatoryFlags.setMandatoryFlags(orgIDPtr, endpointAPIPtr, apiTokenPtr, jiraProjectIDPtr, jiraProjectKeyPtr)
-	opt.optionalFlags.setoptionalFlags(projectIDPtr, jiraTicketTypePtr, severityPtr, maturityFilterPtr,
-		typePtr, assigneeNamePtr, assigneeIDPtr, labelsPtr, priorityIsSeverityPtr, priorityScorePtr, debugPtr, dryRunPtr, ifUpgradeAvailableOnlyPtr)
+	// flags are all setup at the same time so if one is all of them should be enough
+	fs := pflag.NewFlagSet("", pflag.ContinueOnError)
 
+	fs.String("orgID", "", "Your Snyk Organization ID (check under Settings)")
+	fs.String("projectID", "", "Optional. Your Project ID. Will sync all projects Of your organization if not provided")
+	fs.String("api", "https://snyk.io/api", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
+	apiTokenPtr = fs.String("token", "", "Your API token")
+	fs.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
+	fs.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
+	fs.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
+	fs.String("severity", "low", "Optional. Your severity threshold")
+	fs.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
+	fs.String("type", "all", "Optional. Your issue type (all|vuln|license)")
+	fs.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
+	fs.String("assigneeId", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
+	fs.String("labels", "", "Optional. Jira ticket labels")
+	fs.Bool("priorityIsSeverity", false, "Boolean. Use issue severity as priority")
+	fs.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
+	debugPtr := fs.Bool("debug", false, "Optional. Boolean. enable debug mode")
+	debug = *debugPtr
+	dryRunPtr := fs.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
+	dryRun = *dryRunPtr
+	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Open tickets only for upgradable issues")
+	configFilePtr = fs.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
+	fs.Parse(args)
+
+	// Have to set one by one because the name in the config file doesn't correspond to the flag name
+	// This can be done at any time
+	v.BindPFlag("snyk.orgID", fs.Lookup("orgID"))
+	v.BindPFlag("snyk.api", fs.Lookup("api"))
+	v.BindPFlag("jira.jiraProjectID", fs.Lookup("jiraProjectID"))
+	v.BindPFlag("jira.jiraProjectKey", fs.Lookup("jiraProjectKey"))
+
+	v.BindPFlag("snyk.projectID", fs.Lookup("projectID"))
+	v.BindPFlag("jira.jiraTicketType", fs.Lookup("jiraTicketType"))
+	v.BindPFlag("snyk.severity", fs.Lookup("severity"))
+	v.BindPFlag("snyk.type", fs.Lookup("type"))
+	v.BindPFlag("snyk.maturityFilter", fs.Lookup("maturityFilter"))
+	v.BindPFlag("jira.assigneeID", fs.Lookup("assigneeId"))
+	v.BindPFlag("jira.assigneeName", fs.Lookup("assigneeName"))
+	v.BindPFlag("jira.labels", fs.Lookup("labels"))
+	v.BindPFlag("jira.priorityIsSeverity", fs.Lookup("priorityIsSeverity"))
+	v.BindPFlag("snyk.priorityScoreThreshold", fs.Lookup("priorityScoreThreshold"))
+	v.BindPFlag("snyk.ifUpgradeAvailableOnly", fs.Lookup("ifUpgradeAvailableOnly"))
+
+	// Set and parse config file
+	v.SetConfigName("jira") // config file name without extension
+	v.SetConfigType("yaml")
+
+	if configFilePtr != nil {
+		v.AddConfigPath(*configFilePtr)
+	} else {
+		v.AddConfigPath(".")
+	}
+
+	if err := v.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			fmt.Println("error no file")
+		} else {
+			fmt.Println("error ", err)
+		}
+	}
+
+	// Setting the flags structure
+	opt.mandatoryFlags.setMandatoryFlags(apiTokenPtr, *v)
+	opt.optionalFlags.setoptionalFlags(debug, dryRun, *v)
+
+	// check the flags rules
+	opt.checkFlags()
 }
 
 /***
@@ -168,8 +195,8 @@ exit if the mandatory flags are missing
 ***/
 func (Mf *MandatoryFlags) checkMandatoryAreSet() {
 	if len(Mf.orgID) == 0 || len(Mf.apiToken) == 0 || (len(Mf.jiraProjectID) == 0 && len(Mf.jiraProjectKey) == 0) {
-		log.Println("*** ERROR *** Missing mandatory flags")
-		flag.PrintDefaults()
+		log.Println("*** ERROR *** Missing mandatory flags", Mf)
+		pflag.PrintDefaults()
 		os.Exit(1)
 	}
 }
@@ -267,6 +294,45 @@ func writeLogFile(logFile map[string]map[string]interface{}, filename string, cu
 	if err := f.Close(); err != nil {
 		customDebug.Debug("*** ERROR ***  Could not close file")
 		return
+	}
+
+	return
+}
+
+/***
+function IsTestRun
+return: none
+input: boolean
+check is the EXECUTION_ENVIRONMENT env is set
+***/
+func IsTestRun() bool {
+	return os.Getenv("EXECUTION_ENVIRONMENT") == "test"
+}
+
+/***
+function parseConfigFile
+return: none
+input: flags
+Parse the config file to set the flags
+***/
+func setAndParseConfigFile(v viper.Viper, configFilePtr *string) {
+
+	v.SetConfigName("jira") // config file name without extension
+	v.SetConfigType("yaml")
+
+	if configFilePtr != nil {
+		v.AddConfigPath(*configFilePtr)
+	} else {
+		v.AddConfigPath(".")
+	}
+
+	//parse config file to extract values
+	if err := v.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			fmt.Println("error no file")
+		} else {
+			fmt.Println("error ", err)
+		}
 	}
 
 	return

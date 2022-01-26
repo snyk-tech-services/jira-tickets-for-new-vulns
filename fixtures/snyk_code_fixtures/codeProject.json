@@ -1,0 +1,30 @@
+
+{
+  "id": "456",
+  "name": "snyk-other-project/code",
+  "created": "2021-02-13T05:05:20.752Z",
+  "origin": "github",
+  "type": "sast",
+  "readOnly": false,
+  "testFrequency": "weekly",
+  "isMonitored": true,
+  "totalDependencies": null,
+  "issueCountsBySeverity": {
+    "low": 0,
+    "high": 1,
+    "medium": 0,
+    "critical": 0
+  },
+  "lastTestedDate": "2022-01-15T20:17:34.131Z",
+  "browseUrl": "https://app.snyk.io/org/playground/project/456",
+  "owner": null,
+  "importingUser": {
+    "id": "789",
+    "name": "someone",
+    "username": "someone",
+    "email": "someone@snyk.io"
+  },
+  "tags": [],
+  "attributes": { "criticality": [], "lifecycle": [], "environment": [] },
+  "branch": "develop"
+}

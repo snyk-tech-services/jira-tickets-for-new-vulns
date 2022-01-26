@@ -340,10 +340,75 @@ func HTTPResponseEndToEnd() *httptest.Server {
 
 }
 
+// HTTPResponseStubAndMirrorRequest Stubbing HTTP response
+func HTTPResponseStubAndMirrorCodeRequest() *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		body, _ := ioutil.ReadAll(r.Body)
+
+		if r.Method == "POST" && len(body) == 0 {
+			log.Fatal("Missing Body on POST request")
+		} else if r.Method == "GET" && len(body) > 0 {
+			log.Fatal("Unexpected body in GET request")
+		}
+
+		resp := &mirroredResponse{
+			URL:    r.RequestURI,
+			Method: r.Method,
+			Token:  r.Header.Get("Authorization"),
+			Body:   body,
+		}
+		marshalledResp, _ := json.Marshal(resp)
+		w.Write(marshalledResp)
+	}))
+}
+
 func readFixture(path string) []byte {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
 	return data
+}
+
+func HTTPResponseCodeIssueStubAndMirrorRequest() *httptest.Server {
+
+	var resp []byte
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if r.RequestURI == "" {
+			resp = []byte("404 - url mismatch")
+		} else if r.RequestURI == "/v1/org/123/project/456/issue/xxbac5ed-83dd-xx65-8730-2xxx4467e00d/jira-issue" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/results/singleCodeJiraTicketOpeningResponse")
+		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=456&version=2021-08-20~experimental" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeData.json")
+		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=low&version=2021-08-20~experimental" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataLowIssues.json")
+		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=high&version=2021-08-20~experimental" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataHighIssues.json")
+		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=critical&version=2021-08-20~experimental" {
+			w.WriteHeader(http.StatusNotFound)
+		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=medium&version=2021-08-20~experimental" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataMediumIssues.json")
+		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=456&version=2021-08-20~experimental" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails.json")
+		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=456&version=2021-08-20~experimental" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails2.json")
+		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=456&version=2021-08-20~experimental" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails3.json")
+		} else if r.RequestURI == "/v1/org/123/project/456/issue/SNYK-JS-MINIMIST-559764/jira-issue" {
+			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse.json")
+		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=789&version=2021-08-20~experimental" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails.json")
+		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=789&version=2021-08-20~experimental" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails2.json")
+		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=789&version=2021-08-20~experimental" {
+			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails3.json")
+		} else {
+			log.Fatal()
+		}
+
+		w.Write(resp)
+	}))
+
 }
