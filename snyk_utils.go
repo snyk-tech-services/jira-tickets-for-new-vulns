@@ -42,10 +42,12 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 		return nil, errors.New("Not found, Request failed")
 	} else if response.StatusCode == 422 {
 		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		customDebug.Debugf("*** INFO *** Please check that all expected fields are present in the config file\n")
 		customDebug.Debugf("*** INFO *** Details : %s\n", string(responseData))
 		return nil, errors.New("Unprocessable Entity, Request failed")
 	} else if response.StatusCode > 400 {
 		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		customDebug.Debugf("*** INFO *** Please check that all expected fields are present in the config file\n")
 		customDebug.Debugf("*** INFO *** Details : %s\n", string(responseData))
 		return nil, errors.New("Request failed")
 	}
