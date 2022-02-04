@@ -19,26 +19,26 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
 ### Extended options
 ```
 ./snyk-jira-sync-<yourplatform> 
-    -orgID=<SNYK_ORG_ID>                                                // Can find it under settings
-    -projectID=<SNYK_PROJECT_ID>                                        // Optional. Syncs all projects in Organization if not provided.
+    --orgID=<SNYK_ORG_ID>                                                // Can find it under settings
+    --projectID=<SNYK_PROJECT_ID>                                        // Optional. Syncs all projects in Organization if not provided.
                                                                         // Project ID can be found under project->settings
-    -api=<API endpoint>                                                 // Optional. Set to https://<instance>/api for private instances
-    -token=<API Token>                                                  // Snyk API Token. Service accounts work.
-    -jiraProjectID=<12345>                                              // Jira project ID the tickets will be opened against
-    -jiraProjectKey=<KEY>                                               // Jira project Key the tickets will be opened against
-    -jiraTicketType=<Task|Bug|....>                                     // Optional. Type of ticket to open. Defaults to Bug
-    -severity=<critical|high|medium|low>                                // Optional. Severity threshold to open tickets for. Defaults to low.
-    -maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas
-    -type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.
-    -assigneeId=<123abc456def789>                                       // Optional.  Jira ID of user to assign tickets to. Note: Do not use assigneeName and assigneeId at the same time
-    -assigneeName=<AccountName>                                         // Optional.  Jira Name of user to assign tickets to. Note: Do not use assigneeName and assigneeId at the same time
-    -priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
-    -labels=<IssueLabel1>,IssueLabel2                                   // Optional. Set JIRA ticket labels
-    -priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold
-    -dryRun=<true|false>                                                // Optional. result can be found in a json file were the tool is run
-    -debug=<true|false>                                                 // Optional. enable debug mode
-    -ifUpgradeAvailableOnly=<true|false>                                // Optional. create ticket only for upgradable issues
-    -configFile                                                         // Optional. path the jira.yaml if not root 
+    --api=<API endpoint>                                                 // Optional. Set to https://<instance>/api for private instances
+    --token=<API Token>                                                  // Snyk API Token. Service accounts work.
+    --jiraProjectID=<12345>                                              // Jira project ID the tickets will be opened against
+    --jiraProjectKey=<KEY>                                               // Jira project Key the tickets will be opened against
+    --jiraTicketType=<Task|Bug|....>                                     // Optional. Type of ticket to open. Defaults to Bug
+    --severity=<critical|high|medium|low>                                // Optional. Severity threshold to open tickets for. Defaults to low.
+    --maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas
+    --type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.
+    --assigneeId=<123abc456def789>                                       // Optional.  Jira ID of user to assign tickets to. Note: Do not use assigneeName and assigneeId at the same time
+    --assigneeName=<AccountName>                                         // Optional.  Jira Name of user to assign tickets to. Note: Do not use assigneeName and assigneeId at the same time
+    --priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
+    --labels=<IssueLabel1>,IssueLabel2                                   // Optional. Set JIRA ticket labels
+    --priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold
+    --dryRun=<true|false>                                                // Optional. result can be found in a json file were the tool is run
+    --debug=<true|false>                                                 // Optional. enable debug mode
+    --ifUpgradeAvailableOnly=<true|false>                                // Optional. create ticket only for upgradable issues
+    --configFile                                                         // Path the jira.yaml if not root 
 ```
 
 ### Priority is Severity
@@ -108,7 +108,8 @@ A logFile listing all the tickets created can be found where the tool has been r
 ## Jira.yaml
 
 Example of config file structure. 
-
+If your jira project has custom mandatory field configured, they will need to be added to the config file
+Please make sure you give both key and value expected by jira under the customMandatoryField key of the config file
 '''
 schema: 1
 snyk: 
@@ -129,6 +130,9 @@ jira:
     label: label1 # <IssueLabel1>,<IssueLabel2>
     jiraProjectKey: testProject
     priorityIsSeverity: false # <true|false> (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
+    customMandatoryFields:
+        key: 
+            value: 5
 '''
 Notes: 
   - The token is not expected present in the config file

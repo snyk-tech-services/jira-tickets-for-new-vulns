@@ -184,3 +184,50 @@ func formatCodeJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 
 	return jiraTicket
 }
+
+/***
+function addMandatoryFieldToTicket
+input []byte ticket, ticket previously created without any mandatory fields
+input map[string]interface{} customMandatoryField, the new mandatory field
+input debug
+return []byte ticket
+Loop through the mandatory fields
+create a list of key value pair for each
+and add it to the ticket
+***/
+func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]interface{}, customDebug debug) []byte {
+
+	unmarshalledTicket := make(map[string]interface{})
+	fields := make(map[string]interface{})
+	newTicket := make(map[string]interface{})
+
+	err := json.Unmarshal(ticket, &unmarshalledTicket)
+	if err != nil {
+		customDebug.Debug("*** ERROR *** Could not unMarshalled ticket, mandatory fields will no the added ", err)
+	}
+
+	fieldFromTicket := unmarshalledTicket["fields"]
+
+	marshalledFieldFromTicket, _ := json.Marshal(fieldFromTicket)
+	if err != nil {
+		customDebug.Debug("*** ERROR *** Could not marshall ticket fields, mandatory fields will no the added ", err)
+	}
+
+	err = json.Unmarshal(marshalledFieldFromTicket, &fields)
+	if err != nil {
+		customDebug.Debug("*** ERROR *** Could not unMarshalled ticket fields, mandatory fields will no the added ", err)
+	}
+
+	for i, s := range customMandatoryField {
+		fields[i] = s
+	}
+
+	newTicket["fields"] = fields
+
+	newMarchalledTicket, err := json.Marshal(newTicket)
+	if err != nil {
+		customDebug.Debug("*** ERROR *** Could not Marshalled new ticket, mandatory fields will no the added ", err)
+	}
+
+	return newMarchalledTicket
+}

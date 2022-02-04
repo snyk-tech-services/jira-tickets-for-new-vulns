@@ -153,9 +153,14 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 		return nil, nil, errors.New("Failure, Failure to create ticket(s)")
 	}
 
+	// Add Mandatory filed to the ticket
+	if len(flags.customMandatoryJiraFields) > 0 {
+		ticket = addMandatoryFieldToTicket(ticket, flags.customMandatoryJiraFields, customDebug)
+	}
+
 	customDebug.Debugf("*** INFO *** Ticket to be send %s", string(ticket))
 
-	// create ticket struct to dd in the logfile
+	// create ticket struct to add in the logfile
 	// test is dryRun, if not log only what's have been created
 	if flags.optionalFlags.dryRun == true {
 		ticketFile = &Tickets{

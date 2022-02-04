@@ -1,0 +1,19 @@
+schema: 1
+snyk: 
+    orgID: 456
+    severity: critical #threshold for jira ticket creation
+    maturityFilter: proof-of-concept
+    type: vuln #what snyk issue types should we consider to ticket
+    priorityScoreThreshold: 20
+    remoteUrl: github.com/owner/repo # URL to the remote repository (when not detected)
+jira:
+    jiraTicketType: Task
+    jiraProjectID: 15698
+    assigneeId: 1238769
+    priorityIsSeverity: true
+    customMandatoryFields:
+        Something: 
+            Value: This is a summary
+        transition: 
+            id: 5
+
