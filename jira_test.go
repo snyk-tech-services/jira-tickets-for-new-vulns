@@ -701,93 +701,37 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 
 }
 
-/// test flags setting
-func TestSetOptionFunc(t *testing.T) {
+func TestAddMandatoryFieldToTicket(t *testing.T) {
 
 	assert := assert.New(t)
+	ticket := readFixture("./fixtures/ticketJson.json")
 
-	// reset command line arg
-	oldArgs := os.Args
-	defer func() { os.Args = oldArgs }()
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
 
-	args := []string{
-		"--token=123",
-		"--configFile=./fixtures",
-	}
+	customMandatoryJiraFields := map[string]interface{}{"Something": map[string]interface{}{"Value": "This is a summary"}, "transition": map[string]interface{}{"id": 5}}
 
-	options := flags{}
-	options.setOption(args)
+	newTicket := addMandatoryFieldToTicket(ticket, customMandatoryJiraFields, cD)
+	newTicketFixture := readFixture("./fixtures/ticketJsonWithMandatoryField.json")
 
-	mandatoryResult := &MandatoryFlags{
-		orgID:         "456",
-		apiToken:      "123",
-		jiraProjectID: "15698",
-		endpointAPI:   "https://snyk.io/api",
-	}
-
-	optionalResult := &optionalFlags{
-		assigneeID:             "1238769",
-		assigneeName:           "",
-		debug:                  false,
-		dryRun:                 false,
-		issueType:              "vuln",
-		jiraTicketType:         "Task",
-		labels:                 "",
-		maturityFilterString:   "proof-of-concept",
-		priorityIsSeverity:     true,
-		priorityScoreThreshold: 20,
-		projectID:              "",
-		severity:               "critical",
-	}
-
-	assert.Equal(optionalResult, &options.optionalFlags)
-	assert.Equal(mandatoryResult, &options.mandatoryFlags)
+	assert.Equal(string(newTicket), string(newTicketFixture))
 }
 
-//checking that the option override the configFile
-func TestSetOptionMixFunc(t *testing.T) {
+func TestAddNestedMandatoryFieldToTicket(t *testing.T) {
 
 	assert := assert.New(t)
+	ticket := readFixture("./fixtures/ticketJson.json")
 
-	// reset command line arg
-	oldArgs := os.Args
-	defer func() { os.Args = oldArgs }()
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
 
-	args := []string{
-		"--token=123",
-		"--type=license",
-		"--assigneeId=654",
-		"--api=http://snyk.io/api",
-		"--configFile=./fixtures",
-		"--orgID=456",
-		"--jiraProjectID=15699",
-	}
+	customMandatoryJiraFields := map[string]interface{}{"something": map[string]interface{}{"somethingElse": map[string]interface{}{"value": "This is a summary"}}, "transition": map[string]interface{}{"id": 5}}
 
-	options := flags{}
-	options.setOption(args)
+	newTicket := addMandatoryFieldToTicket(ticket, customMandatoryJiraFields, cD)
 
-	mandatoryResult := &MandatoryFlags{
-		orgID:         "456",
-		apiToken:      "123",
-		jiraProjectID: "15699",
-		endpointAPI:   "http://snyk.io/api",
-	}
+	newTicketFixture := readFixture("./fixtures/ticketJsonWithNestedMandatoryField.json")
 
-	optionalResult := &optionalFlags{
-		assigneeID:             "654",
-		assigneeName:           "",
-		debug:                  false,
-		dryRun:                 false,
-		issueType:              "license",
-		jiraTicketType:         "Task",
-		labels:                 "",
-		maturityFilterString:   "proof-of-concept",
-		priorityIsSeverity:     true,
-		priorityScoreThreshold: 20,
-		projectID:              "",
-		severity:               "critical",
-	}
-
-	assert.Equal(optionalResult, &options.optionalFlags)
-	assert.Equal(mandatoryResult, &options.mandatoryFlags)
+	assert.Equal(string(newTicket), string(newTicketFixture))
 }

@@ -9,8 +9,9 @@ type debug struct {
 // flags structures
 // separated in 2 structure because some function needs only the mandatory
 type flags struct {
-	mandatoryFlags MandatoryFlags
-	optionalFlags  optionalFlags
+	mandatoryFlags            MandatoryFlags
+	optionalFlags             optionalFlags
+	customMandatoryJiraFields map[string]interface{}
 }
 
 type MandatoryFlags struct {

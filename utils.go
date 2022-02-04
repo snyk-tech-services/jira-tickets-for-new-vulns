@@ -3,12 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 /***
@@ -111,8 +113,8 @@ set the flags structures
 func (opt *flags) setOption(args []string) {
 
 	var apiTokenPtr *string
-	var debug bool
-	var dryRun bool
+	var debugPtr *bool
+	var dryRunPtr *bool
 	var configFilePtr *string
 
 	// Using viper to bind config file and flags
@@ -136,10 +138,8 @@ func (opt *flags) setOption(args []string) {
 	fs.String("labels", "", "Optional. Jira ticket labels")
 	fs.Bool("priorityIsSeverity", false, "Boolean. Use issue severity as priority")
 	fs.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
-	debugPtr := fs.Bool("debug", false, "Optional. Boolean. enable debug mode")
-	debug = *debugPtr
-	dryRunPtr := fs.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
-	dryRun = *dryRunPtr
+	debugPtr = fs.Bool("debug", false, "Optional. Boolean. enable debug mode")
+	dryRunPtr = fs.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
 	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Open tickets only for upgradable issues")
 	configFilePtr = fs.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
 	fs.Parse(args)
@@ -167,23 +167,32 @@ func (opt *flags) setOption(args []string) {
 	v.SetConfigName("jira") // config file name without extension
 	v.SetConfigType("yaml")
 
-	if configFilePtr != nil {
+	if configFilePtr != nil || len(*configFilePtr) > 0 {
 		v.AddConfigPath(*configFilePtr)
 	} else {
 		v.AddConfigPath(".")
 	}
 
+	configFile := CheckConfigFileFormat(*configFilePtr)
+
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			fmt.Println("error no file")
+			fmt.Println("*** ERROR *** config file not found")
 		} else {
-			fmt.Println("error ", err)
+			fmt.Println("*** ERROR *** ", err)
 		}
+	}
+
+	// Get any mandatory custom jira configuration
+	// needed to open a jira ticket
+	// don't do something not needed
+	if v.Get("jira.customMandatoryFields") != nil {
+		opt.customMandatoryJiraFields = findCustomJiraMandatoryFlags(configFile)
 	}
 
 	// Setting the flags structure
 	opt.mandatoryFlags.setMandatoryFlags(apiTokenPtr, *v)
-	opt.optionalFlags.setoptionalFlags(debug, dryRun, *v)
+	opt.optionalFlags.setoptionalFlags(*debugPtr, *dryRunPtr, *v)
 
 	// check the flags rules
 	opt.checkFlags()
@@ -310,30 +319,94 @@ func IsTestRun() bool {
 }
 
 /***
-function parseConfigFile
-return: none
-input: flags
-Parse the config file to set the flags
+function findCustomJiraMandatoryFlags
+return: map[string]interface{} : list of mandatory fields and value associated
+input: none
+Read the config file and extract the jira fields than the mandatory field inside it
 ***/
-func setAndParseConfigFile(v viper.Viper, configFilePtr *string) {
+func findCustomJiraMandatoryFlags(yamlFile []byte) map[string]interface{} {
 
-	v.SetConfigName("jira") // config file name without extension
-	v.SetConfigType("yaml")
+	config := make(map[interface{}]interface{})
+	yamlCustomJiraMandatoryField := make(map[interface{}]interface{})
+	jsonCustomJiraMandatoryField := make(map[string]interface{})
+	unMarshalledJiraValues := make(map[interface{}]interface{})
 
-	if configFilePtr != nil {
-		v.AddConfigPath(*configFilePtr)
-	} else {
-		v.AddConfigPath(".")
+	err := yaml.Unmarshal(yamlFile, &config)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file", err)
 	}
 
-	//parse config file to extract values
-	if err := v.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			fmt.Println("error no file")
-		} else {
-			fmt.Println("error ", err)
+	// extract jira fields
+	jiraValues := config["jira"]
+	marshalledJiraValues, err := yaml.Marshal(jiraValues)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'jira' config", err)
+	}
+
+	err = yaml.Unmarshal(marshalledJiraValues, &unMarshalledJiraValues)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'jira' config", err)
+	}
+
+	// extract mandatory fields
+	customJiraMandatoryField_ := unMarshalledJiraValues["customMandatoryFields"]
+
+	marshalCustomJiraMandatoryField, err := yaml.Marshal(customJiraMandatoryField_)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'customMandatoryFields' config", err)
+	}
+
+	err = yaml.Unmarshal(marshalCustomJiraMandatoryField, &yamlCustomJiraMandatoryField)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'customMandatoryFields' config", err)
+	}
+
+	// converting the type, the yaml type is not compatible with the json one
+	// json doesn't understand map[interface{}]interface{} => it will fail
+	// when marshalling the ticket in a json format
+	jsonCustomJiraMandatoryField = convertYamltoJson(yamlCustomJiraMandatoryField)
+
+	return jsonCustomJiraMandatoryField
+}
+
+/***
+function convertYamltoJson
+input map[interface{}]interface{}, type from unmarshalling yaml
+return map[string]interface{} ticket type from unmarshalling json
+convert the type we get from yaml to a json one
+***/
+func convertYamltoJson(m map[interface{}]interface{}) map[string]interface{} {
+	res := map[string]interface{}{}
+	for k, v := range m {
+		switch v2 := v.(type) {
+		case map[interface{}]interface{}:
+			res[fmt.Sprint(k)] = convertYamltoJson(v2)
+		default:
+			res[fmt.Sprint(k)] = v
 		}
 	}
+	return res
+}
 
-	return
+/***
+function CheckConfigFileFormat
+input path string, path to the config file
+return []byte config file
+Try to read the yaml file. If this fails the config file is not valid yaml
+***/
+func CheckConfigFileFormat(path string) []byte {
+
+	if len(path) == 0 {
+		path = "."
+	}
+
+	file := path + "/jira.yaml"
+
+	yamlFile, err := ioutil.ReadFile(file)
+	if err != nil {
+		log.Println("*** ERROR *** Could not read config file", err)
+		log.Println("*** ERROR *** Please check the format config file", err)
+	}
+
+	return yamlFile
 }
