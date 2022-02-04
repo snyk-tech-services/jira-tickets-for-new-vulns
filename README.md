@@ -111,7 +111,7 @@ Example of config file structure.
 If your jira project has custom mandatory field configured, they will need to be added to the config file
 Please make sure you give both key and value expected by jira under the customMandatoryField key of the config file
 
-'''
+```
 schema: 1
 snyk: 
     orgID: a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513 # <SNYK_ORG_ID> 
@@ -134,7 +134,7 @@ jira:
     customMandatoryFields:
         key: 
             value: 5
-'''
+```
 
 Notes: 
   - The token is not expected present in the config file
