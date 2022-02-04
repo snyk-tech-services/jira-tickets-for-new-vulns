@@ -110,6 +110,7 @@ A logFile listing all the tickets created can be found where the tool has been r
 Example of config file structure. 
 If your jira project has custom mandatory field configured, they will need to be added to the config file
 Please make sure you give both key and value expected by jira under the customMandatoryField key of the config file
+
 '''
 schema: 1
 snyk: 
@@ -134,6 +135,7 @@ jira:
         key: 
             value: 5
 '''
+
 Notes: 
   - The token is not expected present in the config file
   - Command line arguments override the config file. IE: 
