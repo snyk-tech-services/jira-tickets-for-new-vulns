@@ -26,7 +26,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     --token=<API Token>                                                  // Snyk API Token. Service accounts work.
     --jiraProjectID=<12345>                                              // Jira project ID the tickets will be opened against
     --jiraProjectKey=<KEY>                                               // Jira project Key the tickets will be opened against
-    --jiraTicketType=<Task|Bug|....>                                     // Optional. Type of ticket to open. Defaults to Bug
+    --jiraTicketType=<Task|Bug|....>                                     // Optional. Type of ticket to open. Defaults to Bug. Please see the 'Notes' section below.
     --severity=<critical|high|medium|low>                                // Optional. Severity threshold to open tickets for. Defaults to low.
     --maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas
     --type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.
@@ -40,6 +40,9 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     --ifUpgradeAvailableOnly=<true|false>                                // Optional. create ticket only for upgradable issues
     --configFile                                                         // Path the jira.yaml if not root 
 ```
+
+## Restrictions
+The tool does not support IAC project. It will open issue only for code and open source projects and ignore all other project type.
 
 ### Priority is Severity
 Option to get the JIRA ticket priority set based on issue severity.
@@ -110,7 +113,8 @@ A logFile listing all the tickets created can be found where the tool has been r
 Example of config file structure. 
 If your jira project has custom mandatory field configured, they will need to be added to the config file
 Please make sure you give both key and value expected by jira under the customMandatoryField key of the config file
-'''
+
+```
 schema: 1
 snyk: 
     orgID: a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513 # <SNYK_ORG_ID> 
@@ -133,12 +137,13 @@ jira:
     customMandatoryFields:
         key: 
             value: 5
-'''
+```
+
 Notes: 
   - The token is not expected present in the config file
   - Command line arguments override the config file. IE: 
       Using the config file above, running ./snyk-jira-sync-macOs -Org=1234 -configFile=true -token=123
       the org ID used by the tool will be 1234 and not a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513
   - See 'Extended options' for default values 
-
+  - Please ensure you use the same issue type that is configured in your JIRA. Default is Bug. Please verify the type is use (or default) exists in your JIRA configuration.
 
