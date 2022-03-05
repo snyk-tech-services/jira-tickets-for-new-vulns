@@ -1,4 +1,4 @@
-module github.com/snyk-tech-services/ira-tickets-for-new-vulns
+module github.com/snyk-tech-services/jira-tickets-for-new-vulns
 
 go 1.13
 
