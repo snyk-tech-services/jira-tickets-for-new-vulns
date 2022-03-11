@@ -1,0 +1,21 @@
+{
+  "jsonapi": { "version": "1.0" },
+  "data": [
+    {
+      "type": "issue_summary",
+      "id": "xxbac5ed-83dd-xx65-8730-2xxx4467e00q",
+      "attributes": {
+        "issueType": "code",
+        "title": "Server-Side Request Forgery (SSRF)",
+        "severity": "high",
+        "ignored": false
+      },
+      "links": {
+        "self": "/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx?project_id=xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx&version=2021-08-20~experimental"
+      }
+    }
+  ],
+  "links": {
+    "next": "/v3/orgs/123/issues?project_id=1234&version=2021-08-20~experimental?limit=10&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D"
+  }
+}

@@ -272,61 +272,70 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 			url = endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues?project_id=" + projectID + "&severity=" + severityIndexValue + "&version=2021-08-20~experimental"
 		}
 
-		// get the list of code issue for this project
-		responseData, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
+		for {
 
-		if err != nil {
-			if err.Error() != "Not found, Request failed" {
-				log.Printf("*** ERROR *** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
-				log.Fatal()
+			// get the list of code issue for this project
+			responseData, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
+
+			if err != nil {
+				if err.Error() != "Not found, Request failed" {
+					log.Printf("*** ERROR *** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
+					log.Fatal()
+				}
 			}
-		}
 
-		// loop through the issues and get the details
-		jsonData, err := jsn.NewJson(responseData)
+			// loop through the issues and get the details
+			jsonData, err := jsn.NewJson(responseData)
 
-		issueDetail := make(map[string]interface{})
+			issueDetail := make(map[string]interface{})
 
-		for _, e := range jsonData.K("data").Array().Elements() {
+			for _, e := range jsonData.K("data").Array().Elements() {
 
-			if len(e.K("id").String().Value) != 0 {
-				if _, found := tickets[e.K("id").String().Value]; !found {
+				if len(e.K("id").String().Value) != 0 {
+					if _, found := tickets[e.K("id").String().Value]; !found {
 
-					id := e.K("id").String().Value
+						id := e.K("id").String().Value
 
-					url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues/detail/code/" + id + "?project_id=" + projectID + "&version=2021-08-20~experimental"
+						url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues/detail/code/" + id + "?project_id=" + projectID + "&version=2021-08-20~experimental"
 
-					// get the details of this code issue id
-					responseIssueDetail, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
-					if err != nil {
-						log.Printf("*** ERROR *** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
-						log.Fatalln(err)
+						// get the details of this code issue id
+						responseIssueDetail, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
+						if err != nil {
+							log.Printf("*** ERROR *** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
+							log.Fatalln(err)
+						}
+
+						jsonIssueDetail, er := jsn.NewJson(responseIssueDetail)
+						if er != nil {
+							log.Printf("*** ERROR *** Json creation failed\n")
+							log.Fatalln(er)
+						}
+
+						bytes, err := json.Marshal(jsonIssueDetail)
+						if err != nil {
+							log.Fatalln(err)
+						}
+						json.Unmarshal(bytes, &issueDetail)
+
+						issueDetail["title"] = e.K("attributes").K("title").String().Value
+
+						marshalledjsonIssueDetail, err := json.Marshal(issueDetail)
+						fullCodeIssueDetail[id], err = jsn.NewJson(marshalledjsonIssueDetail)
+						if er != nil {
+							log.Printf("*** ERROR *** Json creation failed\n")
+							log.Fatalln(er)
+						}
 					}
 
-					jsonIssueDetail, er := jsn.NewJson(responseIssueDetail)
-					if er != nil {
-						log.Printf("*** ERROR *** Json creation failed\n")
-						log.Fatalln(er)
-					}
-
-					bytes, err := json.Marshal(jsonIssueDetail)
-					if err != nil {
-						log.Fatalln(err)
-					}
-					json.Unmarshal(bytes, &issueDetail)
-
-					issueDetail["title"] = e.K("attributes").K("title").String().Value
-
-					marshalledjsonIssueDetail, err := json.Marshal(issueDetail)
-					fullCodeIssueDetail[id], err = jsn.NewJson(marshalledjsonIssueDetail)
-					if er != nil {
-						log.Printf("*** ERROR *** Json creation failed\n")
-						log.Fatalln(er)
-					}
 				}
 
 			}
 
+			if len(jsonData.K("links").K("next").String().Value) > 0 {
+				url = endpointAPI + jsonData.K("links").K("next").String().Value
+			} else {
+				break
+			}
 		}
 	}
 
