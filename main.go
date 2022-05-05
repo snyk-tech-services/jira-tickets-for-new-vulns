@@ -72,9 +72,14 @@ Open Source, so feel free to contribute !
 		customDebug.Debug("*** INFO *** List of already existing tickets: ", tickets)
 
 		log.Println("*** INFO *** 3/4 - Getting vulns")
-		vulnsPerPath := getVulnsWithoutTicket(options, project, maturityFilter, tickets, customDebug)
+		vulnsPerPath, skippedIssues := getVulnsWithoutTicket(options, project, maturityFilter, tickets, customDebug)
 
 		customDebug.Debug("*** INFO *** List of vuln without tickets: ", vulnsPerPath)
+
+		if len(skippedIssues) > 0 {
+			customDebug.Debug("*** INFO *** List of skipped vulns: ", skippedIssues)
+			customDebug.Debug("*** INFO *** These have been skipped because data couldn't be retrieved from Snyk")
+		}
 
 		if len(vulnsPerPath) == 0 {
 			log.Println("*** INFO *** 4/4 - No new JIRA ticket required")

@@ -130,6 +130,29 @@ func HTTPResponseCheckAndStub_() *httptest.Server {
 }
 
 // HTTPResponseCheckAndStub Check url match and Stubbing HTTP response
+func HTTPResponseCheckAndStubWithError_() *httptest.Server {
+	var resp []byte
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if "/v1/org/123/project/123/issue/SNYK-JS-PACRESOLVER-1564857/paths" == r.RequestURI {
+			resp = readFixture("./fixtures/issuePACRESOLVERPath.json")
+		} else if "/v1/org/123/project/123/issue/SNYK-JS-DOTPROP-543489/paths" == r.RequestURI {
+			resp = readFixture("./fixtures/issueJSDOTPath.json")
+		} else if "/v1/org/123/project/123/issue/SNYK-JS-ACORN-559469/paths" == r.RequestURI {
+			resp = readFixture("./fixtures/issueACORNPath.json")
+		} else if "/v1/org/123/project/123/issue/SNYK-JS-ACORN-559470/paths" == r.RequestURI {
+			resp = []byte("500 - internal server error")
+		} else if "/v1/org/123/project/123/aggregated-issues" == r.RequestURI {
+			resp = readFixture("./fixtures/projectAggregatedIssuesPerPathWith500Error.json")
+		} else {
+			resp = []byte("404 - url mismatch")
+		}
+
+		w.Write(resp)
+	}))
+}
+
+// HTTPResponseCheckAndStub Check url match and Stubbing HTTP response
 func HTTPResponseCheckAndStubNoVulnOrLicense() *httptest.Server {
 	var resp []byte
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
