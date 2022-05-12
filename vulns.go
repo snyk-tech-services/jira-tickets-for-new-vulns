@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 
+	"time"
+
 	"github.com/michael-go/go-jsn/jsn"
 )
 
@@ -347,6 +349,8 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 				break
 			}
 		}
+		// add a sleep of 1s to avoid rate limit issues
+		time.Sleep(1)
 	}
 
 	return fullCodeIssueDetail
