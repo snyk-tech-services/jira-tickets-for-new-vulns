@@ -54,12 +54,13 @@ func getJiraTickets(Mf MandatoryFlags, projectID string, customDebug debug) map[
 	responseData, err := makeSnykAPIRequest("GET", Mf.endpointAPI+"/v1/org/"+Mf.orgID+"/project/"+projectID+"/jira-issues", Mf.apiToken, nil, customDebug)
 	if err != nil {
 		customDebug.Debug("*** ERROR *** Could not get the tickets")
-		log.Fatal(err)
+		return nil
 	}
 
 	tickets, err := jsn.NewJson(responseData)
 	if err != nil {
-		log.Fatal(err)
+		customDebug.Debug("*** ERROR *** Could not read the tickets")
+		return nil
 	}
 
 	tickRefs := make(map[string]string)

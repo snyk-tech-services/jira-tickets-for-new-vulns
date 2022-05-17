@@ -43,6 +43,7 @@ Open Source, so feel free to contribute !
 	// If project Id is not specified => get all the projets
 	projectIDs, er := getProjectsIds(options, customDebug)
 	if er != nil {
+		customDebug.Debug("*** ERROR *** could not get the projectsIDs. Tool cannot proceed")
 		log.Fatal(er)
 	}
 
@@ -64,7 +65,11 @@ Open Source, so feel free to contribute !
 	for _, project := range projectIDs {
 
 		log.Println("*** INFO *** 1/4 - Retrieving Project", project)
-		projectInfo := getProjectDetails(options.mandatoryFlags, project, customDebug)
+		projectInfo, err := getProjectDetails(options.mandatoryFlags, project, customDebug)
+
+		if err != nil {
+			continue
+		}
 
 		log.Println("*** INFO *** 2/4 - Getting Existing JIRA tickets")
 		tickets := getJiraTickets(options.mandatoryFlags, project, customDebug)
@@ -72,7 +77,7 @@ Open Source, so feel free to contribute !
 		customDebug.Debug("*** INFO *** List of already existing tickets: ", tickets)
 
 		log.Println("*** INFO *** 3/4 - Getting vulns")
-		vulnsPerPath, skippedIssues := getVulnsWithoutTicket(options, project, maturityFilter, tickets, customDebug)
+		vulnsPerPath, skippedIssues, _ := getVulnsWithoutTicket(options, project, maturityFilter, tickets, customDebug)
 
 		customDebug.Debug("*** INFO *** List of vuln without tickets: ", vulnsPerPath)
 
