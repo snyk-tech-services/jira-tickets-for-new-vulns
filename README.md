@@ -111,8 +111,40 @@ A logFile listing all the tickets created can be found where the tool has been r
 ## Jira.yaml
 
 Example of config file structure. 
-If your jira project has custom mandatory field configured, they will need to be added to the config file
-Please make sure you give both key and value expected by jira under the customMandatoryField key of the config file
+If your jira project has specific mandatory field or custom fields configured, they will need to be added to the config file.
+Mandatory fields: 
+  - Make sure to give both key and value expected by jira under the customMandatoryField key of the config file.
+  We support 2 kind of mandatory field: simple key/value pair or nested key/value
+  
+  - Simple key/Value:
+    
+    ``` 
+      customMandatoryFields:
+            key: 
+              value: "This is a summary" 
+    ```
+    will result in adding this object to the ticket ``` {"key":{"Value":"This is a summary"} ```
+  
+  - Nested:
+    ``` 
+    firstKey:
+          secondKey: 
+            id: 65 
+    ```
+    will result in adding this object to the ticket ``` "firstKey":{"secondKey":{"id":62}} ```
+
+
+Custom fields:
+  - At the moment we are supporting 3 types of custom fields: labels, MultiGroupPicker and MultiSelect.
+  - Make sure to respect the format belong in the config file:
+    - labels:
+      ``` "customfield_10601": jiraValue-label-Value1,Value2``` => ``` "customfield_10601":["Value1","Value2"]```
+    - MultiGroupPicker:
+      ``` "customfield_10601": jiraValue-MultiGroupPicker-Value1,Value2``` => ``` "customfield_10601":[{"name":"Value1"},{"name":"Value2"}]```
+    - MultiGroupPicker:
+      ``` "customfield_10601": jiraValue-MultiSelect-Value1,Value2```  => ``` "customfield_10601":[{"value":"Value1"},{"value":"Value2"}]```
+
+For more details on jira custom field please visit [Jira documentation] (https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/)
 
 ```
 schema: 1
@@ -137,6 +169,7 @@ jira:
     customMandatoryFields:
         key: 
             value: 5
+    customfield_10601: jiraValue-MultiGroupPicker-Value1,Value2
 ```
 
 Notes: 

@@ -735,3 +735,39 @@ func TestAddNestedMandatoryFieldToTicket(t *testing.T) {
 
 	assert.Equal(string(newTicket), string(newTicketFixture))
 }
+func TestAddMandatoryFieldToTicketCustomField(t *testing.T) {
+
+	assert := assert.New(t)
+	ticket := readFixture("./fixtures/ticketJson.json")
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": map[string]interface{}{"value": "jiraValue-MultiGroupPicker-Value1,Value2"}, "transition": map[string]interface{}{"id": 5}}
+
+	newTicket := addMandatoryFieldToTicket(ticket, customMandatoryJiraFields, cD)
+
+	newTicketFixture := readFixture("./fixtures/ticketJsonWithMandatoryFieldCustomJiraValue.json")
+
+	assert.Equal(string(newTicket), string(newTicketFixture))
+}
+
+func TestAddMandatoryFieldToTicketCustomFieldLabel(t *testing.T) {
+
+	assert := assert.New(t)
+	ticket := readFixture("./fixtures/ticketJson.json")
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": map[string]interface{}{"value": "jiraValue-Labels-Value1,Value2"}, "transition": map[string]interface{}{"id": 5}}
+
+	newTicket := addMandatoryFieldToTicket(ticket, customMandatoryJiraFields, cD)
+
+	println("newTicket ", newTicket)
+	newTicketFixture := readFixture("./fixtures/ticketJsonWithMandatoryFieldCustomJiraValueLabel.json")
+
+	assert.Equal(string(newTicket), string(newTicketFixture))
+}
