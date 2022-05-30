@@ -10,6 +10,11 @@ import (
 	bf "gopkg.in/russross/blackfriday.v2"
 )
 
+const JiraPrefix = "jiraValue-"
+const JiraMultiSelect = "MultiSelect"
+const JiraMultiGroupPicker = "MultiGroupPicker"
+const JiraLabels = "Labels"
+
 type JiraIssueForTicket struct {
 	Id  string `json:Id,omitempty"`
 	Key string `json:Key,omitempty"`
@@ -219,6 +224,19 @@ func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]in
 	}
 
 	for i, s := range customMandatoryField {
+
+		value, ok := s.(map[string]interface{})
+		if ok {
+			v, ok := value["value"].(string)
+			if ok {
+				if strings.HasPrefix(v, JiraPrefix) {
+					s = supportJiraFormats(v, customDebug)
+				}
+			}
+		} else {
+			customDebug.Debug(fmt.Sprintf("*** ERROR *** Assertion error expected map[string]interface{} but got type %T ", s))
+		}
+
 		fields[i] = s
 	}
 
@@ -230,4 +248,55 @@ func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]in
 	}
 
 	return newMarchalledTicket
+}
+
+/***
+function supportJiraFormats
+input interface{} v, previous custom value
+input debug
+return interface{}
+replace any custom values which start with "jiraValue-" with the proper formatting for jira
+Usage: customfield_10601:
+      value: jira-MultiGroupPicker-Value1,Value2
+https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/
+***/
+func supportJiraFormats(v string, customDebug debug) (result interface{}) {
+
+	valueSplit := strings.Split(v, "-")
+
+	switch valueSplit[1] {
+	case JiraMultiSelect:
+		list := make([]map[string]string, 0)
+		// add each selection to the collection
+		for _, x := range strings.Split(valueSplit[2], ",") {
+			data := make(map[string]string)
+			data["value"] = x
+
+			list = append(list, data)
+		}
+
+		result = list
+	case JiraMultiGroupPicker:
+		list := make([]map[string]string, 0)
+		// add each selection to the collection
+		for _, x := range strings.Split(valueSplit[2], ",") {
+			data := make(map[string]string)
+			data["name"] = x
+
+			list = append(list, data)
+		}
+
+		result = list
+	case JiraLabels:
+		list := []string{}
+		for _, x := range strings.Split(valueSplit[2], ",") {
+			list = append(list, x)
+		}
+
+		result = list
+	}
+
+	customDebug.Debug(fmt.Sprintf("*** INFO *** Custom field value '%s' replaced with '%s' ", v, result))
+
+	return result
 }
