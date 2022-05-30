@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"strings"
 
 	"github.com/michael-go/go-jsn/jsn"
 )
@@ -46,18 +47,28 @@ func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []strin
 	if flags.optionalFlags.issueType != "all" && flags.optionalFlags.issueType != "" {
 		body.Filters.Types = []string{flags.optionalFlags.issueType}
 	}
-	switch flags.optionalFlags.severity {
-	case "critical":
-		body.Filters.Severities = []string{"critical"}
-	case "high":
-		body.Filters.Severities = []string{"critical", "high"}
-	case "medium":
-		body.Filters.Severities = []string{"critical", "high", "medium"}
-	case "low":
-		body.Filters.Severities = []string{"critical", "high", "medium", "low"}
-	default:
-		log.Fatalln("Unexpected severity threshold")
-	}
+
+	var severitiesArray []string = strings.Split(flags.optionalFlags.severity, ",")
+	var severityFilter []string
+	for _, severity := range severitiesArray {
+    	switch severity {
+    		case "critical":
+    			severityFilter = append(severityFilter, severity)
+    		case "high":
+    			severityFilter = append(severityFilter, severity)
+    		case "medium":
+    			severityFilter = append(severityFilter, severity)
+    		case "low":
+    			severityFilter = append(severityFilter, severity)
+    		case "":
+    		default:
+    			log.Fatalf("*** ERROR ***: %s is Unexpected severity threshold. Severity threshold must be one of {critical,high,medium,low}", severity)
+    		}
+    	}
+    if len(severityFilter) > 0 {
+        body.Filters.Severities = severityFilter
+    }
+    
 	if len(maturityFilter) > 0 {
 		body.Filters.ExploitMaturity = maturityFilter
 	}
@@ -247,25 +258,27 @@ Create a list of issue details without tickets.
 ***/
 func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[string]string, customDebug debug) map[string]interface{} {
 
-	// In the v1 api low severity means get all the issues up,
-	// mediun means all but low and so on
-	// this is not possible with v3.
-	// to keep the logic of the tool
-	// we create an array of severity
-	// and loop on it to get all the issues
-	severity := []string{}
-	switch flags.optionalFlags.severity {
-	case "critical":
-		severity = []string{"critical"}
-	case "high":
-		severity = []string{"critical", "high"}
-	case "medium":
-		severity = []string{"critical", "high", "medium"}
-	case "low":
-		severity = []string{"critical", "high", "medium", "low"}
-	default:
-		log.Fatalln("Unexpected severity threshold")
-	}
+	// In this, low severity means get issues only with low severity,
+	// medium means only medium and so on
+	// if we want to use multiple severity, we have to pass comma separated values
+
+	var severitiesArray []string = strings.Split(flags.optionalFlags.severity, ",")
+	var severityFilter []string
+	for _, severity := range severitiesArray {
+    	switch severity {
+    		case "critical":
+    			severityFilter = append(severityFilter, severity)
+    		case "high":
+    			severityFilter = append(severityFilter, severity)
+    		case "medium":
+    			severityFilter = append(severityFilter, severity)
+    		case "low":
+    			severityFilter = append(severityFilter, severity)
+    		case "":
+    		default:
+    			log.Fatalf("*** ERROR ***: %s is Unexpected severity threshold. Severity threshold must be one of {critical,high,medium,low}", severity)
+    		}
+    	}
 
 	fullCodeIssueDetail := make(map[string]interface{})
 
@@ -275,7 +288,7 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 		endpointAPI = flags.mandatoryFlags.endpointAPI
 	}
 
-	for _, severityIndexValue := range severity {
+	for _, severityIndexValue := range severitiesArray {
 
 		url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues?project_id=" + projectID + "&version=2021-08-20~experimental"
 		if len(flags.optionalFlags.severity) > 0 {

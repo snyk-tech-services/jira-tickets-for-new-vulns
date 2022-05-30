@@ -130,7 +130,7 @@ func (opt *flags) setOption(args []string) {
 	fs.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
 	fs.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
 	fs.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
-	fs.String("severity", "low", "Optional. Your severity threshold")
+	fs.String("severity", "critical,high,medium,low", "Optional. Your severity threshold")
 	fs.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
 	fs.String("type", "all", "Optional. Your issue type (all|vuln|license)")
 	fs.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
