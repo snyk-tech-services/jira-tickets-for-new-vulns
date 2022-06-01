@@ -65,7 +65,7 @@ func TestOpenJiraTicketCodeOnly(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -118,7 +118,7 @@ func TestOpenJiraTicketCodeOnlyWithLabel(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -179,7 +179,7 @@ func TestOpenJiraTicketCodeOnlyWithSeverity(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -240,7 +240,7 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeId(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -301,7 +301,7 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeName(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -358,7 +358,8 @@ func TestGetSnykCodeIssueWithoutTickets(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = "low,high,medium,critical"
+	// Of.severity = "low,high,medium,critical"
+	Of.severityThreshold = "low"
 	Of.priorityScoreThreshold = 0
 	Of.issueType = "all"
 	Of.debug = false
@@ -411,7 +412,7 @@ func TestGetSnykCodeIssueWithoutTicketsWithMultipleSeverityFilter(t *testing.T) 
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = "high,medium"
+	Of.severities = "high,medium"
 	Of.priorityScoreThreshold = 0
 	Of.issueType = "all"
 	Of.debug = false
@@ -464,7 +465,7 @@ func TestGetSnykCodeIssueWithoutTicketsWithSeverityFilter(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = "high"
+	Of.severityThreshold = "high"
 	Of.priorityScoreThreshold = 0
 	Of.issueType = "all"
 	Of.debug = false
@@ -516,7 +517,8 @@ func TestGetSnykCodeIssueWithoutTicketsWithPagination(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = "low,high,medium,critical"
+	// Of.severity = "low,high,medium,critical"
+	Of.severityThreshold = "low"
 	Of.priorityScoreThreshold = 0
 	Of.issueType = "all"
 	Of.debug = false

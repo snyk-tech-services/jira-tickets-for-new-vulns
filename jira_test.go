@@ -36,7 +36,7 @@ func TestOpenJiraTicketFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -91,7 +91,7 @@ func TestOpenJiraTicketWithProjectKeyFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -146,7 +146,7 @@ func TestOpenJiraTicketErrorAndRetryFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -201,7 +201,7 @@ func TestOpenJiraMultipleTicketsErrorAndRetryFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -272,7 +272,7 @@ func TestOpenJiraMultipleTicketsErrorAndRetryAndFailFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -344,7 +344,7 @@ func TestOpenJiraMultipleTicketsFailureFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -417,7 +417,7 @@ func TestOpenJiraTicketWithAssigneeNameFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -477,7 +477,7 @@ func TestOpenJiraTicketWithAssigneeIDFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -538,7 +538,7 @@ func TestOpenJiraTicketDryRun(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -593,7 +593,7 @@ func TestOpenJiraMultipleTicketsIsUpgradableFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -668,7 +668,7 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false

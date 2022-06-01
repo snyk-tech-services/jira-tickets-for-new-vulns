@@ -35,7 +35,7 @@ func TestOpenJiraTicketWithPriorityMappingFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -95,7 +95,7 @@ func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false
@@ -157,7 +157,7 @@ func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false

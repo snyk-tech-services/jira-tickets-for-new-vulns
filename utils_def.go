@@ -25,7 +25,8 @@ type MandatoryFlags struct {
 type optionalFlags struct {
 	projectID              string
 	jiraTicketType         string
-	severity               string
+	severityThreshold      string
+	severities             string
 	issueType              string
 	maturityFilterString   string
 	assigneeID             string
