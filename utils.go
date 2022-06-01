@@ -78,6 +78,9 @@ set the optional flags structure
 func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper.Viper) {
 
 	Of.projectID = v.GetString("snyk.projectID")
+	Of.projectCriticality = v.GetString("snyk.projectCriticality")
+	Of.projectEnvironment = v.GetString("snyk.projectEnvironment")
+	Of.projectLifecycle = v.GetString("snyk.projectLifecycle")
 	Of.jiraTicketType = v.GetString("jira.jiraTicketType")
 	Of.severity = v.GetString("snyk.severity")
 	Of.issueType = v.GetString("snyk.type")
@@ -90,7 +93,6 @@ func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper
 	Of.debug = debugPtr
 	Of.dryRun = dryRunPtr
 	Of.ifUpgradeAvailableOnly = v.GetBool("snyk.ifUpgradeAvailableOnly")
-
 }
 
 /***
@@ -130,6 +132,9 @@ func (opt *flags) setOption(args []string) {
 	fs.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
 	fs.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
 	fs.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
+	fs.String("projectCriticality", "", "Optional. Include only projects whose criticality attribute contains one or more of the specified values.")
+	fs.String("projectEnvironment", "", "Optional. Include only projects whose environment attribute contains one or more of the specified values.")
+	fs.String("projectLifecycle", "", "Optional. Include only projects whose lifecycle attribute contains one or more of the specified values.")
 	fs.String("severity", "low", "Optional. Your severity threshold")
 	fs.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
 	fs.String("type", "all", "Optional. Your issue type (all|vuln|license)")
@@ -152,6 +157,9 @@ func (opt *flags) setOption(args []string) {
 	v.BindPFlag("jira.jiraProjectKey", fs.Lookup("jiraProjectKey"))
 
 	v.BindPFlag("snyk.projectID", fs.Lookup("projectID"))
+	v.BindPFlag("snyk.projectCriticality", fs.Lookup("projectCriticality"))
+	v.BindPFlag("snyk.projectEnvironment", fs.Lookup("projectEnvironment"))
+	v.BindPFlag("snyk.projectLifecycle", fs.Lookup("projectLifecycle"))
 	v.BindPFlag("jira.jiraTicketType", fs.Lookup("jiraTicketType"))
 	v.BindPFlag("snyk.severity", fs.Lookup("severity"))
 	v.BindPFlag("snyk.type", fs.Lookup("type"))

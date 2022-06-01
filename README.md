@@ -38,6 +38,9 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     --dryRun=<true|false>                                                // Optional. result can be found in a json file were the tool is run
     --debug=<true|false>                                                 // Optional. enable debug mode
     --ifUpgradeAvailableOnly=<true|false>                                // Optional. create ticket only for upgradable issues
+    --projectCriticality=[critical,high,medium,low]                      // Optional. Include only projects whose criticality attribute contains one or more of the specified values
+    --projectEnvironment=[backend,frontend,internal,external,mobile,...] // Optional. Include only projects whose environment attribute contains one or more of the specified values
+    --projectLifecycle=[development,sandbox,production]                  // Optional. Include only projects whose lifecycle attribute contains one or more of the specified values
     --configFile                                                         // Path the jira.yaml if not root 
 ```
 
