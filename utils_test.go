@@ -209,6 +209,27 @@ func HTTPResponseCheckOpenJiraTicketsWithError(url string) *httptest.Server {
 	}))
 }
 
+var count int = 0
+
+func HTTPResponseCheckOpenJiraTicketsWithError50x(url string) *httptest.Server {
+	var resp []byte
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if count >= 2 {
+			fmt.Println("Working case")
+			w.WriteHeader(http.StatusAccepted)
+			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse.json")
+		} else {
+			fmt.Println("Error case")
+			w.WriteHeader(503)
+			resp = []byte("503 - Service Unavailable")
+			count++
+		}
+
+		w.Write(resp)
+	}))
+}
+
 // HTTPResponseStub Stubbing HTTP response
 func HTTPResponseCheckOpenJiraMultipleTicketsWithError() *httptest.Server {
 	var resp []byte
