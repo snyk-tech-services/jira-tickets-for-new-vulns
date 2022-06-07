@@ -288,8 +288,8 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 			responseData, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
 
 			if err != nil {
-				if err.Error() != "Not found, Request failed" {
-					log.Printf("*** ERROR *** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
+				if (err.Error() != "Not found, Request failed") && (err.Error() != "Request failed with 50x") {
+					log.Printf("*** ERROR ***** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
 					log.Fatal()
 				}
 			}
