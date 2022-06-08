@@ -25,7 +25,60 @@ func TestGetVulnsWithoutTicketFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = "low"
+	Of.severityThreshold = "low"
+	Of.priorityScoreThreshold = 0
+	Of.issueType = "all"
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.ifUpgradeAvailableOnly = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	var tickets map[string]string
+	tickets = make(map[string]string)
+	// Simulate an existing ticket for that vuln
+	tickets["SNYK-JS-PACRESOLVER-1564857"] = "FPI-794"
+	var maturityLevels []string
+
+	response, skippedIssues := getVulnsWithoutTicket(flags, "123", maturityLevels, tickets, cD)
+	assert.Equal(0, len(skippedIssues))
+	assert.Equal(2, len(response))
+
+	return
+}
+
+// Test getVulnsWithoutTicketWithSeverityFilter function
+func TestGetVulnsWithoutTicketFuncWithSeverityFilter(t *testing.T) {
+
+	assert := assert.New(t)
+
+	server := HTTPResponseCheckAndStub_()
+
+	defer server.Close()
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severities = "critical,low"
 	Of.priorityScoreThreshold = 0
 	Of.issueType = "all"
 	Of.debug = false
@@ -82,7 +135,7 @@ func TestNoVulnOrLicense(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = "low"
+	Of.severityThreshold = "low"
 	Of.priorityScoreThreshold = 0
 	Of.issueType = "all"
 	Of.debug = false
@@ -133,7 +186,7 @@ func TestGetVulnsWithoutTicketErrorRetrievingDataFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = "low"
+	Of.severityThreshold = "low"
 	Of.priorityScoreThreshold = 0
 	Of.issueType = "all"
 	Of.debug = false

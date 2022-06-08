@@ -65,7 +65,7 @@ func TestOpenJiraTicketCodeOnly(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -118,7 +118,7 @@ func TestOpenJiraTicketCodeOnlyWithLabel(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -179,7 +179,7 @@ func TestOpenJiraTicketCodeOnlyWithSeverity(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -240,7 +240,7 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeId(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -301,7 +301,7 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeName(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -358,7 +358,8 @@ func TestGetSnykCodeIssueWithoutTickets(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = "low"
+	// Of.severity = "low,high,medium,critical"
+	Of.severityThreshold = "low"
 	Of.priorityScoreThreshold = 0
 	Of.issueType = "all"
 	Of.debug = false
@@ -391,6 +392,59 @@ func TestGetSnykCodeIssueWithoutTickets(t *testing.T) {
 
 }
 
+func TestGetSnykCodeIssueWithoutTicketsWithMultipleSeverityFilter(t *testing.T) {
+
+	os.Setenv("EXECUTION_ENVIRONMENT", "test")
+
+	assert := assert.New(t)
+
+	server := HTTPResponseCodeIssueStubAndMirrorRequest()
+
+	defer server.Close()
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severities = "high,medium"
+	Of.priorityScoreThreshold = 0
+	Of.issueType = "all"
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.ifUpgradeAvailableOnly = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	var tickets map[string]string
+	tickets = make(map[string]string)
+	// Simulate an existing ticket for that vuln
+	tickets["xxbac5ed-83dd-xx65-8730-2xxx4467e0xx"] = "FPI-454"
+
+	response := getSnykCodeIssueWithoutTickets(flags, "789", tickets, cD)
+	assert.Equal(1, len(response))
+
+	return
+
+}
+
 func TestGetSnykCodeIssueWithoutTicketsWithSeverityFilter(t *testing.T) {
 
 	os.Setenv("EXECUTION_ENVIRONMENT", "test")
@@ -411,7 +465,7 @@ func TestGetSnykCodeIssueWithoutTicketsWithSeverityFilter(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = "high"
+	Of.severityThreshold = "high"
 	Of.priorityScoreThreshold = 0
 	Of.issueType = "all"
 	Of.debug = false
@@ -463,7 +517,8 @@ func TestGetSnykCodeIssueWithoutTicketsWithPagination(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = "low"
+	// Of.severity = "low,high,medium,critical"
+	Of.severityThreshold = "low"
 	Of.priorityScoreThreshold = 0
 	Of.issueType = "all"
 	Of.debug = false

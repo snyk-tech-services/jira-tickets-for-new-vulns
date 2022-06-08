@@ -64,7 +64,7 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = true
@@ -124,7 +124,7 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 
 	// setting optional options
 	Of := optionalFlags{}
-	Of.severity = ""
+	Of.severityThreshold = ""
 	Of.priorityScoreThreshold = 0
 	Of.issueType = ""
 	Of.debug = false

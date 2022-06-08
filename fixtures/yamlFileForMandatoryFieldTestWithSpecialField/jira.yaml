@@ -1,7 +1,7 @@
 schema: 1
 snyk: 
     orgID: 456
-    severity: critical #threshold for jira ticket creation
+    severityThreshold: critical #threshold for jira ticket creation
     maturityFilter: proof-of-concept
     type: vuln #what snyk issue types should we consider to ticket
     priorityScoreThreshold: 20

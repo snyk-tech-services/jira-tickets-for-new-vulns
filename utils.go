@@ -79,7 +79,8 @@ func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper
 
 	Of.projectID = v.GetString("snyk.projectID")
 	Of.jiraTicketType = v.GetString("jira.jiraTicketType")
-	Of.severity = v.GetString("snyk.severity")
+	Of.severityThreshold = v.GetString("snyk.severityThreshold")
+	Of.severities = v.GetString("snyk.severities")
 	Of.issueType = v.GetString("snyk.type")
 	Of.maturityFilterString = v.GetString("snyk.maturityFilter")
 	Of.assigneeID = v.GetString("jira.assigneeID")
@@ -130,7 +131,8 @@ func (opt *flags) setOption(args []string) {
 	fs.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
 	fs.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
 	fs.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
-	fs.String("severity", "low", "Optional. Your severity threshold")
+	fs.String("severities", "", "Optional. Your severity array, to be used for multiple or specific severity")
+	fs.String("severityThreshold", "", "Optional. Your severity threshold, defaults to low")
 	fs.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
 	fs.String("type", "all", "Optional. Your issue type (all|vuln|license)")
 	fs.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
@@ -153,7 +155,8 @@ func (opt *flags) setOption(args []string) {
 
 	v.BindPFlag("snyk.projectID", fs.Lookup("projectID"))
 	v.BindPFlag("jira.jiraTicketType", fs.Lookup("jiraTicketType"))
-	v.BindPFlag("snyk.severity", fs.Lookup("severity"))
+	v.BindPFlag("snyk.severityThreshold", fs.Lookup("severityThreshold"))
+	v.BindPFlag("snyk.severities", fs.Lookup("severities"))
 	v.BindPFlag("snyk.type", fs.Lookup("type"))
 	v.BindPFlag("snyk.maturityFilter", fs.Lookup("maturityFilter"))
 	v.BindPFlag("jira.assigneeID", fs.Lookup("assigneeId"))
@@ -229,6 +232,10 @@ func (flags *flags) checkFlags() {
 
 	if flags.optionalFlags.assigneeName != "" && flags.optionalFlags.assigneeID != "" {
 		log.Fatalf(("*** ERROR *** You passed both assigneeID and assigneeName in parameters\n Please, Use assigneeID OR assigneeName, not both"))
+	}
+
+	if flags.optionalFlags.severities != "" && flags.optionalFlags.severityThreshold != "" {
+		log.Fatalf(("*** ERROR *** You passed both severities and severityThreshold in parameters\n Please, Use severities OR severityThreshold, not both"))
 	}
 }
 

@@ -27,7 +27,8 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
     --jiraProjectID=<12345>                                              // Jira project ID the tickets will be opened against
     --jiraProjectKey=<KEY>                                               // Jira project Key the tickets will be opened against
     --jiraTicketType=<Task|Bug|....>                                     // Optional. Type of ticket to open. Defaults to Bug. Please see the 'Notes' section below.
-    --severity=<critical|high|medium|low>                                // Optional. Severity threshold to open tickets for. Defaults to low.
+    --severityThreshold=<critical|high|medium|low>                       // Optional. Severity threshold to open tickets for. Defaults to low.
+    --severities=[critical,high,medium,low]                              // Optional. Your severity array, to be used for multiple or specific severity
     --maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas
     --type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.
     --assigneeId=<123abc456def789>                                       // Optional.  Jira ID of user to assign tickets to. Note: Do not use assigneeName and assigneeId at the same time
@@ -151,7 +152,8 @@ schema: 1
 snyk: 
     orgID: a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513 # <SNYK_ORG_ID> 
     projectID: a1b2c3de-99b1-4f3f-bfdb-6ee4b4990514 # <SNYK_PROJECT_ID>
-    severity: critical # <critical|high|medium|low>
+    severityThreshold: critical # <critical|high|medium|low> defaults to low
+    severities: low # <critical,high,medium,low>
     maturityFilter: mature # <mature,proof-of-concept,no-known-exploit,no-data>
     type: all # <all|vuln|license>
     priorityScoreThreshold: 10
@@ -163,7 +165,7 @@ jira:
     assigneeId: 123abc456def789
     assigneeName: AccountName
     priorityIsSeverity: true # <true|false>
-    label: label1 # <IssueLabel1>,<IssueLabel2>
+    labels: label1 # <IssueLabel1>,<IssueLabel2>
     jiraProjectKey: testProject
     priorityIsSeverity: false # <true|false> (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
     customMandatoryFields:
