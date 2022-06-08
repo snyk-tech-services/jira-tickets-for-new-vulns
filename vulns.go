@@ -33,6 +33,59 @@ type Filter struct {
 	isUpgradable    bool     `json:"isUpgradable"`
 }
 
+func getSeverity(flags flags) ([]string) {
+
+	var severity []string
+    if len(flags.optionalFlags.severities) > 0 && len(flags.optionalFlags.severityThreshold) == 0 {
+
+	// In this, low severity means get issues only with low severity,
+	// medium means only medium and so on
+	// if we want to use multiple severity, we have to pass comma separated values
+
+	var severitiesArray []string = strings.Split(flags.optionalFlags.severities, ",")
+	var severityFilter []string
+	for _, severity := range severitiesArray {
+    	switch severity {
+    		case "critical":
+    			severityFilter = append(severityFilter, severity)
+    		case "high":
+    			severityFilter = append(severityFilter, severity)
+    		case "medium":
+    			severityFilter = append(severityFilter, severity)
+    		case "low":
+    			severityFilter = append(severityFilter, severity)
+    		case "":
+    		default:
+    			log.Fatalf("*** ERROR ***: %s is Unexpected severity threshold. Severity threshold must be one of {critical,high,medium,low}", severity)
+    		}
+    	}
+    severity = severityFilter
+    } else {
+	// In the v1 api low severity means get all the issues up,
+	// mediun means all but low and so on
+	// this is not possible with v3.
+	// to keep the logic of the tool
+	// we create an array of severity
+	// and loop on it to get all the issues
+	switch flags.optionalFlags.severityThreshold {
+	case "critical":
+		severity = []string{"critical"}
+	case "high":
+		severity = []string{"critical", "high"}
+	case "medium":
+		severity = []string{"critical", "high", "medium"}
+	case "low":
+		severity = []string{"critical", "high", "medium", "low"}
+    case "":
+        severity = []string{"critical", "high", "medium", "low"}
+	default:
+		log.Fatalln("Unexpected severity threshold")
+	    }
+    }
+
+    return severity
+}
+
 func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug) (map[string]interface{}, string) {
 
 	body := IssuesFilter{
@@ -48,41 +101,7 @@ func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []strin
 		body.Filters.Types = []string{flags.optionalFlags.issueType}
 	}
 
-    if len(flags.optionalFlags.severities) > 0 && len(flags.optionalFlags.severityThreshold) == 0 {
-    	var severitiesArray []string = strings.Split(flags.optionalFlags.severities, ",")
-    	var severityFilter []string
-    	for _, severity := range severitiesArray {
-        	switch severity {
-        		case "critical":
-        			severityFilter = append(severityFilter, severity)
-        		case "high":
-        			severityFilter = append(severityFilter, severity)
-        		case "medium":
-        			severityFilter = append(severityFilter, severity)
-        		case "low":
-        			severityFilter = append(severityFilter, severity)
-        		case "":
-        		default:
-        			log.Fatalf("*** ERROR ***: %s is Unexpected severity threshold. Severity threshold must be one of {critical,high,medium,low}", severity)
-        		}
-        	}
-       body.Filters.Severities = severityFilter
-    } else {
-    switch flags.optionalFlags.severityThreshold {
-        case "critical":
-        	body.Filters.Severities = []string{"critical"}
-        case "high":
-        	body.Filters.Severities = []string{"critical", "high"}
-        case "medium":
-        	body.Filters.Severities = []string{"critical", "high", "medium"}
-        case "low":
-        	body.Filters.Severities = []string{"critical", "high", "medium", "low"}
-        case "":
-            body.Filters.Severities = []string{"critical", "high", "medium", "low"}
-        default:
-        	log.Fatalln("Unexpected severity threshold")
-        }
-    }
+    body.Filters.Severities = getSeverity(flags)
 
 	if len(maturityFilter) > 0 {
 		body.Filters.ExploitMaturity = maturityFilter
@@ -273,53 +292,7 @@ Create a list of issue details without tickets.
 ***/
 func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[string]string, customDebug debug) map[string]interface{} {
 
-	severity := []string{}
-    if len(flags.optionalFlags.severities) > 0 && len(flags.optionalFlags.severityThreshold) == 0 {
-
-	// In this, low severity means get issues only with low severity,
-	// medium means only medium and so on
-	// if we want to use multiple severity, we have to pass comma separated values
-
-	var severitiesArray []string = strings.Split(flags.optionalFlags.severities, ",")
-	var severityFilter []string
-	for _, severity := range severitiesArray {
-    	switch severity {
-    		case "critical":
-    			severityFilter = append(severityFilter, severity)
-    		case "high":
-    			severityFilter = append(severityFilter, severity)
-    		case "medium":
-    			severityFilter = append(severityFilter, severity)
-    		case "low":
-    			severityFilter = append(severityFilter, severity)
-    		case "":
-    		default:
-    			log.Fatalf("*** ERROR ***: %s is Unexpected severity threshold. Severity threshold must be one of {critical,high,medium,low}", severity)
-    		}
-    	}
-    severity = severityFilter
-    } else {
-	// In the v1 api low severity means get all the issues up,
-	// mediun means all but low and so on
-	// this is not possible with v3.
-	// to keep the logic of the tool
-	// we create an array of severity
-	// and loop on it to get all the issues
-	switch flags.optionalFlags.severityThreshold {
-	case "critical":
-		severity = []string{"critical"}
-	case "high":
-		severity = []string{"critical", "high"}
-	case "medium":
-		severity = []string{"critical", "high", "medium"}
-	case "low":
-		severity = []string{"critical", "high", "medium", "low"}
-    case "":
-        severity = []string{"critical", "high", "medium", "low"}
-	default:
-		log.Fatalln("Unexpected severity threshold")
-	    }
-    }
+	var severity = getSeverity(flags)
 
 	fullCodeIssueDetail := make(map[string]interface{})
 
