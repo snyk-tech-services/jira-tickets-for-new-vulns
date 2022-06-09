@@ -3,9 +3,12 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
+	"time"
 )
 
 func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body []byte, customDebug debug) ([]byte, error) {
@@ -27,7 +30,6 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 
 	if err != nil {
 		customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s\n", endpointURL, err.Error())
-		return nil, errors.New("Request failed")
 	}
 
 	customDebug.Debugf("*** INFO *** Sending %s request to %s", verb, endpointURL)
@@ -36,6 +38,34 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 	}
 
 	responseData, err := ioutil.ReadAll(response.Body)
+
+	count := 0
+
+	for ok := true; ok; ok = (response.StatusCode >= 500 && count < 3) {
+
+		customDebug.Debugf("*** INFO *** Sending %s request to %s", verb, endpointURL)
+		customDebug.Debugf("*** INFO *** retry number %d\n", count)
+
+		response, err = client.Do(request)
+
+		if err != nil {
+			customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s, Retrying\n", endpointURL, err.Error())
+		}
+
+		if body != nil {
+			customDebug.Debug("*** INFO *** Body : ", string(body))
+		}
+
+		if response.StatusCode >= 500 && count >= 2 {
+			customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed too many times\n", endpointURL)
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+
+		responseData, err = ioutil.ReadAll(response.Body)
+		count++
+		time.Sleep(1)
+	}
 
 	if response.StatusCode == 404 {
 		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
@@ -59,5 +89,6 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 		}
 		return nil, errors.New("Request failed")
 	}
+	time.Sleep(1)
 	return responseData, nil
 }
