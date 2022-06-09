@@ -3,8 +3,10 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -37,41 +39,32 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 
 	responseData, err := ioutil.ReadAll(response.Body)
 
-	if response.StatusCode >= 500 {
+	count := 0
 
-		count := 0
-		for {
+	for ok := true; ok; ok = (response.StatusCode >= 500 && count < 3) {
 
-			customDebug.Debugf("*** INFO *** Sending %s request to %s", verb, endpointURL)
-			customDebug.Debugf("*** INFO *** retry number %d\n", count)
+		customDebug.Debugf("*** INFO *** Sending %s request to %s", verb, endpointURL)
+		customDebug.Debugf("*** INFO *** retry number %d\n", count)
 
-			response, err = client.Do(request)
+		response, err = client.Do(request)
 
-			if err != nil {
-				customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s, Retrying\n", endpointURL, err.Error())
-			}
-
-			if body != nil {
-				customDebug.Debug("*** INFO *** Body : ", string(body))
-			}
-
-			if response.StatusCode < 500 {
-				break
-			}
-
-			if response.StatusCode >= 500 && count >= 2 {
-				customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed too many times\n", endpointURL)
-				customDebug.Debugf("*** ERROR *** Ticket for this issue cannot be created. Skipping\n")
-				errorMessage := "*** ERROR *** Request on endpoint " + endpointURL + " failed too many times with 50x error\n" + "*** ERROR *** Ticket for this issue cannot be created. Skipping\n"
-				// writing into the file
-				writeErrorFile(errorMessage, customDebug)
-				return nil, errors.New("Failed too many time with 50x errors") // skipping this
-			}
-
-			responseData, err = ioutil.ReadAll(response.Body)
-			count = count + 1
-			time.Sleep(1)
+		if err != nil {
+			customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s, Retrying\n", endpointURL, err.Error())
 		}
+
+		if body != nil {
+			customDebug.Debug("*** INFO *** Body : ", string(body))
+		}
+
+		if response.StatusCode >= 500 && count >= 2 {
+			customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed too many times\n", endpointURL)
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+
+		responseData, err = ioutil.ReadAll(response.Body)
+		count++
+		time.Sleep(1)
 	}
 
 	if response.StatusCode == 404 {

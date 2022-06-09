@@ -50,17 +50,16 @@ type IssueType struct {
 	Name string `json:"name"`
 }
 
-func getJiraTickets(Mf MandatoryFlags, projectID string, customDebug debug) (map[string]string, error) {
+func getJiraTickets(Mf MandatoryFlags, projectID string, customDebug debug) map[string]string {
 	responseData, err := makeSnykAPIRequest("GET", Mf.endpointAPI+"/v1/org/"+Mf.orgID+"/project/"+projectID+"/jira-issues", Mf.apiToken, nil, customDebug)
 	if err != nil {
 		customDebug.Debug("*** ERROR *** Could not get the tickets")
-		return nil, errors.New("Could not get the tickets")
+		log.Fatal(err)
 	}
 
 	tickets, err := jsn.NewJson(responseData)
 	if err != nil {
-		customDebug.Debug("*** ERROR *** Could not read the tickets")
-		return nil, errors.New("Could not read the tickets")
+		log.Fatal(err)
 	}
 
 	tickRefs := make(map[string]string)
@@ -69,7 +68,7 @@ func getJiraTickets(Mf MandatoryFlags, projectID string, customDebug debug) (map
 		tickRefs[k] = v.I(0).K("jiraIssue").K("key").String().Value
 		return true
 	})
-	return tickRefs, err
+	return tickRefs
 }
 
 /***
@@ -176,9 +175,6 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 		responseData, er := makeSnykAPIRequest("POST", flags.mandatoryFlags.endpointAPI+"/v1/org/"+flags.mandatoryFlags.orgID+"/project/"+projectInfoId+"/issue/"+vulnID+"/jira-issue", flags.mandatoryFlags.apiToken, ticket, customDebug)
 
 		if er != nil {
-			if er.Error() == "Failed too many time with 50x errors" {
-				return nil, nil, errors.New("Failed too many time with 50x errors")
-			}
 			customDebug.Debug("*** ERROR *** Request failed")
 			return nil, nil, errors.New("Failure, Failure to create ticket(s)")
 		}

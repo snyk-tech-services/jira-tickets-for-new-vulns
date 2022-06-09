@@ -64,27 +64,15 @@ Open Source, so feel free to contribute !
 	for _, project := range projectIDs {
 
 		log.Println("*** INFO *** 1/4 - Retrieving Project", project)
-		projectInfo, err := getProjectDetails(options.mandatoryFlags, project, customDebug)
-		if err != nil {
-			customDebug.Debug("*** ERROR *** could not get project details. Skipping project ", project)
-			continue
-		}
+		projectInfo := getProjectDetails(options.mandatoryFlags, project, customDebug)
 
 		log.Println("*** INFO *** 2/4 - Getting Existing JIRA tickets")
-		tickets, err := getJiraTickets(options.mandatoryFlags, project, customDebug)
-		if err != nil {
-			customDebug.Debug("*** ERROR *** could not get already existing tickets details. Skipping project ", project)
-			continue
-		}
+		tickets := getJiraTickets(options.mandatoryFlags, project, customDebug)
 
 		customDebug.Debug("*** INFO *** List of already existing tickets: ", tickets)
 
 		log.Println("*** INFO *** 3/4 - Getting vulns")
-		vulnsPerPath, skippedIssues, err := getVulnsWithoutTicket(options, project, maturityFilter, tickets, customDebug)
-		if err != nil {
-			customDebug.Debug("*** ERROR *** could not vulnerability details. Skipping project ", project)
-			continue
-		}
+		vulnsPerPath, skippedIssues := getVulnsWithoutTicket(options, project, maturityFilter, tickets, customDebug)
 
 		customDebug.Debug("*** INFO *** List of vuln without tickets: ", vulnsPerPath)
 

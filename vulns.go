@@ -32,7 +32,7 @@ type Filter struct {
 	isUpgradable    bool     `json:"isUpgradable"`
 }
 
-func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug) (map[string]interface{}, string, error) {
+func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug) (map[string]interface{}, string) {
 
 	body := IssuesFilter{
 		Filter{
@@ -71,13 +71,13 @@ func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []strin
 	marshalledBody, err := json.Marshal(body)
 
 	if err != nil {
-		customDebug.Debug(" *** ERROR *** IAC projects are not supported by this tool, skipping this project")
+		log.Fatalln(err)
 	}
 
 	responseAggregatedData, err := makeSnykAPIRequest("POST", flags.mandatoryFlags.endpointAPI+"/v1/org/"+flags.mandatoryFlags.orgID+"/project/"+projectID+"/aggregated-issues", flags.mandatoryFlags.apiToken, marshalledBody, customDebug)
 	if err != nil {
-		customDebug.Debugf("*** ERROR *** Could not get aggregated data from %s org %s project %s, skipping this project", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
-		return nil, "", err
+		log.Printf("*** ERROR *** Could not get aggregated data from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
+		log.Fatalln(err)
 	}
 
 	j, err := jsn.NewJson(responseAggregatedData)
@@ -92,21 +92,20 @@ func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []strin
 	// IAC issues are of type configuration and are not supported atm
 	if issueType == "configuration" {
 		customDebug.Debug(" *** INFO *** IAC projects are not supported by this tool, skipping this project")
-		return vulnsWithAllPaths, "", err
+		return vulnsWithAllPaths, ""
 	}
 
 	// Code issue
 	// the response from aggregated data is empty for code issues
 	if len(listOfIssues) == 0 {
-		snykCodeIssue, err := getSnykCodeIssueWithoutTickets(flags, projectID, tickets, customDebug)
-		return snykCodeIssue, "", err
+		return getSnykCodeIssueWithoutTickets(flags, projectID, tickets, customDebug), ""
 	}
 
 	// Open source issue
 	skippedIssues := ""
-	vulnsWithAllPaths, skippedIssues, err = getSnykOpenSourceIssueWithoutTickets(flags, projectID, maturityFilter, tickets, customDebug, responseAggregatedData)
+	vulnsWithAllPaths, skippedIssues = getSnykOpenSourceIssueWithoutTickets(flags, projectID, maturityFilter, tickets, customDebug, responseAggregatedData)
 
-	return vulnsWithAllPaths, skippedIssues, err
+	return vulnsWithAllPaths, skippedIssues
 }
 
 /***
@@ -123,14 +122,14 @@ Create a list of issue details without tickets.
 		Get the path for each issue id
 		add the path to the issue details
 ***/
-func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug, responseAggregatedData []byte) (map[string]interface{}, string, error) {
+func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug, responseAggregatedData []byte) (map[string]interface{}, string) {
 
 	vulnsPerPath := make(map[string]interface{})
 	vulnsWithAllPaths := make(map[string]interface{})
 
 	j, err := jsn.NewJson(responseAggregatedData)
 	if err != nil {
-		return nil, "", err
+		log.Fatalln(err)
 	}
 
 	listOfIssues := j.K("issues").Array().Elements()
@@ -145,7 +144,7 @@ func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturit
 
 					bytes, err := json.Marshal(e)
 					if err != nil {
-						continue
+						log.Fatalln(err)
 					}
 					json.Unmarshal(bytes, &vulnsPerPath)
 
@@ -181,7 +180,7 @@ func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturit
 
 				bytes, err := json.Marshal(e)
 				if err != nil {
-					continue
+					log.Fatalln(err)
 				}
 				json.Unmarshal(bytes, &vulnsPerPath)
 
@@ -208,7 +207,7 @@ func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturit
 			}
 		}
 	}
-	return vulnsWithAllPaths, issueSkipped, nil
+	return vulnsWithAllPaths, issueSkipped
 }
 
 func createMaturityFilter(filtersArray []string) []string {
@@ -246,7 +245,7 @@ Create a list of issue details without tickets.
 		The issue details doesn't give the title of the severity => adding it the the details
 	Adding all the details to the list
 ***/
-func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[string]string, customDebug debug) (map[string]interface{}, error) {
+func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[string]string, customDebug debug) map[string]interface{} {
 
 	// In the v1 api low severity means get all the issues up,
 	// mediun means all but low and so on
@@ -269,7 +268,6 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 	}
 
 	fullCodeIssueDetail := make(map[string]interface{})
-	var errorMessage error
 
 	// Doing this for test propose
 	endpointAPI := "https://api.snyk.io"
@@ -292,8 +290,7 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 			if err != nil {
 				if (err.Error() != "Not found, Request failed") && (err.Error() != "Request failed with 50x") {
 					log.Printf("*** ERROR ***** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
-					errorMessage = err
-					break
+					log.Fatal()
 				}
 			}
 
@@ -315,18 +312,18 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 						responseIssueDetail, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
 						if err != nil {
 							log.Printf("*** ERROR *** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
-							continue
+							log.Fatalln(err)
 						}
 
 						jsonIssueDetail, er := jsn.NewJson(responseIssueDetail)
 						if er != nil {
 							log.Printf("*** ERROR *** Json creation failed\n")
-							continue
+							log.Fatalln(er)
 						}
 
 						bytes, err := json.Marshal(jsonIssueDetail)
 						if err != nil {
-							continue
+							log.Fatalln(err)
 						}
 						json.Unmarshal(bytes, &issueDetail)
 
@@ -352,5 +349,5 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 		}
 	}
 
-	return fullCodeIssueDetail, errorMessage
+	return fullCodeIssueDetail
 }

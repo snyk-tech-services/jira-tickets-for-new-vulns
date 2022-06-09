@@ -29,7 +29,7 @@ func TestGetProjectDetailsFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	response, _ := getProjectDetails(Mf, "123", cD)
+	response := getProjectDetails(Mf, "123", cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
@@ -58,7 +58,7 @@ func TestGetOrgProjects(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	response, _ := getOrgProjects(Mf, cD)
+	response := getOrgProjects(Mf, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)

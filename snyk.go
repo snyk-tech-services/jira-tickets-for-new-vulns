@@ -7,22 +7,19 @@ import (
 	"github.com/michael-go/go-jsn/jsn"
 )
 
-func getOrgProjects(Mf MandatoryFlags, customDebug debug) (jsn.Json, error) {
+func getOrgProjects(Mf MandatoryFlags, customDebug debug) jsn.Json {
 	responseData, err := makeSnykAPIRequest("GET", Mf.endpointAPI+"/v1/org/"+Mf.orgID+"/projects", Mf.apiToken, nil, customDebug)
 	if err != nil {
 		log.Printf("*** ERROR *** Could not get the Project(s) for endpoint %s\n", Mf.endpointAPI)
-		errorMessage := "Failure, Could not get the Project(s) for endpoint " + Mf.endpointAPI + "\n"
-		err = errors.New(errorMessage)
+		log.Fatal(err)
 	}
 
 	project, err := jsn.NewJson(responseData)
 	if err != nil {
-		log.Printf("*** ERROR *** Could not get read the response from endpoint %s\n", Mf.endpointAPI)
-		errorMessage := "Failure, Could not get read the response from endpoint " + Mf.endpointAPI + "\n"
-		err = errors.New(errorMessage)
+		log.Fatal(err)
 	}
 
-	return project, err
+	return project
 }
 
 func getProjectsIds(options flags, customDebug debug) ([]string, error) {
@@ -31,11 +28,7 @@ func getProjectsIds(options flags, customDebug debug) ([]string, error) {
 	if len(options.optionalFlags.projectID) == 0 {
 		log.Println("*** INFO *** Project ID not specified - importing all projects")
 
-		projects, err := getOrgProjects(options.mandatoryFlags, customDebug)
-
-		if err != nil {
-			return nil, err
-		}
+		projects := getOrgProjects(options.mandatoryFlags, customDebug)
 
 		for i := 0; i < len(projects.K("projects").Array().Elements()); i++ {
 			p := projects.K("projects").Array().Elements()[i]
@@ -53,19 +46,17 @@ func getProjectsIds(options flags, customDebug debug) ([]string, error) {
 	return projectId, nil
 }
 
-func getProjectDetails(Mf MandatoryFlags, projectID string, customDebug debug) (jsn.Json, error) {
+func getProjectDetails(Mf MandatoryFlags, projectID string, customDebug debug) jsn.Json {
 	responseData, err := makeSnykAPIRequest("GET", Mf.endpointAPI+"/v1/org/"+Mf.orgID+"/project/"+projectID, Mf.apiToken, nil, customDebug)
 	if err != nil {
-		log.Printf("*** ERROR *** Could not get the Project detail for endpoint %s\n", Mf.endpointAPI)
-		errorMessage := "Failure, Could not get the Project detail for endpoint " + Mf.endpointAPI + "\n"
-		err = errors.New(errorMessage)
+		log.Printf("*** ERROR *** Could not get the Project(s) for endpoint %s\n", Mf.endpointAPI)
+		log.Fatal(err)
 	}
 
 	project, err := jsn.NewJson(responseData)
 	if err != nil {
-		errorMessage := "Failure, Could not read the Project detail for endpoint " + Mf.endpointAPI + "\n"
-		err = errors.New(errorMessage)
+		log.Fatal(err)
 	}
 
-	return project, err
+	return project
 }
