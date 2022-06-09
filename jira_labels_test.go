@@ -30,7 +30,7 @@ func TestGetJiraTicketFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	response := getJiraTickets(Mf, "123", cD)
+	response, _ := getJiraTickets(Mf, "123", cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
