@@ -8,17 +8,18 @@ import (
 )
 
 func getOrgProjects(Mf MandatoryFlags, customDebug debug) (jsn.Json, error) {
-	responseData, err := makeSnykAPIRequest("GET", Mf.endpointAPI+"/v1/org/"+Mf.orgID+"/projects", Mf.apiToken, nil, customDebug)
+	var projectsAPI =  Mf.endpointAPI+"/v1/org/"+Mf.orgID+"/projects";
+	responseData, err := makeSnykAPIRequest("GET", projectsAPI, Mf.apiToken, nil, customDebug)
 	if err != nil {
-		log.Printf("*** ERROR *** Could not get the Project(s) for endpoint %s\n", Mf.endpointAPI)
-		errorMessage := "Failure, Could not get the Project(s) for endpoint " + Mf.endpointAPI + "\n"
+		log.Printf("*** ERROR *** Could not get the Project(s) for endpoint %s\n", projectsAPI)
+		errorMessage := "Failure, Could not get the Project(s) for endpoint " + projectsAPI + "\n"
 		err = errors.New(errorMessage)
 	}
 
 	project, err := jsn.NewJson(responseData)
 	if err != nil {
-		log.Printf("*** ERROR *** Could not get read the response from endpoint %s\n", Mf.endpointAPI)
-		errorMessage := "Failure, Could not get read the response from endpoint " + Mf.endpointAPI + "\n"
+		log.Printf("*** ERROR *** Could not get read the response from endpoint %s\n", projectsAPI)
+		errorMessage := "Failure, Could not get read the response from endpoint " + projectsAPI + "\n"
 		err = errors.New(errorMessage)
 	}
 
@@ -29,7 +30,7 @@ func getProjectsIds(options flags, customDebug debug) ([]string, error) {
 
 	var projectId []string
 	if len(options.optionalFlags.projectID) == 0 {
-		log.Println("*** INFO *** Project ID not specified - importing all projects")
+		log.Println("*** INFO *** Project ID not specified, importing all projects")
 
 		projects, err := getOrgProjects(options.mandatoryFlags, customDebug)
 
