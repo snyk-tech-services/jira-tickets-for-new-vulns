@@ -33,60 +33,60 @@ type Filter struct {
 	isUpgradable    bool     `json:"isUpgradable"`
 }
 
-func getSeverity(flags flags) ([]string) {
+func getSeverity(flags flags) []string {
 
 	var severity []string
-    if len(flags.optionalFlags.severities) > 0 && len(flags.optionalFlags.severityThreshold) == 0 {
+	if len(flags.optionalFlags.severities) > 0 && len(flags.optionalFlags.severityThreshold) == 0 {
 
-	// In this, low severity means get issues only with low severity,
-	// medium means only medium and so on
-	// if we want to use multiple severity, we have to pass comma separated values
+		// In this, low severity means get issues only with low severity,
+		// medium means only medium and so on
+		// if we want to use multiple severity, we have to pass comma separated values
 
-	var severitiesArray []string = strings.Split(flags.optionalFlags.severities, ",")
-	var severityFilter []string
-	for _, severity := range severitiesArray {
-    	switch severity {
-    		case "critical":
-    			severityFilter = append(severityFilter, severity)
-    		case "high":
-    			severityFilter = append(severityFilter, severity)
-    		case "medium":
-    			severityFilter = append(severityFilter, severity)
-    		case "low":
-    			severityFilter = append(severityFilter, severity)
-    		case "":
-    		default:
-    			log.Fatalf("*** ERROR ***: %s is Unexpected severity threshold. Severity threshold must be one of {critical,high,medium,low}", severity)
-    		}
-    	}
-    severity = severityFilter
-    } else {
-	// In the v1 api low severity means get all the issues up,
-	// mediun means all but low and so on
-	// this is not possible with v3.
-	// to keep the logic of the tool
-	// we create an array of severity
-	// and loop on it to get all the issues
-	switch flags.optionalFlags.severityThreshold {
-	case "critical":
-		severity = []string{"critical"}
-	case "high":
-		severity = []string{"critical", "high"}
-	case "medium":
-		severity = []string{"critical", "high", "medium"}
-	case "low":
-		severity = []string{"critical", "high", "medium", "low"}
-    case "":
-        severity = []string{"critical", "high", "medium", "low"}
-	default:
-		log.Fatalln("Unexpected severity threshold")
-	    }
-    }
+		var severitiesArray []string = strings.Split(flags.optionalFlags.severities, ",")
+		var severityFilter []string
+		for _, severity := range severitiesArray {
+			switch severity {
+			case "critical":
+				severityFilter = append(severityFilter, severity)
+			case "high":
+				severityFilter = append(severityFilter, severity)
+			case "medium":
+				severityFilter = append(severityFilter, severity)
+			case "low":
+				severityFilter = append(severityFilter, severity)
+			case "":
+			default:
+				log.Fatalf("*** ERROR ***: %s is Unexpected severity threshold. Severity threshold must be one of {critical,high,medium,low}", severity)
+			}
+		}
+		severity = severityFilter
+	} else {
+		// In the v1 api low severity means get all the issues up,
+		// mediun means all but low and so on
+		// this is not possible with v3.
+		// to keep the logic of the tool
+		// we create an array of severity
+		// and loop on it to get all the issues
+		switch flags.optionalFlags.severityThreshold {
+		case "critical":
+			severity = []string{"critical"}
+		case "high":
+			severity = []string{"critical", "high"}
+		case "medium":
+			severity = []string{"critical", "high", "medium"}
+		case "low":
+			severity = []string{"critical", "high", "medium", "low"}
+		case "":
+			severity = []string{"critical", "high", "medium", "low"}
+		default:
+			log.Fatalln("Unexpected severity threshold")
+		}
+	}
 
-    return severity
+	return severity
 }
 
-func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug) (map[string]interface{}, string) {
+func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug) (map[string]interface{}, string, error) {
 
 	body := IssuesFilter{
 		Filter{
@@ -101,7 +101,7 @@ func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []strin
 		body.Filters.Types = []string{flags.optionalFlags.issueType}
 	}
 
-    body.Filters.Severities = getSeverity(flags)
+	body.Filters.Severities = getSeverity(flags)
 
 	if len(maturityFilter) > 0 {
 		body.Filters.ExploitMaturity = maturityFilter
@@ -116,13 +116,13 @@ func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []strin
 	marshalledBody, err := json.Marshal(body)
 
 	if err != nil {
-		log.Fatalln(err)
+		customDebug.Debug(" *** ERROR *** IAC projects are not supported by this tool, skipping this project")
 	}
 
 	responseAggregatedData, err := makeSnykAPIRequest("POST", flags.mandatoryFlags.endpointAPI+"/v1/org/"+flags.mandatoryFlags.orgID+"/project/"+projectID+"/aggregated-issues", flags.mandatoryFlags.apiToken, marshalledBody, customDebug)
 	if err != nil {
-		log.Printf("*** ERROR *** Could not get aggregated data from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
-		log.Fatalln(err)
+		customDebug.Debugf("*** ERROR *** Could not get aggregated data from %s org %s project %s, skipping this project", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
+		return nil, "", err
 	}
 
 	j, err := jsn.NewJson(responseAggregatedData)
@@ -136,21 +136,22 @@ func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []strin
 
 	// IAC issues are of type configuration and are not supported atm
 	if issueType == "configuration" {
-		customDebug.Debug(" *** INFO *** IAC projects are not supported by this tool, skipping this project")
-		return vulnsWithAllPaths, ""
+		customDebug.Debug(" *** WARN *** IAC projects are not supported, skipping")
+		return vulnsWithAllPaths, "", err
 	}
 
 	// Code issue
 	// the response from aggregated data is empty for code issues
 	if len(listOfIssues) == 0 {
-		return getSnykCodeIssueWithoutTickets(flags, projectID, tickets, customDebug), ""
+		snykCodeIssue, err := getSnykCodeIssueWithoutTickets(flags, projectID, tickets, customDebug)
+		return snykCodeIssue, "", err
 	}
 
 	// Open source issue
 	skippedIssues := ""
-	vulnsWithAllPaths, skippedIssues = getSnykOpenSourceIssueWithoutTickets(flags, projectID, maturityFilter, tickets, customDebug, responseAggregatedData)
+	vulnsWithAllPaths, skippedIssues, err = getSnykOpenSourceIssueWithoutTickets(flags, projectID, maturityFilter, tickets, customDebug, responseAggregatedData)
 
-	return vulnsWithAllPaths, skippedIssues
+	return vulnsWithAllPaths, skippedIssues, err
 }
 
 /***
@@ -167,14 +168,14 @@ Create a list of issue details without tickets.
 		Get the path for each issue id
 		add the path to the issue details
 ***/
-func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug, responseAggregatedData []byte) (map[string]interface{}, string) {
+func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug, responseAggregatedData []byte) (map[string]interface{}, string, error) {
 
 	vulnsPerPath := make(map[string]interface{})
 	vulnsWithAllPaths := make(map[string]interface{})
 
 	j, err := jsn.NewJson(responseAggregatedData)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, "", err
 	}
 
 	listOfIssues := j.K("issues").Array().Elements()
@@ -189,7 +190,7 @@ func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturit
 
 					bytes, err := json.Marshal(e)
 					if err != nil {
-						log.Fatalln(err)
+						continue
 					}
 					json.Unmarshal(bytes, &vulnsPerPath)
 
@@ -225,7 +226,7 @@ func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturit
 
 				bytes, err := json.Marshal(e)
 				if err != nil {
-					log.Fatalln(err)
+					continue
 				}
 				json.Unmarshal(bytes, &vulnsPerPath)
 
@@ -252,7 +253,7 @@ func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturit
 			}
 		}
 	}
-	return vulnsWithAllPaths, issueSkipped
+	return vulnsWithAllPaths, issueSkipped, nil
 }
 
 func createMaturityFilter(filtersArray []string) []string {
@@ -290,11 +291,12 @@ Create a list of issue details without tickets.
 		The issue details doesn't give the title of the severity => adding it the the details
 	Adding all the details to the list
 ***/
-func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[string]string, customDebug debug) map[string]interface{} {
+func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[string]string, customDebug debug) (map[string]interface{}, error) {
 
 	var severity = getSeverity(flags)
 
 	fullCodeIssueDetail := make(map[string]interface{})
+	var errorMessage error
 
 	// Doing this for test propose
 	endpointAPI := "https://api.snyk.io"
@@ -317,7 +319,8 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 			if err != nil {
 				if (err.Error() != "Not found, Request failed") && (err.Error() != "Request failed with 50x") {
 					log.Printf("*** ERROR ***** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
-					log.Fatal()
+					errorMessage = err
+					break
 				}
 			}
 
@@ -339,18 +342,18 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 						responseIssueDetail, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
 						if err != nil {
 							log.Printf("*** ERROR *** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
-							log.Fatalln(err)
+							continue
 						}
 
 						jsonIssueDetail, er := jsn.NewJson(responseIssueDetail)
 						if er != nil {
 							log.Printf("*** ERROR *** Json creation failed\n")
-							log.Fatalln(er)
+							continue
 						}
 
 						bytes, err := json.Marshal(jsonIssueDetail)
 						if err != nil {
-							log.Fatalln(err)
+							continue
 						}
 						json.Unmarshal(bytes, &issueDetail)
 
@@ -376,5 +379,5 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 		}
 	}
 
-	return fullCodeIssueDetail
+	return fullCodeIssueDetail, errorMessage
 }

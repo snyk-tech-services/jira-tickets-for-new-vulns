@@ -101,7 +101,7 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 	descriptionFromIssue := ""
 
 	if issueData.K("type").String().Value == "license" {
-		descriptionFromIssue = `This dependency is infriguing your organization license policy. 
+		descriptionFromIssue = `This dependency is infriguing your organization license policy.
 								Refer to the Reporting tab for possible instructions from your legal team.`
 	}
 

@@ -8,26 +8,6 @@ import (
 )
 
 func main() {
-
-	asciiArt :=
-		`
-================================================
-  _____             _      _______        _     
- / ____|           | |    |__   __|      | |    
-| (___  _ __  _   _| | __    | | ___  ___| |__  
- \___ \| '_ \| | | | |/ /    | |/ _ \/ __| '_ \ 
- ____) | | | | |_| |   <     | |  __/ (__| | | |
-|_____/|_| |_|\__, |_|\_\    |_|\___|\___|_| |_|
-              __/ /                            
-             |___/                             
-================================================
-JIRA Syncing Tool
-Open Source, so feel free to contribute !
-================================================
-`
-
-	fmt.Println(asciiArt)
-
 	// set Flags
 	options := flags{}
 	options.setOption(os.Args[1:])
@@ -46,7 +26,7 @@ Open Source, so feel free to contribute !
 		log.Fatal(er)
 	}
 
-	customDebug.Debug("*** INFO *** options.optionalFlags ", options.optionalFlags)
+	customDebug.Debug("*** INFO *** options.optionalFlags: ", options.optionalFlags)
 
 	// check flags are set according to rules
 	options.checkFlags()
@@ -63,16 +43,28 @@ Open Source, so feel free to contribute !
 
 	for _, project := range projectIDs {
 
-		log.Println("*** INFO *** 1/4 - Retrieving Project", project)
-		projectInfo := getProjectDetails(options.mandatoryFlags, project, customDebug)
+		log.Println("*** INFO *** Step 1/4 - Retrieving project", project)
+		projectInfo, err := getProjectDetails(options.mandatoryFlags, project, customDebug)
+		if err != nil {
+			customDebug.Debug("*** ERROR *** could not get project details. Skipping project ", project)
+			continue
+		}
 
-		log.Println("*** INFO *** 2/4 - Getting Existing JIRA tickets")
-		tickets := getJiraTickets(options.mandatoryFlags, project, customDebug)
+		log.Println("*** INFO *** Step 2/4 - Retrieving a list of existing Jira tickets")
+		tickets, err := getJiraTickets(options.mandatoryFlags, project, customDebug)
+		if err != nil {
+			customDebug.Debug("*** ERROR *** could not get already existing tickets details. Skipping project ", project)
+			continue
+		}
 
 		customDebug.Debug("*** INFO *** List of already existing tickets: ", tickets)
 
-		log.Println("*** INFO *** 3/4 - Getting vulns")
-		vulnsPerPath, skippedIssues := getVulnsWithoutTicket(options, project, maturityFilter, tickets, customDebug)
+		log.Println("*** INFO *** Step 3/4 - Getting vulns")
+		vulnsPerPath, skippedIssues, err := getVulnsWithoutTicket(options, project, maturityFilter, tickets, customDebug)
+		if err != nil {
+			customDebug.Debug("*** ERROR *** could not vulnerability details. Skipping project ", project)
+			continue
+		}
 
 		customDebug.Debug("*** INFO *** List of vuln without tickets: ", vulnsPerPath)
 
@@ -82,17 +74,17 @@ Open Source, so feel free to contribute !
 		}
 
 		if len(vulnsPerPath) == 0 {
-			log.Println("*** INFO *** 4/4 - No new JIRA ticket required")
+			log.Println("*** INFO *** Step 4/4 - No new Jira ticket required")
 		} else {
-			log.Println("*** INFO *** 4/4 - Opening JIRA Tickets")
+			log.Println("*** INFO *** Step 4/4 - Opening Jira tickets")
 			numberIssueCreated, jiraResponse, notCreatedJiraIssues, projectsTickets = openJiraTickets(options, projectInfo, vulnsPerPath, customDebug)
 			if jiraResponse == "" && !options.optionalFlags.dryRun {
-				log.Println("*** ERROR *** Failure to create a ticket(s)")
+				log.Println("*** ERROR *** Failed to create Jira ticket(s)")
 			}
 			if options.optionalFlags.dryRun {
 				fmt.Printf("\n----------PROJECT ID %s----------\n Dry run mode: no issue created\n------------------------------------------------------------------------\n", project)
 			} else {
-				fmt.Printf("\n----------PROJECT ID %s---------- \n Number of tickets created: %d\n List of issueId for which the ticket could not be created: %s\n-------------------------------------------------------------------\n", project, numberIssueCreated, notCreatedJiraIssues)
+				fmt.Printf("\n----------PROJECT ID %s---------- \n Number of tickets created: %d\n List of issueIds for which Jira ticket(s) could not be created: %s\n-------------------------------------------------------------------\n", project, numberIssueCreated, notCreatedJiraIssues)
 			}
 
 			// Adding new project tickets detail to logfile struct

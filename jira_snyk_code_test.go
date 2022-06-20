@@ -87,9 +87,10 @@ func TestOpenJiraTicketCodeOnly(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	responseDataAggregatedByte, ticket, err := openJiraTicket(flags, projectInfo, codeIssueForJira, cD)
+	responseDataAggregatedByte, ticket, err, jiraApiUrl := openJiraTicket(flags, projectInfo, codeIssueForJira, cD)
 
 	assert.NotNil(t, ticket)
+	assert.NotNil(t, jiraApiUrl)
 	assert.NotNil(t, responseDataAggregatedByte)
 
 }
@@ -385,7 +386,7 @@ func TestGetSnykCodeIssueWithoutTickets(t *testing.T) {
 	// Simulate an existing ticket for that vuln
 	tickets["xxbac5ed-83dd-xx65-8730-2xxx4467e0xx"] = "FPI-454"
 
-	response := getSnykCodeIssueWithoutTickets(flags, "789", tickets, cD)
+	response, _ := getSnykCodeIssueWithoutTickets(flags, "789", tickets, cD)
 	assert.Equal(2, len(response))
 
 	return
@@ -491,7 +492,7 @@ func TestGetSnykCodeIssueWithoutTicketsWithSeverityFilter(t *testing.T) {
 	// Simulate an existing ticket for that vuln
 	tickets["xxbac5ed-83dd-xx65-8730-2xxx4467e0xx"] = "FPI-454"
 
-	response := getSnykCodeIssueWithoutTickets(flags, "789", tickets, cD)
+	response, _ := getSnykCodeIssueWithoutTickets(flags, "789", tickets, cD)
 	assert.Equal(1, len(response))
 
 	return
@@ -544,7 +545,7 @@ func TestGetSnykCodeIssueWithoutTicketsWithPagination(t *testing.T) {
 	// Simulate an existing ticket for that vuln
 	tickets["xxbac5ed-83dd-xx65-8730-2xxx4467e0xx"] = "FPI-454"
 
-	response := getSnykCodeIssueWithoutTickets(flags, "1234", tickets, cD)
+	response, _ := getSnykCodeIssueWithoutTickets(flags, "1234", tickets, cD)
 
 	assert.Equal(2, len(response))
 

@@ -105,7 +105,7 @@ func TestGetVulnsWithoutTicketFuncWithSeverityFilter(t *testing.T) {
 	tickets["SNYK-JS-PACRESOLVER-1564857"] = "FPI-794"
 	var maturityLevels []string
 
-	response, skippedIssues := getVulnsWithoutTicket(flags, "123", maturityLevels, tickets, cD)
+	response, skippedIssues, _ := getVulnsWithoutTicket(flags, "123", maturityLevels, tickets, cD)
 	assert.Equal(0, len(skippedIssues))
 	assert.Equal(2, len(response))
 
@@ -160,7 +160,7 @@ func TestNoVulnOrLicense(t *testing.T) {
 	tickets = make(map[string]string)
 	var maturityLevels []string
 
-	response, skippedIssues := getVulnsWithoutTicket(flags, "123", maturityLevels, tickets, cD)
+	response, skippedIssues, _ := getVulnsWithoutTicket(flags, "123", maturityLevels, tickets, cD)
 	//fmt.Println(response)
 	assert.Equal(0, len(response))
 	assert.Equal(0, len(skippedIssues))
@@ -213,7 +213,7 @@ func TestGetVulnsWithoutTicketErrorRetrievingDataFunc(t *testing.T) {
 	tickets["SNYK-JS-PACRESOLVER-1564857"] = "FPI-794"
 	var maturityLevels []string
 
-	response, skippedIssues := getVulnsWithoutTicket(flags, "123", maturityLevels, tickets, cD)
+	response, skippedIssues, _ := getVulnsWithoutTicket(flags, "123", maturityLevels, tickets, cD)
 
 	assert.Equal(2, len(response))
 	assert.GreaterOrEqual(len(skippedIssues), 1)
