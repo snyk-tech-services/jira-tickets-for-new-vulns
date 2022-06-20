@@ -173,11 +173,11 @@ func (opt *flags) setOption(args []string) {
 		v.AddConfigPath(".")
 	}
 
-	configFile := CheckConfigFileFormat(*configFilePtr)
+	configFile, configFileLocation := CheckConfigFileFormat(*configFilePtr)
 
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			fmt.Println("*** ERROR *** config file not found")
+			fmt.Println("*** WARN *** Config file is not found or maybe empty at location:", configFileLocation)
 		} else {
 			fmt.Println("*** ERROR *** ", err)
 		}
@@ -202,10 +202,9 @@ func (opt *flags) setOption(args []string) {
 Function checkMandatoryAreSet
 exit if the mandatory flags are missing
 ***/
-func (Mf *MandatoryFlags) checkMandatoryAreSet() {
-	if len(Mf.orgID) == 0 || len(Mf.apiToken) == 0 || (len(Mf.jiraProjectID) == 0 && len(Mf.jiraProjectKey) == 0) {
-		log.Println("*** ERROR *** Missing mandatory flags", Mf)
-		pflag.PrintDefaults()
+func (flags *MandatoryFlags) checkMandatoryAreSet() {
+	if len(flags.orgID) == 0 || len(flags.apiToken) == 0 || (len(flags.jiraProjectID) == 0 && len(flags.jiraProjectKey) == 0) {
+		log.Println("*** ERROR *** Missing required flag(s). Please ensure orgID, token, jiraProjectID or jiraProjectKey are set.")
 		os.Exit(1)
 	}
 }
@@ -440,7 +439,7 @@ input path string, path to the config file
 return []byte config file
 Try to read the yaml file. If this fails the config file is not valid yaml
 ***/
-func CheckConfigFileFormat(path string) []byte {
+func CheckConfigFileFormat(path string)([]byte, string) {
 
 	if len(path) == 0 {
 		path = "."
@@ -450,9 +449,8 @@ func CheckConfigFileFormat(path string) []byte {
 
 	yamlFile, err := ioutil.ReadFile(file)
 	if err != nil {
-		log.Println("*** ERROR *** Could not read config file", err)
-		log.Println("*** ERROR *** Please check the format config file", err)
+		fmt.Printf("*** ERROR *** Could not read config file at location: %s. Please ensure the file exists and is formatted correctly.\nERROR: %s\n", file, err.Error())
 	}
 
-	return yamlFile
+	return yamlFile, file
 }

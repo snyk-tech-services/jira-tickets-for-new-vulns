@@ -91,7 +91,7 @@ func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []strin
 
 	// IAC issues are of type configuration and are not supported atm
 	if issueType == "configuration" {
-		customDebug.Debug(" *** INFO *** IAC projects are not supported by this tool, skipping this project")
+		customDebug.Debug(" *** WARN *** IAC projects are not supported, skipping")
 		return vulnsWithAllPaths, "", err
 	}
 
