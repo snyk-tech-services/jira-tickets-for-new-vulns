@@ -87,9 +87,10 @@ func TestOpenJiraTicketCodeOnly(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	responseDataAggregatedByte, ticket, err := openJiraTicket(flags, projectInfo, codeIssueForJira, cD)
+	responseDataAggregatedByte, ticket, err, jiraApiUrl := openJiraTicket(flags, projectInfo, codeIssueForJira, cD)
 
 	assert.NotNil(t, ticket)
+	assert.NotNil(t, jiraApiUrl)
 	assert.NotNil(t, responseDataAggregatedByte)
 
 }
