@@ -18,6 +18,11 @@
                 "high": 13,
                 "medium": 15
             },
+            "attributes":{
+                "criticality": ["critical"],
+                "lifecycle": ["production"],
+                "environment": ["frontend", "external"]
+            },
             "remoteRepoUrl": "https://github.com/snyk/goof.git",
             "lastTestedDate": "2019-02-05T06:21:00.000Z",
             "importingUser": {
@@ -48,6 +53,11 @@
                 "high": 13,
                 "medium": 21
             },
+            "attributes":{
+                "criticality": [],
+                "lifecycle": [],
+                "environment": []
+            },
              "remoteRepoUrl": "https://github.com/clojure/clojure.git",
             "lastTestedDate": "2019-02-05T07:01:00.000Z",
             "owner": {
@@ -77,6 +87,11 @@
                 "low": 0,
                 "high": 0,
                 "medium": 0
+            },
+            "attributes":{
+                "criticality": [],
+                "lifecycle": [],
+                "environment": []
             },
             "imageId": "sha256:caf27325b298a6730837023a8a342699c8b7b388b8d878966b064a1320043019",
             "imageTag": "latest",
