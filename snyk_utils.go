@@ -98,5 +98,5 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 		return nil, errors.New("Request failed")
 	}
 	time.Sleep(1)
-	return responseData, nil
+	return responseData, err
 }
