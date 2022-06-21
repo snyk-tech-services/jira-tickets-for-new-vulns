@@ -50,6 +50,7 @@ func main() {
 			continue
 		}
 
+
 		log.Println("*** INFO *** Step 2/4 - Retrieving a list of existing Jira tickets")
 		tickets, err := getJiraTickets(options.mandatoryFlags, project, customDebug)
 		if err != nil {

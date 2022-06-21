@@ -88,6 +88,7 @@ func getProjectsIds(options flags, customDebug debug) ([]string, error) {
 		log.Println("*** INFO *** Project ID not specified - listing all projects that match the following filers: ", filters)
 
 		projects, err := getOrgProjects(options, customDebug)
+
 		if err != nil {
 			return nil, err
 		}
