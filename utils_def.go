@@ -24,6 +24,9 @@ type MandatoryFlags struct {
 
 type optionalFlags struct {
 	projectID              string
+	projectCriticality     string
+	projectEnvironment     string
+	projectLifecycle       string
 	jiraTicketType         string
 	severity               string
 	issueType              string
