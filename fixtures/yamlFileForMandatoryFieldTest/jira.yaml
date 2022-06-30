@@ -1,6 +1,6 @@
 schema: 1
-snyk: 
-    orgID: 456
+snyk:
+    orgID: 0e9373a6-f858-11ec-b939-0242ac120002
     severity: critical #threshold for jira ticket creation
     maturityFilter: proof-of-concept
     type: vuln #what snyk issue types should we consider to ticket
@@ -12,8 +12,8 @@ jira:
     assigneeId: 1238769
     priorityIsSeverity: true
     customMandatoryFields:
-        Something: 
+        Something:
             Value: This is a summary
-        transition: 
+        transition:
             id: 5
 
