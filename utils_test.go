@@ -108,6 +108,20 @@ func HTTPResponseCheckAndStub(url string, testType string) *httptest.Server {
 	}))
 }
 
+// HTTPResponseCheckAndStubError Check url match and Stubbing HTTP response
+func HTTPResponseCheckAndStubError(url string, testType string) *httptest.Server {
+	var resp []byte
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		fmt.Println("Error case")
+		w.WriteHeader(400)
+		resp = []byte("400 - Bad Request error ")
+		count++
+
+		w.Write(resp)
+	}))
+}
+
 // HTTPResponseCheckAndStub Check url match and Stubbing HTTP response
 func HTTPResponseCheckAndStub_() *httptest.Server {
 	var resp []byte
@@ -226,6 +240,7 @@ func HTTPResponseCheckOpenJiraTicketsWithError50x(url string) *httptest.Server {
 			count++
 		}
 
+		fmt.Println(string(resp))
 		w.Write(resp)
 	}))
 }

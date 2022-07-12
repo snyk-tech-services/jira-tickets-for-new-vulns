@@ -7,42 +7,158 @@ Aimed to be executed at regular interval or with a trigger of your choice (webho
 [![CircleCI](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns.svg?style=svg)](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns)
 [![Not Maintained](https://img.shields.io/badge/Maintenance%20Level-Not%20Maintained-yellow.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
 
-**This repository is not in active developemnt and critical bug fixes only will be considered.**
+**This repository is not in active development and critical bug fixes only will be considered.**
 
 ## Installation
 Use the binaries from [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
 
 ## Usage - Quick start
+- `--orgID` *required*
+
+  Public Snyk organization ID can be located in the [organization settings](https://docs.snyk.io/products/snyk-code/cli-for-snyk-code/before-you-start-set-the-organization-for-the-cli-tests/finding-the-snyk-id-and-internal-name-of-an-organization)
+
+  *Example*: `--orgID=0e9373a6-f858-11ec-b939-0242ac120002`
+- `--token` *required*
+
+  Create a [service account](https://docs.snyk.io/features/user-and-group-management/managing-groups-and-organizations/service-accounts) in Snyk and use the provided token.
+
+  *Example*: `--token=0e9373a6-f858-11ec-b939-0242ac120002`
+
+- `--jiraProjectKey` *required*
+
+  [Jira project key](https://confluence.atlassian.com/jirakb/how-to-get-project-id-from-the-jira-user-interface-827341414.html) the tickets will be opened against.
+
+  *Example*: `--jiraProjectKey=TEAM_A`
+
+
+*Example*:
 ```
-./snyk-jira-sync-<yourplatform> 
-    -orgID=<SNYK_ORG_ID>                    // Can find it under settings
-    -token=<API Token>                      // Snyk API Token. Service accounts work.
-    -jiraProjectKey=<Key>                  // Jira project Key the tickets will be opened against
+./snyk-jira-sync-linux --orgID=0e9373a6-f858-11ec-b939-0242ac120002 --token=xxxxxxxx-xxxx-xxxx-xxxx-0242ac120002 --jiraProjectKey=TEAM_A
 ```
 ### Extended options
-```
-./snyk-jira-sync-<yourplatform> 
-    --orgID=<SNYK_ORG_ID>                                                // Can find it under settings
-    --projectID=<SNYK_PROJECT_ID>                                        // Optional. Syncs all projects in Organization if not provided.
-                                                                        // Project ID can be found under project->settings
-    --api=<API endpoint>                                                 // Optional. Set to https://<instance>/api for private instances
-    --token=<API Token>                                                  // Snyk API Token. Service accounts work.
-    --jiraProjectID=<12345>                                              // Jira project ID the tickets will be opened against
-    --jiraProjectKey=<KEY>                                               // Jira project Key the tickets will be opened against
-    --jiraTicketType=<Task|Bug|....>                                     // Optional. Type of ticket to open. Defaults to Bug. Please see the 'Notes' section below.
-    --severity=<critical|high|medium|low>                                // Optional. Severity threshold to open tickets for. Defaults to low.
-    --maturityFilter=[mature,proof-of-concept,no-known-exploit,no-data]  // Optional. include only maturity level(s). Separated by commas
-    --type=<all|vuln|license>                                            // Optional. Issue type to open tickets for. Defaults to all.
-    --assigneeId=<123abc456def789>                                       // Optional.  Jira ID of user to assign tickets to. Note: Do not use assigneeName and assigneeId at the same time
-    --assigneeName=<AccountName>                                         // Optional.  Jira Name of user to assign tickets to. Note: Do not use assigneeName and assigneeId at the same time
-    --priorityIsSeverity                                                 // Optional. Set the ticket priority to be based on severity (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
-    --labels=<IssueLabel1>,IssueLabel2                                   // Optional. Set JIRA ticket labels
-    --priorityScoreThreshold=[0-1000]                                    // Optional. Your min priority score threshold
-    --dryRun=<true|false>                                                // Optional. result can be found in a json file were the tool is run
-    --debug=<true|false>                                                 // Optional. enable debug mode
-    --ifUpgradeAvailableOnly=<true|false>                                // Optional. create ticket only for upgradable issues
-    --configFile                                                         // Path the jira.yaml if not root 
-```
+- `--orgID` *required*
+
+  Public Snyk organization ID can be located in the [organization settings](https://docs.snyk.io/products/snyk-code/cli-for-snyk-code/before-you-start-set-the-organization-for-the-cli-tests/finding-the-snyk-id-and-internal-name-of-an-organization)
+
+  *Example*: `--orgID=0e9373a6-f858-11ec-b939-0242ac120002`
+- `--token` *required*
+
+  Create a [service account](https://docs.snyk.io/features/user-and-group-management/managing-groups-and-organizations/service-accounts) in Snyk and use the provided token.
+
+  *Example*: `--token=0e9373a6-f858-11ec-b939-0242ac120002`
+
+- `--jiraProjectKey` *required*
+
+  [Jira project key](https://confluence.atlassian.com/jirakb/how-to-get-project-id-from-the-jira-user-interface-827341414.html) the tickets will be opened against.
+
+  *Example*: `--jiraProjectKey=TEAM_A`
+
+- `--jiraProjectID` *optional*
+
+  `jiraProjectKey` or `jiraProjectID` must be set, but not both. This is an alternative way to specify a Jira project.
+
+  *Example*: `--jiraProjectKey=1234`
+
+- `--projectID` *optional*
+
+  By default all projects in a given Snyk organization will be synced, if `projectID` is set only this project will be synced. Project public ID can be located in [project settings](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-settings)
+
+  *Example*: `--projectID=0e9373a6-f858-11ec-b939-0242ac120002`
+
+- `--api` *optional*
+
+  Alternative API host.
+
+  Example: `--api=https://my.private.instance.com/api`
+- `--jiraTicketType` *optional*
+
+  Type of ticket to open. Defaults to `Bug`. Must match the issue type configured in the provided Jira project.
+
+  *Example*: `--jiraTicketType=Defect`
+- `--severity` *optional*
+
+  Severity threshold to open tickets for. Can be one of `critical`, `high`, `medium`, `low`. Defaults to `low`.
+  *Example*: `--severity=critical`
+- `--maturityFilter` *optional*
+
+  Can be one or multiple values: `mature`, `proof-of-concept`, `no-known-exploit`, `no-data`.
+
+  *Example*: `--maturityFilter=[mature,no-data]`
+- `--type` *optional*
+
+  Snyk issue type to open tickets for. Defaults to `all`. Possible values: `all`, `vuln`, `license`
+
+  *Example*: `--type=vuln`
+- `--assigneeId` *optional*
+
+  Alternative to `--assigneeName`.
+  [Jira ID of user](https://community.atlassian.com/t5/Jira-questions/How-do-I-find-my-account-ID/qaq-p/1702795#:~:text=Click%20your%20Profile%20menu%20in,people%2F%20is%20your%20account%20ID.&text=p.s.%20of%20course%20this%20is%20a%20manual%20way%20to%20check%20user%20IDs.&text=Ah%2C%20for%20some%20reason%20I%20thought%20you%20were%20on%20Jira%20Cloud!) to assign tickets to.
+  Note: Do not use `assigneeName` and `assigneeId` at the same time.
+
+  *Example*: `--assigneeId=123abc456def789`
+- `--assigneeName` *optional*
+
+  Alternative to `--assigneeId`. Jira name of user to assign tickets to.
+- `--priorityIsSeverity` *optional*
+
+  Set the ticket priority to be based on severity, default priorities & severities: `Low|Medium|High|Critical=>Low|Medium|High|Highest`. Can be `true` or ` false`.
+
+  *Example*: `--priorityIsSeverity=true`
+
+- `--labels` *optional*
+
+  Set [Jira ticket labels](https://confluence.atlassian.com/jirasoftwareserver/editing-and-collaborating-on-issues-939938928.html)
+
+  *Example*: `--labels=app-1234`
+
+- `--priorityScoreThreshold` *optional*
+
+  Your minimum [Snyk priority score](https://docs.snyk.io/features/fixing-and-prioritizing-issues/starting-to-fix-vulnerabilities/snyk-priority-score) threshold. Can be a number between `0` and `1000`.
+
+  *Example*: `--priorityScoreThreshold=700`
+[0-1000]
+- `--dryRun` *optional*
+
+  Enables dry run mode, which will not open any tickets but provide information on what changes will occur. Results can be found in a json log file in the same directory.
+
+  *Example*: `--dryRun=true`
+
+- `--debug` *optional*
+
+  Enables debug mode. For more comprehensive debug information from Go set the environment variable `GODEBUG=http2debug=2` as well.
+
+  *Example*: `--debug=true`
+
+- `--ifUpgradeAvailableOnly` *optional*
+
+  Only create tickets for `vuln` issues that are upgradable.`--type` must be set to `all` or `vuln` for this to work.
+
+  *Example*: `--ifUpgradeAvailableOnly=true`
+
+- `--projectCriticality` *optional*
+
+  Include only projects whose [Snyk business criticality attribute](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-information/project-attributes#business-criticality) contains one or more of the specified values.
+
+  *Example*: `--projectCriticality=[Critical,Medium]`
+
+- `--projectEnvironment` *optional*
+
+  Include only projects whose [Snyk environment attribute](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-information/project-attributes#environment) contains one or more of the specified values.
+
+  *Example*: `--projectLifecycle=[backend,frontend]`
+
+- `--projectLifecycle` *optional*
+
+  Include only projects whose [Snyk lifecycle attribute](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-information/project-attributes#lifecycle-stage) contains one or more of the specified values.
+
+  *Example*: `--projectLifecycle=[development,production]`
+
+- `--configFile` *optional*
+
+  Path the  required `jira.yaml` file if not located in the root.
+
+  *Example*: `--configFile=/path/to/jira.yaml`
+
 
 ## Restrictions
 The tool does not support IAC project. It will open issue only for code and open source projects and ignore all other project type.
@@ -58,8 +174,8 @@ high | High
 medium | Medium
 low | Low
 
-Use SNYK_JIRA_PRIORITY_FOR_XXX_VULN env var to override the default an set your value.
-> Example:
+Use `SNYK_JIRA_PRIORITY_FOR_XXX_VULN` env var to override the default an set your value.
+> *Example*:
 > Critical sevs should receive the Hot Fix priority in JIRA
 >
 > export SNYK_JIRA_PRIORITY_FOR_CRITICAL_VULN='Hot Fix'
@@ -113,26 +229,26 @@ A logFile listing all the tickets created can be found where the tool has been r
 
 ## Jira.yaml
 
-Example of config file structure. 
-If your jira project has specific mandatory field or custom fields configured, they will need to be added to the config file.
-Mandatory fields: 
+Example of config file structure.
+If your jira project has specific required field or custom fields configured, they will need to be added to the config file.
+Mandatory fields:
   - Make sure to give both key and value expected by jira under the customMandatoryField key of the config file.
-  We support 2 kind of mandatory field: simple key/value pair or nested key/value
-  
+  We support 2 kind of required field: simple key/value pair or nested key/value
+
   - Simple key/Value:
-    
-    ``` 
+
+    ```
       customMandatoryFields:
-            key: 
-              value: "This is a summary" 
+            key:
+              value: "This is a summary"
     ```
     will result in adding this object to the ticket ``` {"key":{"Value":"This is a summary"} ```
-  
+
   - Nested:
-    ``` 
+    ```
     firstKey:
-          secondKey: 
-            id: 65 
+          secondKey:
+            id: 65
     ```
     will result in adding this object to the ticket ``` "firstKey":{"secondKey":{"id":62}} ```
 
@@ -151,14 +267,14 @@ For more details on jira custom field please visit [Jira documentation] (https:/
 
 ```
 schema: 1
-snyk: 
-    orgID: a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513 # <SNYK_ORG_ID> 
+snyk:
+    orgID: a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513 # <SNYK_ORG_ID>
     projectID: a1b2c3de-99b1-4f3f-bfdb-6ee4b4990514 # <SNYK_PROJECT_ID>
     severity: critical # <critical|high|medium|low>
     maturityFilter: mature # <mature,proof-of-concept,no-known-exploit,no-data>
     type: all # <all|vuln|license>
     priorityScoreThreshold: 10
-    api: https://myapi # <API endpoint> default to 
+    api: https://myapi # <API endpoint> default to
     ifUpgradeAvailableOnly: false # <true|false>
 jira:
     jiraTicketType: Task # <Task|Bug|....>
@@ -170,16 +286,15 @@ jira:
     jiraProjectKey: testProject
     priorityIsSeverity: false # <true|false> (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
     customMandatoryFields:
-        key: 
+        key:
             value: 5
     customfield_10601: jiraValue-MultiGroupPicker-Value1,Value2
 ```
 
-Notes: 
+Notes:
   - The token is not expected present in the config file
-  - Command line arguments override the config file. IE: 
+  - Command line arguments override the config file. IE:
       Using the config file above, running ./snyk-jira-sync-macOs -Org=1234 -configFile=true -token=123
       the org ID used by the tool will be 1234 and not a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513
-  - See 'Extended options' for default values 
-  - Please ensure you use the same issue type that is configured in your JIRA. Default is Bug. Please verify the type is use (or default) exists in your JIRA configuration.
+  - See 'Extended options' for default values
 
