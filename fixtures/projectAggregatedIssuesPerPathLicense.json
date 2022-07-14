@@ -1,0 +1,38 @@
+{
+  "issues": [
+    {
+      "id": "snyk:lic:npm:goof:GPL-2.0",
+      "issueType": "license",
+      "pkgName": "goof",
+      "pkgVersions": ["0.0.3"],
+      "priorityScore": 500,
+      "priority": {
+        "score": 500,
+        "factors": [{ "name": "severity", "description": "High severity" }]
+      },
+      "issueData": {
+        "id": "snyk:lic:npm:goof:GPL-2.0",
+        "title": "GPL-2.0 license",
+        "severity": "high",
+        "url": "https://snyk.io/vuln/snyk:lic:npm:goof:GPL-2.0",
+        "exploitMaturity": "no-data",
+        "semver": { "vulnerable": [">=0"] },
+        "publicationTime": "2021-07-02T00:14:22.812Z",
+        "language": "js",
+        "nearestFixedInVersion": ""
+      },
+      "isPatched": false,
+      "isIgnored": false,
+      "fixInfo": {
+        "isUpgradable": false,
+        "isPinnable": false,
+        "isPatchable": false,
+        "isPartiallyFixable": false,
+        "nearestFixedInVersion": ""
+      },
+      "links": {
+        "paths": "https://app.snyk.io/api/v1/org/f6999a85-c519-4ee7-ae55-3269b9bfa4b6/project/9d64b8a9-883e-42f9-abd3-66b274b66a4c/history/1c2130c4-82a5-4130-9632-fcbf204a8267/issue/snyk:lic:npm:goof:GPL-2.0/paths"
+      }
+    }
+  ]
+}
