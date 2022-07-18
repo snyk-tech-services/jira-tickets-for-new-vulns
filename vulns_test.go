@@ -166,3 +166,51 @@ func TestGetVulnsWithoutTicketErrorRetrievingDataFunc(t *testing.T) {
 	assert.GreaterOrEqual(len(skippedIssues), 1)
 	return
 }
+
+func TestGetLicenseWithoutTicketFunc(t *testing.T) {
+
+	assert := assert.New(t)
+
+	server := HTTPResponseCheckAndStub_()
+
+	defer server.Close()
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "456"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "456"
+	Mf.jiraProjectID = "456"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = "low"
+	Of.priorityScoreThreshold = 0
+	Of.issueType = "all"
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.assigneeName = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.ifUpgradeAvailableOnly = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	var maturityLevels []string
+
+	response, skippedIssues, _ := getVulnsWithoutTicket(flags, "456", maturityLevels, nil, cD)
+	assert.Equal(0, len(skippedIssues))
+	assert.Equal(1, len(response))
+
+	return
+}

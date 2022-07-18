@@ -135,6 +135,10 @@ func HTTPResponseCheckAndStub_() *httptest.Server {
 			resp = readFixture("./fixtures/issueACORNPath.json")
 		} else if "/v1/org/123/project/123/aggregated-issues" == r.RequestURI {
 			resp = readFixture("./fixtures/projectAggregatedIssuesPerPath.json")
+		} else if "/v1/org/456/project/456/aggregated-issues" == r.RequestURI {
+			resp = readFixture("./fixtures/projectAggregatedIssuesPerPathLicense.json")
+		} else if "/v1/org/456/project/456/issue/snyk:lic:npm:goof:GPL-2.0/paths" == r.RequestURI {
+			resp = readFixture("./fixtures/licensePath.json")
 		} else {
 			resp = []byte("404 - url mismatch")
 		}
