@@ -35,6 +35,7 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
 ```
 ./snyk-jira-sync-linux --orgID=0e9373a6-f858-11ec-b939-0242ac120002 --token=xxxxxxxx-xxxx-xxxx-xxxx-0242ac120002 --jiraProjectKey=TEAM_A
 ```
+
 ### Extended options
 - `--orgID` *required*
 
@@ -158,7 +159,6 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
   Path the  required `jira.yaml` file if not located in the root.
 
   *Example*: `--configFile=/path/to/jira.yaml`
-
 
 ## Restrictions
 The tool does not support IAC project. It will open issue only for code and open source projects and ignore all other project type.
