@@ -66,7 +66,7 @@ func main() {
 			continue
 		}
 
-		customDebug.Debug("*** INFO *** List of vuln without tickets: ", vulnsPerPath)
+		customDebug.Debug("*** INFO *** # of vulns without tickets: ", len(vulnsPerPath))
 
 		if len(skippedIssues) > 0 {
 			customDebug.Debug("*** INFO *** List of skipped vulns: ", skippedIssues)

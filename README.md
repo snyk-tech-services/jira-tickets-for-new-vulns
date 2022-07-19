@@ -254,16 +254,18 @@ Mandatory fields:
 
 
 Custom fields:
-  - At the moment we are supporting 3 types of custom fields: labels, MultiGroupPicker and MultiSelect.
-  - Make sure to respect the format belong in the config file:
-    - labels:
-      ``` "customfield_10601": jiraValue-label-Value1,Value2``` => ``` "customfield_10601":["Value1","Value2"]```
-    - MultiGroupPicker:
-      ``` "customfield_10601": jiraValue-MultiGroupPicker-Value1,Value2``` => ``` "customfield_10601":[{"name":"Value1"},{"name":"Value2"}]```
-    - MultiGroupPicker:
-      ``` "customfield_10601": jiraValue-MultiSelect-Value1,Value2```  => ``` "customfield_10601":[{"value":"Value1"},{"value":"Value2"}]```
 
-For more details on jira custom field please visit [Jira documentation] (https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/)
+At the moment we are supporting 3 types of custom Jira fields: [`labels`](https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/), [`MultiGroupPicker`](https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/) and [`MultiSelect`](https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/).
+
+Make sure to respect the format in the config file:
+- labels:
+  ``` "customfield_10601": jiraValue-label-Value1,Value2``` will be sent as ``` "customfield_10601":["Value1","Value2"]```
+- MultiGroupPicker:
+  ``` "customfield_10601": jiraValue-MultiGroupPicker-Value1,Value2``` will be sent as ``` "customfield_10601":[{"name":"Value1"},{"name":"Value2"}]```
+- MultiGroupPicker:
+  ``` "customfield_10601": jiraValue-MultiSelect-Value1,Value2``` will be sent as ``` "customfield_10601":[{"value":"Value1"},{"value":"Value2"}]```
+
+For more details on jira custom field please visit [Jira documentation](https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/)
 
 ```
 schema: 1
@@ -294,7 +296,7 @@ jira:
 Notes:
   - The token is not expected present in the config file
   - Command line arguments override the config file. IE:
-      Using the config file above, running ./snyk-jira-sync-macOs -Org=1234 -configFile=true -token=123
-      the org ID used by the tool will be 1234 and not a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513
+      Using the config file above, running `./snyk-jira-sync-macOs --Org=1234 --configFile=./path/to/folder --token=123`
+      the org ID used by the tool will be `1234` and not `a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513`
   - See 'Extended options' for default values
 
