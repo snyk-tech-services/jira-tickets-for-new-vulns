@@ -294,7 +294,7 @@ jira:
 Notes:
   - The token is not expected present in the config file
   - Command line arguments override the config file. IE:
-      Using the config file above, running ./snyk-jira-sync-macOs -Org=1234 -configFile=true -token=123
-      the org ID used by the tool will be 1234 and not a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513
+      Using the config file above, running `./snyk-jira-sync-macOs --Org=1234 --configFile=./path/to/folder --token=123`
+      the org ID used by the tool will be `1234` and not `a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513`
   - See 'Extended options' for default values
 
