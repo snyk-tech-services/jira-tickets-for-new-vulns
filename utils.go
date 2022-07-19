@@ -195,6 +195,7 @@ func (opt *flags) setOption(args []string) {
 	// needed to open a jira ticket
 	// don't do something not needed
 	if v.Get("jira.customMandatoryFields") != nil {
+		log.Println("*** INFO *** Detected custom Jira fields configuration, trying to parse the data")
 		opt.customMandatoryJiraFields = findCustomJiraMandatoryFlags(configFile)
 	}
 
@@ -378,7 +379,6 @@ input: none
 Read the config file and extract the jira fields than the mandatory field inside it
 ***/
 func findCustomJiraMandatoryFlags(yamlFile []byte) map[string]interface{} {
-
 	config := make(map[interface{}]interface{})
 	yamlCustomJiraMandatoryField := make(map[interface{}]interface{})
 	jsonCustomJiraMandatoryField := make(map[string]interface{})

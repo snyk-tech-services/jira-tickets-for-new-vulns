@@ -215,12 +215,12 @@ func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]in
 
 	marshalledFieldFromTicket, _ := json.Marshal(fieldFromTicket)
 	if err != nil {
-		customDebug.Debug("*** ERROR *** Could not marshall ticket fields, mandatory fields will no the added ", err)
+		customDebug.Debug("*** ERROR *** Could not parse Jira fields config, mandatory fields will no the added ", err)
 	}
 
 	err = json.Unmarshal(marshalledFieldFromTicket, &fields)
 	if err != nil {
-		customDebug.Debug("*** ERROR *** Could not unMarshalled ticket fields, mandatory fields will no the added ", err)
+		customDebug.Debug("*** ERROR *** Could not Jira fields config, mandatory fields will no the added ", err)
 	}
 
 	for i, s := range customMandatoryField {
@@ -234,7 +234,7 @@ func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]in
 				}
 			}
 		} else {
-			customDebug.Debug(fmt.Sprintf("*** ERROR *** Assertion error expected map[string]interface{} but got type %T ", s))
+			customDebug.Debug(fmt.Sprintf("*** ERROR *** Expected mandatory Jira fields configuration to be in format map[string]interface{}, received type: %T for field %s ", s, i))
 		}
 
 		fields[i] = s
@@ -242,12 +242,12 @@ func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]in
 
 	newTicket["fields"] = fields
 
-	newMarchalledTicket, err := json.Marshal(newTicket)
+	newMarshalledTicket, err := json.Marshal(newTicket)
 	if err != nil {
-		customDebug.Debug("*** ERROR *** Could not Marshalled new ticket, mandatory fields will no the added ", err)
+		customDebug.Debug("*** ERROR *** Invalid JSON, mandatory Jira fields will be skipped. ERROR:", err)
 	}
 
-	return newMarchalledTicket
+	return newMarshalledTicket
 }
 
 /***
