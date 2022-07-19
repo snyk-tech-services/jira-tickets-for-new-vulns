@@ -169,10 +169,11 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 			Summary:     jiraTicket.Fields.Summary,
 			Description: jiraTicket.Fields.Description,
 		}
+		return nil, ticketFile, errors.New("*** WARN *** Skipping opening a ticket in --dryRun mode"), jiraApiUrl
 	}
 
 	// check that vulnId exist and dryRun is off
-	if len(vulnID) != 0 && !flags.optionalFlags.dryRun {
+	if len(vulnID) != 0 {
 		var er error
 		responseData, er := makeSnykAPIRequest("POST", jiraApiUrl, flags.mandatoryFlags.apiToken, ticket, customDebug)
 
@@ -220,10 +221,9 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 	var ticketArray []Tickets
 
 	for _, vulnForJira := range vulnsForJira {
-
+		jsonVuln, _ := jsn.NewJson(vulnForJira)
 		// skip ticket creating if the vuln is not upgradable
 		if flags.optionalFlags.ifUpgradeAvailableOnly {
-			jsonVuln, _ := jsn.NewJson(vulnForJira)
 			if jsonVuln.K("fixInfo").K("isUpgradable").Bool().Value == false {
 				continue
 			}
@@ -231,10 +231,10 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 
 		RequestFailed = false
 
-		customDebug.Debug("*** INFO *** Trying to open ticket for vuln:", vulnForJira)
+		customDebug.Debug("*** INFO *** Trying to open ticket for vuln:", jsonVuln.K("issueData").K("title"))
 		responseDataAggregatedByte, ticket, err, jiraApiUrl := openJiraTicket(flags, projectInfo, vulnForJira, customDebug)
 		if err != nil {
-			customDebug.Debugf("*** ERROR *** Opening Jira ticket failed %s\n", jiraApiUrl)
+			customDebug.Debugf("*** ERROR *** Failed to open a Jira ticket via Snyk API: %s\nERROR:%s", jiraApiUrl, err)
 			RequestFailed = true
 		}
 
