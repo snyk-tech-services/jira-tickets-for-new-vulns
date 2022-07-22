@@ -284,7 +284,7 @@ jira:
     assigneeId: 123abc456def789
     assigneeName: AccountName
     priorityIsSeverity: true # <true|false>
-    label: label1 # <IssueLabel1>,<IssueLabel2>
+    labels: label1 # <IssueLabel1>,<IssueLabel2>
     jiraProjectKey: testProject
     priorityIsSeverity: false # <true|false> (defaults: Low|Medium|High|Critical=>Low|Medium|High|Highest)
     customMandatoryFields:
