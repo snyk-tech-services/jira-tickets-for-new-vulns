@@ -32,7 +32,6 @@ type optionalFlags struct {
 	issueType              string
 	maturityFilterString   string
 	assigneeID             string
-	assigneeName           string
 	labels                 string
 	priorityIsSeverity     bool
 	priorityScoreThreshold int

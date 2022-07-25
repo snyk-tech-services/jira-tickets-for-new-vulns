@@ -71,7 +71,6 @@ func TestOpenJiraTicketCodeOnly(t *testing.T) {
 	Of.debug = true
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
@@ -125,7 +124,6 @@ func TestOpenJiraTicketCodeOnlyWithLabel(t *testing.T) {
 	Of.debug = true
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = "Label1,Label2"
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
@@ -186,7 +184,6 @@ func TestOpenJiraTicketCodeOnlyWithSeverity(t *testing.T) {
 	Of.debug = true
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = true
 	Of.projectID = ""
@@ -247,7 +244,6 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeId(t *testing.T) {
 	Of.debug = true
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = "123456"
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
@@ -278,67 +274,6 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeId(t *testing.T) {
 	return
 }
 
-func TestOpenJiraTicketCodeOnlyWithAssigneeName(t *testing.T) {
-
-	assert := assert.New(t)
-	server := HTTPResponseStubAndMirrorCodeRequest()
-
-	defer server.Close()
-
-	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/snyk_code_fixtures/codeProject.json"))
-	codeIssueForJira := make(map[string]interface{})
-	err := json.Unmarshal(readFixture("./fixtures/snyk_code_fixtures/codeIssueForJira.json"), &codeIssueForJira)
-	if err != nil {
-		panic(err)
-	}
-
-	// setting mandatory options
-	Mf := MandatoryFlags{}
-	Mf.orgID = "123"
-	Mf.endpointAPI = server.URL
-	Mf.apiToken = "123"
-	Mf.jiraProjectID = "123"
-	Mf.jiraProjectKey = ""
-
-	// setting optional options
-	Of := optionalFlags{}
-	Of.severity = ""
-	Of.priorityScoreThreshold = 0
-	Of.issueType = ""
-	Of.debug = true
-	Of.jiraTicketType = "Bug"
-	Of.assigneeID = ""
-	Of.assigneeName = "test"
-	Of.labels = ""
-	Of.priorityIsSeverity = false
-	Of.projectID = ""
-	Of.maturityFilterString = ""
-	Of.dryRun = false
-	Of.ifUpgradeAvailableOnly = false
-
-	flags := flags{}
-	flags.mandatoryFlags = Mf
-	flags.optionalFlags = Of
-
-	// setting debug
-	cD := debug{}
-	cD.setDebug(false)
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, codeIssueForJira, cD)
-
-	var mirroredResponse mirroredResponse
-	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
-		panic(err)
-	}
-
-	assert.Equal(NotCreatedIssueId, "")
-	assert.Equal(numberIssueCreated, 1)
-	assert.NotNil(tickets)
-	assert.Equal(string(readFixture("./fixtures/snyk_code_fixtures/results/codeTicketWithAssigneeName.json")), string(mirroredResponse.Body))
-
-	return
-}
-
 func TestGetSnykCodeIssueWithoutTickets(t *testing.T) {
 
 	os.Setenv("EXECUTION_ENVIRONMENT", "test")
@@ -365,7 +300,6 @@ func TestGetSnykCodeIssueWithoutTickets(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
@@ -418,7 +352,6 @@ func TestGetSnykCodeIssueWithoutTicketsWithSeverityFilter(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
@@ -470,7 +403,6 @@ func TestGetSnykCodeIssueWithoutTicketsWithPagination(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""

@@ -114,11 +114,7 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 		jiraTicket.Fields.Labels = strings.Split(flags.optionalFlags.labels, ",")
 	}
 
-	if flags.optionalFlags.assigneeName != "" {
-		var assignee Assignee
-		assignee.Name = flags.optionalFlags.assigneeName
-		jiraTicket.Fields.Assignees = &assignee
-	} else if flags.optionalFlags.assigneeID != "" {
+	if flags.optionalFlags.assigneeID != "" {
 		var assignee Assignee
 		assignee.AccountId = flags.optionalFlags.assigneeID
 		jiraTicket.Fields.Assignees = &assignee
