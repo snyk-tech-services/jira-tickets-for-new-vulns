@@ -238,7 +238,6 @@ func TestGetProjectsIdsAllProjects(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""

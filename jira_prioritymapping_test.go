@@ -41,7 +41,6 @@ func TestOpenJiraTicketWithPriorityMappingFunc(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = true
 	Of.projectID = ""
@@ -101,7 +100,6 @@ func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
@@ -117,7 +115,7 @@ func TestOpenJiraTicketWithoutPriorityMappingFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	//endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool
+	//endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool
 	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	var mirroredResponse mirroredResponse
@@ -163,7 +161,6 @@ func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = true
 	Of.projectID = ""
@@ -179,7 +176,7 @@ func TestOpenJiraTicketWithCustomPriorityMappingFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	//endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeName string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool
+	//endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool
 	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
 
 	var mirroredResponse mirroredResponse

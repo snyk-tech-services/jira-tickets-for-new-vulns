@@ -33,7 +33,6 @@ func TestSetOptionFunc(t *testing.T) {
 
 	optionalResult := &optionalFlags{
 		assigneeID:             "1238769",
-		assigneeName:           "",
 		debug:                  false,
 		dryRun:                 false,
 		issueType:              "vuln",
@@ -81,7 +80,6 @@ func TestSetOptionMixFunc(t *testing.T) {
 
 	optionalResult := &optionalFlags{
 		assigneeID:             "654",
-		assigneeName:           "",
 		debug:                  false,
 		dryRun:                 false,
 		issueType:              "license",
@@ -125,7 +123,6 @@ func TestSetOption(t *testing.T) {
 
 	optionalResult := &optionalFlags{
 		assigneeID:             "1238769",
-		assigneeName:           "",
 		debug:                  false,
 		dryRun:                 false,
 		issueType:              "vuln",

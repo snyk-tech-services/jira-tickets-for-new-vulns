@@ -70,7 +70,6 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 	Of.debug = true
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = "Label1,Label2"
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
@@ -130,7 +129,6 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""

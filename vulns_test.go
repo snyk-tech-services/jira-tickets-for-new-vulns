@@ -31,7 +31,6 @@ func TestGetVulnsWithoutTicketFunc(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
@@ -88,7 +87,6 @@ func TestNoVulnOrLicense(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
@@ -139,7 +137,6 @@ func TestGetVulnsWithoutTicketErrorRetrievingDataFunc(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""
@@ -191,7 +188,6 @@ func TestGetLicenseWithoutTicketFunc(t *testing.T) {
 	Of.debug = false
 	Of.jiraTicketType = "Bug"
 	Of.assigneeID = ""
-	Of.assigneeName = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
 	Of.projectID = ""

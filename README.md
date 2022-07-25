@@ -92,14 +92,12 @@ Use the binaries from [the release page](https://github.com/snyk-tech-services/j
   *Example*: `--type=vuln`
 - `--assigneeId` *optional*
 
-  Alternative to `--assigneeName`.
   [Jira ID of user](https://community.atlassian.com/t5/Jira-questions/How-do-I-find-my-account-ID/qaq-p/1702795#:~:text=Click%20your%20Profile%20menu%20in,people%2F%20is%20your%20account%20ID.&text=p.s.%20of%20course%20this%20is%20a%20manual%20way%20to%20check%20user%20IDs.&text=Ah%2C%20for%20some%20reason%20I%20thought%20you%20were%20on%20Jira%20Cloud!) to assign tickets to.
-  Note: Do not use `assigneeName` and `assigneeId` at the same time.
 
   *Example*: `--assigneeId=123abc456def789`
-- `--assigneeName` *optional*
+- **DEPRECATED** `--assigneeName` *optional*
 
-  Alternative to `--assigneeId`. Jira name of user to assign tickets to.
+  Currently Snyk supports Jira API v2 where this field is now deprecated. See the [Jira deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/).
 - `--priorityIsSeverity` *optional*
 
   Set the ticket priority to be based on severity, default priorities & severities: `Low|Medium|High|Critical=>Low|Medium|High|Highest`. Can be `true` or ` false`.
@@ -282,7 +280,6 @@ jira:
     jiraTicketType: Task # <Task|Bug|....>
     jiraProjectID: 12345
     assigneeId: 123abc456def789
-    assigneeName: AccountName
     priorityIsSeverity: true # <true|false>
     labels: label1 # <IssueLabel1>,<IssueLabel2>
     jiraProjectKey: testProject
