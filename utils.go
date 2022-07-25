@@ -86,7 +86,6 @@ func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper
 	Of.issueType = v.GetString("snyk.type")
 	Of.maturityFilterString = v.GetString("snyk.maturityFilter")
 	Of.assigneeID = v.GetString("jira.assigneeID")
-	Of.assigneeName = v.GetString("jira.assigneeName")
 	Of.labels = v.GetString("jira.labels")
 	Of.priorityIsSeverity = v.GetBool("jira.priorityIsSeverity")
 	Of.priorityScoreThreshold = v.GetInt("snyk.priorityScoreThreshold")
@@ -138,8 +137,7 @@ func (opt *flags) setOption(args []string) {
 	fs.String("severity", "low", "Optional. Your severity threshold")
 	fs.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
 	fs.String("type", "all", "Optional. Your issue type (all|vuln|license)")
-	fs.String("assigneeName", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
-	fs.String("assigneeId", "", "Optional. The Jira user ID to assign issues to. Note: Do not use assigneeName and assigneeId at the same time")
+	fs.String("assigneeId", "", "Optional. The Jira user accountId to assign issues to.")
 	fs.String("labels", "", "Optional. Jira ticket labels")
 	fs.Bool("priorityIsSeverity", false, "Boolean. Use issue severity as priority")
 	fs.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
@@ -165,7 +163,6 @@ func (opt *flags) setOption(args []string) {
 	v.BindPFlag("snyk.type", fs.Lookup("type"))
 	v.BindPFlag("snyk.maturityFilter", fs.Lookup("maturityFilter"))
 	v.BindPFlag("jira.assigneeID", fs.Lookup("assigneeId"))
-	v.BindPFlag("jira.assigneeName", fs.Lookup("assigneeName"))
 	v.BindPFlag("jira.labels", fs.Lookup("labels"))
 	v.BindPFlag("jira.priorityIsSeverity", fs.Lookup("priorityIsSeverity"))
 	v.BindPFlag("snyk.priorityScoreThreshold", fs.Lookup("priorityScoreThreshold"))
@@ -224,7 +221,6 @@ check flags rules
 To work properly with jira these needs to be respected:
 	- set only jiraProjectID or jiraProjectKey, not both
 	- priorityScoreThreshold must be between 0 and 1000
- 	- set only assigneeName or assigneeID, not both
 ***/
 func (flags *flags) checkFlags() {
 	if flags.mandatoryFlags.jiraProjectID != "" && flags.mandatoryFlags.jiraProjectKey != "" {
@@ -233,10 +229,6 @@ func (flags *flags) checkFlags() {
 
 	if flags.optionalFlags.priorityScoreThreshold < 0 || flags.optionalFlags.priorityScoreThreshold > 1000 {
 		log.Fatalf("*** ERROR *** %d is not a valid score. Must be between 0-1000.", flags.optionalFlags.priorityScoreThreshold)
-	}
-
-	if flags.optionalFlags.assigneeName != "" && flags.optionalFlags.assigneeID != "" {
-		log.Fatalf(("*** ERROR *** You passed both assigneeID and assigneeName in parameters\n Please, Use assigneeID OR assigneeName, not both"))
 	}
 }
 
