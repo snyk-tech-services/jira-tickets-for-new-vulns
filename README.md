@@ -10,7 +10,9 @@ Aimed to be executed at regular interval or with a trigger of your choice (webho
 **This repository is not in active development and critical bug fixes only will be considered.**
 
 ## Installation
-Use the binaries from [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
+You can either download the binaries fron the from [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
+or 
+Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
 ## Usage - Quick start
 - `--orgID` *required*
