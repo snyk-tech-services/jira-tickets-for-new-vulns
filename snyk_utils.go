@@ -17,7 +17,11 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 		bodyBuffer = bytes.NewBuffer(body)
 	}
 
-	request, _ := http.NewRequest(verb, endpointURL, bodyBuffer)
+	request, err := http.NewRequest(verb, endpointURL, bodyBuffer)
+	if err != nil {
+		customDebug.Debugf("*** ERROR *** could not create requests to '%s' failed with error %s\n", endpointURL, err.Error())
+		return nil, err
+	}
 
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Add("Authorization", "token "+snykToken)
@@ -25,7 +29,6 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 
 	client := &http.Client{}
 	response, err := client.Do(request)
-
 	if err != nil {
 		customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s\n", endpointURL, err.Error())
 	}
@@ -35,9 +38,16 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 		customDebug.Debug("*** INFO *** Body : ", string(body))
 	}
 
-	responseData, err := ioutil.ReadAll(response.Body)
+	var responseData []byte
+	if response != nil {
+		var er error
+		responseData, er = ioutil.ReadAll(response.Body)
+		if er != nil {
+			customDebug.Debugf("*** ERROR *** could not read response from request to endpoint %s with error %s\n", endpointURL, err.Error())
+		}
+	}
 
-	if response.StatusCode >= 500 {
+	if err != nil || response == nil || response.StatusCode >= 300 {
 
 		count := 0
 		for {
@@ -46,21 +56,34 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 			customDebug.Debugf("*** INFO *** retry number %d\n", count)
 
 			response, err = client.Do(request)
-
 			if err != nil {
 				customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s, Retrying\n", endpointURL, err.Error())
 			}
 
-			if body != nil {
-				customDebug.Debug("*** INFO *** Body : ", string(body))
+			// requests fails but we want to retry
+			if response != nil {
+
+				if response.StatusCode < 500 {
+					if response.Body != nil {
+						responseData, err = ioutil.ReadAll(response.Body)
+						if err != nil {
+							customDebug.Debugf("*** ERROR *** could not read response from request to endpoint %s with error %s\n", endpointURL, err.Error())
+						}
+					}
+
+					break
+				}
+
+				if response.Body != nil {
+					responseData, err = ioutil.ReadAll(response.Body)
+					if err != nil {
+						customDebug.Debugf("*** ERROR *** could not read response from request to endpoint %s with error %s\n", endpointURL, err.Error())
+					}
+				}
 			}
 
-			if response.StatusCode < 500 {
-				responseData, err = ioutil.ReadAll(response.Body)
-				break
-			}
-
-			if response.StatusCode >= 500 && count >= 2 {
+			// Allow 2 retries with other error type then fail properly
+			if count >= 2 {
 				customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed too many times\n", endpointURL)
 				customDebug.Debugf("*** ERROR *** Ticket for this issue cannot be created. Skipping\n")
 				errorMessage := "*** ERROR *** Request on endpoint " + endpointURL + " failed too many times with 50x error\n" + "*** ERROR *** Ticket for this issue cannot be created. Skipping\n"
@@ -69,7 +92,6 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 				return nil, errors.New("Failed too many time with 50x errors") // skipping this
 			}
 
-			responseData, err = ioutil.ReadAll(response.Body)
 			count = count + 1
 			time.Sleep(1)
 		}
