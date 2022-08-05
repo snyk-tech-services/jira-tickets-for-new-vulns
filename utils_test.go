@@ -237,6 +237,10 @@ func HTTPResponseCheckOpenJiraTicketsWithError50x(url string) *httptest.Server {
 			fmt.Println("Working case")
 			w.WriteHeader(http.StatusAccepted)
 			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse.json")
+		} else if count == 1 {
+			fmt.Println("Error case no status")
+			resp = nil
+			count++
 		} else {
 			fmt.Println("Error case")
 			w.WriteHeader(503)
