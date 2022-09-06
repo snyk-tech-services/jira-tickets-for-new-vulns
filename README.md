@@ -258,12 +258,14 @@ Custom fields:
 At the moment we are supporting 3 types of custom Jira fields: [`labels`](https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/), [`MultiGroupPicker`](https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/) and [`MultiSelect`](https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/).
 
 Make sure to respect the format in the config file:
+- simpleField:
+  ``` "customfield_10601": value: jiraValue-label-something to add to the ticket``` will be sent as ``` "customfield_10601":"something to add to the ticket"```
 - labels:
-  ``` "customfield_10601": jiraValue-label-Value1,Value2``` will be sent as ``` "customfield_10601":["Value1","Value2"]```
+  ``` "customfield_10601": value: jiraValue-label-Value1,Value2``` will be sent as ``` "customfield_10601":["Value1","Value2"]```
 - MultiGroupPicker:
-  ``` "customfield_10601": jiraValue-MultiGroupPicker-Value1,Value2``` will be sent as ``` "customfield_10601":[{"name":"Value1"},{"name":"Value2"}]```
+  ``` "customfield_10601": value: jiraValue-MultiGroupPicker-Value1,Value2``` will be sent as ``` "customfield_10601":[{"name":"Value1"},{"name":"Value2"}]```
 - MultiGroupPicker:
-  ``` "customfield_10601": jiraValue-MultiSelect-Value1,Value2``` will be sent as ``` "customfield_10601":[{"value":"Value1"},{"value":"Value2"}]```
+  ``` "customfield_10601": value: jiraValue-MultiSelect-Value1,Value2``` will be sent as ``` "customfield_10601":[{"value":"Value1"},{"value":"Value2"}]```
 
 For more details on jira custom field please visit [Jira documentation](https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/)
 
@@ -289,7 +291,10 @@ jira:
     customMandatoryFields:
         key:
             value: 5
-    customfield_10601: jiraValue-MultiGroupPicker-Value1,Value2
+        customfield_10601: 
+          value: jiraValue-MultiGroupPicker-Value1,Value2
+        customfield_10602: 
+          value: jiraValue-simpleField-something to add to the ticket
 ```
 
 Notes:
