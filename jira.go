@@ -221,6 +221,7 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 		// skip ticket creating if the vuln is not upgradable
 		if flags.optionalFlags.ifUpgradeAvailableOnly {
 			if jsonVuln.K("fixInfo").K("isUpgradable").Bool().Value == false {
+				log.Printf("*** INFO *** Skipping creating a Jira issue because no upgrade is available. Vuln: %s", jsonVuln.K("issueData").K("title").String().Value)
 				continue
 			}
 		}
