@@ -142,3 +142,50 @@ func TestSetOption(t *testing.T) {
 	assert.Equal(customMandatoryJiraFields, options.customMandatoryJiraFields)
 
 }
+
+func TestSetOptionWithCustomMandatoryField(t *testing.T) {
+
+	assert := assert.New(t)
+
+	options := flags{}
+
+	// reset command line arg
+	oldArgs := os.Args
+	defer func() { os.Args = oldArgs }()
+
+	os.Args = append(os.Args, "--orgID=123")
+	os.Args = append(os.Args, "--token=123")
+	os.Args = append(os.Args, "--jiraProjectID=123")
+	os.Args = append(os.Args, "--api=https://test.com")
+	os.Args = append(os.Args, "--configFile=./fixtures/yamlFileForCustomMandatoryFieldTest")
+
+	options.setOption(os.Args)
+
+	mandatoryResult := &MandatoryFlags{
+		orgID:         "123",
+		apiToken:      "123",
+		jiraProjectID: "123",
+		endpointAPI:   "https://test.com",
+	}
+
+	optionalResult := &optionalFlags{
+		assigneeID:             "1238769",
+		debug:                  false,
+		dryRun:                 false,
+		issueType:              "vuln",
+		jiraTicketType:         "Task",
+		labels:                 "",
+		maturityFilterString:   "proof-of-concept",
+		priorityIsSeverity:     true,
+		priorityScoreThreshold: 20,
+		projectID:              "",
+		severity:               "critical",
+	}
+
+	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": map[string]interface{}{"value": "jiraValue-simpleField-some value to add to the ticket"}}
+
+	assert.Equal(optionalResult, &options.optionalFlags)
+	assert.Equal(mandatoryResult, &options.mandatoryFlags)
+	assert.Equal(customMandatoryJiraFields, options.customMandatoryJiraFields)
+
+}

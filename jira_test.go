@@ -640,7 +640,7 @@ func TestAddMandatoryFieldToTicket(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	customMandatoryJiraFields := map[string]interface{}{"Something": map[string]interface{}{"Value": "This is a summary"}, "transition": map[string]interface{}{"id": 5}}
+	customMandatoryJiraFields := map[string]interface{}{"Something": map[string]interface{}{"value": "This is a summary"}, "transition": map[string]interface{}{"id": 5}}
 
 	newTicket := addMandatoryFieldToTicket(ticket, customMandatoryJiraFields, cD)
 	newTicketFixture := readFixture("./fixtures/ticketJsonWithMandatoryField.json")
@@ -698,6 +698,25 @@ func TestAddMandatoryFieldToTicketCustomFieldLabel(t *testing.T) {
 
 	println("newTicket ", newTicket)
 	newTicketFixture := readFixture("./fixtures/ticketJsonWithMandatoryFieldCustomJiraValueLabel.json")
+
+	assert.Equal(string(newTicket), string(newTicketFixture))
+}
+
+func TestAddMandatoryFieldToTicketCustomFieldSimpleField(t *testing.T) {
+
+	assert := assert.New(t)
+	ticket := readFixture("./fixtures/ticketJson.json")
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": map[string]interface{}{"value": "jiraValue-simpleField-some value to add to the ticket"}, "transition": map[string]interface{}{"id": 5}}
+
+	newTicket := addMandatoryFieldToTicket(ticket, customMandatoryJiraFields, cD)
+
+	println("newTicket ", string(newTicket))
+	newTicketFixture := readFixture("./fixtures/ticketJsonWithMandatoryFieldCustomJiraValueSimpleField.json")
 
 	assert.Equal(string(newTicket), string(newTicketFixture))
 }
