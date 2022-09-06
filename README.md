@@ -11,7 +11,7 @@ Aimed to be executed at regular interval or with a trigger of your choice (webho
 
 ## Installation
 You can either download the binaries fron the from [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
-or 
+or
 Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
 ## Usage - Quick start
@@ -259,7 +259,7 @@ At the moment we are supporting 3 types of custom Jira fields: [`labels`](https:
 
 Make sure to respect the format in the config file:
 - simpleField:
-  ``` "customfield_10601": value: jiraValue-simpleField-something to add to the ticket``` will be sent as ``` "customfield_10601":"something to add to the ticket"```
+  ``` "customfield_10601": value: jiraValue-label-something to add to the ticket``` will be sent as ``` "customfield_10601":"something to add to the ticket"```
 - labels:
   ``` "customfield_10601": value: jiraValue-label-Value1,Value2``` will be sent as ``` "customfield_10601":["Value1","Value2"]```
 - MultiGroupPicker:
@@ -291,9 +291,9 @@ jira:
     customMandatoryFields:
         key:
             value: 5
-        customfield_10601: 
+        customfield_10601:
           value: jiraValue-MultiGroupPicker-Value1,Value2
-        customfield_10602: 
+        customfield_10602:
           value: jiraValue-simpleField-something to add to the ticket
 ```
 
