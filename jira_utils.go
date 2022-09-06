@@ -14,6 +14,7 @@ const JiraPrefix = "jiraValue-"
 const JiraMultiSelect = "MultiSelect"
 const JiraMultiGroupPicker = "MultiGroupPicker"
 const JiraLabels = "Labels"
+const JiraSimpleField = "simpleField"
 
 type JiraIssueForTicket struct {
 	Id  string `json:Id,omitempty"`
@@ -294,6 +295,10 @@ func supportJiraFormats(v string, customDebug debug) (result interface{}) {
 		}
 
 		result = list
+
+	case JiraSimpleField:
+
+		result = valueSplit[2]
 	}
 
 	customDebug.Debug(fmt.Sprintf("*** INFO *** Custom field value '%s' replaced with '%s' ", v, result))
