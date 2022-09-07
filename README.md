@@ -262,7 +262,7 @@ At the moment we are supporting 3 types of custom Jira fields: [`labels`](https:
 
 Make sure to respect the format in the config file:
 - simpleField:
-  ``` "customfield_10601": value: jiraValue-label-something to add to the ticket``` will be sent as ``` "customfield_10601":"something to add to the ticket"```
+  ``` "customfield_10601": value: jiraValue-simpleField-something to add to the ticket``` will be sent as ``` "customfield_10601":"something to add to the ticket"```
 - labels:
   ``` "customfield_10601": value: jiraValue-label-Value1,Value2``` will be sent as ``` "customfield_10601":["Value1","Value2"]```
 - MultiGroupPicker:
