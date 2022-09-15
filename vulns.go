@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/michael-go/go-jsn/jsn"
@@ -109,7 +110,8 @@ func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []strin
 	return vulnsWithAllPaths, skippedIssues, err
 }
 
-/***
+/*
+**
 function getSnykOpenSourceIssueWithoutTickets
 input flags mandatory and optionnal flags
 input projectID string, the ID of the project we are get issues from
@@ -119,10 +121,13 @@ input responseAggregatedData []byte, response from the aggregated data endpoint
 return vulnsWithAllPaths map[string]interface{}, list of issues with all details and path
 return skippedIssues string, list of issues that couldn't be created because there was a problem retrieving data from snyk
 Create a list of issue details without tickets.
+
 	Loop through the issues
 		Get the path for each issue id
 		add the path to the issue details
-***/
+
+**
+*/
 func getSnykOpenSourceIssueWithoutTickets(flags flags, projectID string, maturityFilter []string, tickets map[string]string, customDebug debug, responseAggregatedData []byte) (map[string]interface{}, string, error) {
 
 	vulnsPerPath := make(map[string]interface{})
@@ -237,7 +242,8 @@ func createMaturityFilter(filtersArray []string) []string {
 	return MaturityFilter
 }
 
-/***
+/*
+**
 function getSnykCodeIssueWithoutTickets
 input flags mandatory and optionnal flags
 input projectID string, the ID of the project we are get issues from
@@ -245,11 +251,14 @@ input tickets map[string]string, the list value pair ticket id, issue id which a
 input debug customDebug
 return fullCodeIssueDetail map[string]interface{}, list of issue details without tickets
 Create a list of issue details without tickets.
+
 	Loop through the severity array to get the all issues IDs
 	Loop through those ids the get the details
 		The issue details doesn't give the title of the severity => adding it the the details
 	Adding all the details to the list
-***/
+
+**
+*/
 func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[string]string, customDebug debug) (map[string]interface{}, error) {
 
 	// In the v1 api low severity means get all the issues up,
@@ -282,6 +291,7 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 	}
 
 	for _, severityIndexValue := range severity {
+		fmt.Println("test1")
 
 		url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues?project_id=" + projectID + "&version=2021-08-20~experimental"
 		if len(flags.optionalFlags.severity) > 0 {
@@ -289,7 +299,6 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 		}
 
 		for {
-
 			// get the list of code issue for this project
 			responseData, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
 
@@ -334,6 +343,11 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 						}
 						json.Unmarshal(bytes, &issueDetail)
 
+						// checking if the issue is ignored
+						if e.K("attributes").K("ignored").Bool().Value == true {
+							continue
+						}
+
 						issueDetail["title"] = e.K("attributes").K("title").String().Value
 
 						marshalledjsonIssueDetail, err := json.Marshal(issueDetail)
@@ -345,7 +359,6 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 					}
 
 				}
-
 			}
 
 			if len(jsonData.K("links").K("next").String().Value) > 0 {
