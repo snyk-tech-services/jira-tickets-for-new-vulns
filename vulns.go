@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
+	"strings"
 
 	"github.com/michael-go/go-jsn/jsn"
 )
@@ -285,22 +287,27 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 	var errorMessage error
 
 	// Doing this for test propose
-	endpointAPI := "https://api.snyk.io"
+	host := "api.snyk.io"
+	httpScheme := "https"
 	if IsTestRun() {
-		endpointAPI = flags.mandatoryFlags.endpointAPI
+		before, after, found := strings.Cut(flags.mandatoryFlags.endpointAPI, "//")
+		if found {
+			host = after
+			httpScheme = before
+		}
 	}
 
 	for _, severityIndexValue := range severity {
-		fmt.Println("test1")
-
-		url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues?project_id=" + projectID + "&version=2021-08-20~experimental"
+		queryParams := fmt.Sprintf("project_id=%s&version=2021-08-20~experimental", projectID)
 		if len(flags.optionalFlags.severity) > 0 {
-			url = endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues?project_id=" + projectID + "&severity=" + severityIndexValue + "&version=2021-08-20~experimental"
+			queryParams = fmt.Sprintf("%s&severity=%s", queryParams, severityIndexValue)
 		}
+
+		projectIssuesUrl := url.URL{Scheme: httpScheme, Host: host, Path: fmt.Sprintf("/v3/orgs/%s/issues", flags.mandatoryFlags.orgID), RawQuery: queryParams}
 
 		for {
 			// get the list of code issue for this project
-			responseData, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
+			responseData, err := makeSnykAPIRequest("GET", projectIssuesUrl.String(), flags.mandatoryFlags.apiToken, nil, customDebug)
 
 			if err != nil {
 				if (err.Error() != "Not found, Request failed") && (err.Error() != "Request failed with 50x") {
@@ -317,52 +324,60 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 
 			for _, e := range jsonData.K("data").Array().Elements() {
 
-				if len(e.K("id").String().Value) != 0 {
-					if _, found := tickets[e.K("id").String().Value]; !found {
-
-						id := e.K("id").String().Value
-
-						url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues/detail/code/" + id + "?project_id=" + projectID + "&version=2021-08-20~experimental"
-
-						// get the details of this code issue id
-						responseIssueDetail, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
-						if err != nil {
-							log.Printf("*** ERROR *** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
-							continue
-						}
-
-						jsonIssueDetail, er := jsn.NewJson(responseIssueDetail)
-						if er != nil {
-							log.Printf("*** ERROR *** Json creation failed\n")
-							continue
-						}
-
-						bytes, err := json.Marshal(jsonIssueDetail)
-						if err != nil {
-							continue
-						}
-						json.Unmarshal(bytes, &issueDetail)
-
-						// checking if the issue is ignored
-						if e.K("attributes").K("ignored").Bool().Value == true {
-							continue
-						}
-
-						issueDetail["title"] = e.K("attributes").K("title").String().Value
-
-						marshalledjsonIssueDetail, err := json.Marshal(issueDetail)
-						fullCodeIssueDetail[id], err = jsn.NewJson(marshalledjsonIssueDetail)
-						if er != nil {
-							log.Printf("*** ERROR *** Json creation failed\n")
-							log.Fatalln(er)
-						}
-					}
-
+				if len(e.K("id").String().Value) == 0 {
+					continue
 				}
+				if _, found := tickets[e.K("id").String().Value]; found {
+					continue
+				}
+
+				vulnId := e.K("id").String().Value
+
+				issueDetailUrl := url.URL{Host: host, Path: fmt.Sprintf("/v3/orgs/%s/issues/detail/code/%s", flags.mandatoryFlags.orgID, vulnId), RawQuery: "&version=2021-08-20~experimental"}
+
+				// get the details of this code issue id
+				responseIssueDetail, err := makeSnykAPIRequest("GET", issueDetailUrl.String(), flags.mandatoryFlags.apiToken, nil, customDebug)
+				if err != nil {
+					log.Printf("*** ERROR *** Could not get code issues list from %s org %s project %s", flags.mandatoryFlags.endpointAPI, flags.mandatoryFlags.orgID, projectID)
+					continue
+				}
+
+				jsonIssueDetail, er := jsn.NewJson(responseIssueDetail)
+				if er != nil {
+					log.Printf("*** ERROR *** Json creation failed\n")
+					continue
+				}
+
+				bytes, err := json.Marshal(jsonIssueDetail)
+				if err != nil {
+					continue
+				}
+				json.Unmarshal(bytes, &issueDetail)
+
+				// checking if the issue is ignored
+				if e.K("attributes").K("ignored").Bool().Value == true {
+					continue
+				}
+
+				issueDetail["title"] = e.K("attributes").K("title").String().Value
+
+				marshalledjsonIssueDetail, err := json.Marshal(issueDetail)
+				fullCodeIssueDetail[vulnId], err = jsn.NewJson(marshalledjsonIssueDetail)
+				if er != nil {
+					log.Printf("*** ERROR *** Json creation failed\n")
+					log.Fatalln(er)
+				}
+
 			}
 
 			if len(jsonData.K("links").K("next").String().Value) > 0 {
-				url = endpointAPI + jsonData.K("links").K("next").String().Value
+				log.Printf("*** INFO *** Fetching next page: %s", jsonData.K("links").K("next").String().Value)
+				nextPointer := jsonData.K("links").K("next").String().Value
+				u, err := url.Parse(nextPointer)
+				if err != nil {
+					log.Fatal(err)
+				}
+				projectIssuesUrl = url.URL{Scheme: "https", Host: host, Path: u.Path, RawQuery: u.Query().Encode()}
 			} else {
 				break
 			}

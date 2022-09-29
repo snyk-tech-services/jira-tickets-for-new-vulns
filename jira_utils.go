@@ -191,7 +191,8 @@ func formatCodeJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 	return jiraTicket
 }
 
-/***
+/*
+**
 function addMandatoryFieldToTicket
 input []byte ticket, ticket previously created without any mandatory fields
 input map[string]interface{} customMandatoryField, the new mandatory field
@@ -200,7 +201,8 @@ return []byte ticket
 Loop through the mandatory fields
 create a list of key value pair for each
 and add it to the ticket
-***/
+**
+*/
 func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]interface{}, customDebug debug) []byte {
 
 	unmarshalledTicket := make(map[string]interface{})
@@ -251,16 +253,20 @@ func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]in
 	return newMarshalledTicket
 }
 
-/***
+/*
+**
 function supportJiraFormats
 input interface{} v, previous custom value
 input debug
 return interface{}
 replace any custom values which start with "jiraValue-" with the proper formatting for jira
 Usage: customfield_10601:
-      value: jira-MultiGroupPicker-Value1,Value2
+
+	value: jira-MultiGroupPicker-Value1,Value2
+
 https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/
-***/
+**
+*/
 func supportJiraFormats(v string, customDebug debug) (result interface{}) {
 
 	valueSplit := strings.Split(v, "-")

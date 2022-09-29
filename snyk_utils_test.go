@@ -9,10 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Test MakeSnykRequest function
-
-//makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body []byte) []byte
-
 func TestMakeSnykRequestFunc(t *testing.T) {
 	// should use the verb, the token, the url, and the body if POST
 	// return the body we send to check it works as expected

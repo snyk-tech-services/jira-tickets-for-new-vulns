@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-/// test flags setting
+// / test flags setting
 func TestSetOptionFunc(t *testing.T) {
 
 	assert := assert.New(t)
@@ -49,7 +49,7 @@ func TestSetOptionFunc(t *testing.T) {
 	assert.Equal(mandatoryResult, &options.mandatoryFlags)
 }
 
-//checking that the option override the configFile
+// checking that the option override the configFile
 func TestSetOptionMixFunc(t *testing.T) {
 
 	assert := assert.New(t)
