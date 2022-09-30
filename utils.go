@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"reflect"
+	"strings"
 	"time"
 
 	"github.com/spf13/pflag"
@@ -13,9 +15,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-/***
+/*
+**
 Function setDebug and getDebug
-***/
+**
+*/
 func (m *debug) setDebug(b bool) {
 	m.PrintDebug = b
 }
@@ -24,11 +28,13 @@ func (m *debug) getDebug() bool {
 	return m.PrintDebug
 }
 
-/***
+/*
+**
 Function Debug
 check if flag is set
 print debug
-***/
+**
+*/
 func (m *debug) Debug(args ...interface{}) {
 	if m.PrintDebug {
 		m.Print(args...)
@@ -39,11 +45,13 @@ func (m *debug) Print(args ...interface{}) {
 	log.Print(args...)
 }
 
-/***
+/*
+**
 Function Debugf
 check if flag is set
 print debug with formatting directive
-***/
+**
+*/
 func (m *debug) Debugf(format string, args ...interface{}) {
 	if m.PrintDebug {
 		m.Printf(format, args...)
@@ -54,10 +62,12 @@ func (m *debug) Printf(format string, args ...interface{}) {
 	log.Printf(format, args...)
 }
 
-/***
+/*
+**
 Function setOption
 set the mandatory flags structure
-***/
+**
+*/
 func (Mf *MandatoryFlags) setMandatoryFlags(apiTokenPtr *string, v viper.Viper) {
 
 	Mf.orgID = v.GetString("snyk.orgID")
@@ -71,10 +81,12 @@ func (Mf *MandatoryFlags) setMandatoryFlags(apiTokenPtr *string, v viper.Viper) 
 	Mf.checkMandatoryAreSet()
 }
 
-/***
+/*
+**
 Function setOption
 set the optional flags structure
-***/
+**
+*/
 func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper.Viper) {
 
 	Of.projectID = v.GetString("snyk.projectID")
@@ -94,10 +106,12 @@ func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper
 	Of.ifUpgradeAvailableOnly = v.GetBool("snyk.ifUpgradeAvailableOnly")
 }
 
-/***
+/*
+**
 Function resetFlag
 reset commands line flags
-***/
+**
+*/
 func resetFlag() {
 
 	pflag.VisitAll(func(f *pflag.Flag) {
@@ -106,11 +120,13 @@ func resetFlag() {
 
 }
 
-/***
+/*
+**
 Function setOption
 get the arguments
 set the flags structures
-***/
+**
+*/
 func (opt *flags) setOption(args []string) {
 
 	var apiTokenPtr *string
@@ -178,7 +194,7 @@ func (opt *flags) setOption(args []string) {
 		v.AddConfigPath(".")
 	}
 
-	configFile, configFileLocation := CheckConfigFileFormat(*configFilePtr)
+	configFile, configFileLocation := CheckConfigPresent(*configFilePtr)
 
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -188,13 +204,8 @@ func (opt *flags) setOption(args []string) {
 		}
 	}
 
-	// Get any mandatory custom jira configuration
-	// needed to open a jira ticket
-	// don't do something not needed
-	if v.Get("jira.customMandatoryFields") != nil {
-		log.Println("*** INFO *** Detected custom Jira fields configuration, trying to parse the data")
-		opt.customMandatoryJiraFields = findCustomJiraMandatoryFlags(configFile)
-	}
+	customMandatoryJiraFields := CheckConfigFileFormat(configFile)
+	opt.customMandatoryJiraFields = customMandatoryJiraFields
 
 	// Setting the flags structure
 	opt.mandatoryFlags.setMandatoryFlags(apiTokenPtr, *v)
@@ -204,10 +215,12 @@ func (opt *flags) setOption(args []string) {
 	opt.checkFlags()
 }
 
-/***
+/*
+**
 Function checkMandatoryAreSet
 exit if the mandatory flags are missing
-***/
+**
+*/
 func (flags *MandatoryFlags) checkMandatoryAreSet() {
 	if len(flags.orgID) == 0 || len(flags.apiToken) == 0 || (len(flags.jiraProjectID) == 0 && len(flags.jiraProjectKey) == 0) {
 		log.Println("*** ERROR *** Missing required flag(s). Please ensure orgID, token, jiraProjectID or jiraProjectKey are set.")
@@ -215,13 +228,16 @@ func (flags *MandatoryFlags) checkMandatoryAreSet() {
 	}
 }
 
-/***
+/*
+**
 Function checkFlags
 check flags rules
 To work properly with jira these needs to be respected:
-	- set only jiraProjectID or jiraProjectKey, not both
-	- priorityScoreThreshold must be between 0 and 1000
-***/
+  - set only jiraProjectID or jiraProjectKey, not both
+  - priorityScoreThreshold must be between 0 and 1000
+
+**
+*/
 func (flags *flags) checkFlags() {
 	if flags.mandatoryFlags.jiraProjectID != "" && flags.mandatoryFlags.jiraProjectKey != "" {
 		log.Fatalf(("*** ERROR *** You passed both jiraProjectID and jiraProjectKey in parameters\n Please, Use jiraProjectID OR jiraProjectKey, not both"))
@@ -232,12 +248,14 @@ func (flags *flags) checkFlags() {
 	}
 }
 
-/***
+/*
+**
 function CreateLogFile
 return filename: string
 argument: debug
 Check if the file exist if not create it
-***/
+**
+*/
 func CreateLogFile(customDebug debug) string {
 
 	// Get date
@@ -257,12 +275,14 @@ func CreateLogFile(customDebug debug) string {
 	return filename
 }
 
-/***
+/*
+**
 function getDate
 return date: string
 argument: none
 return a string containing date and time
-***/
+**
+*/
 func getDate() string {
 
 	now := time.Now().Round(0)
@@ -276,12 +296,14 @@ func getDate() string {
 	return y + m + d + h + min + s
 }
 
-/***
+/*
+**
 function getDate
 return date: string
 argument: none
 return a string containing date and time
-***/
+**
+*/
 func getDateDayOnly() string {
 
 	now := time.Now().Round(0)
@@ -292,14 +314,16 @@ func getDateDayOnly() string {
 	return y + m + d
 }
 
-/***
+/*
+**
 function writeLogFile
 return date: string
 input: map[string]interface{} logFile: details of the ticket to be written in the file
 input: string filename: name of the file created in the main function
 input: customDebug debug
 Write the logFile in the file. Details are append to the file per project ID
-***/
+**
+*/
 func writeLogFile(logFile map[string]map[string]interface{}, filename string, customDebug debug) {
 
 	// If the file doesn't exist => exit, append to the file otherwise
@@ -354,22 +378,26 @@ func writeErrorFile(errorText string, customDebug debug) {
 	return
 }
 
-/***
+/*
+**
 function IsTestRun
 return: none
 input: boolean
 check is the EXECUTION_ENVIRONMENT env is set
-***/
+**
+*/
 func IsTestRun() bool {
 	return os.Getenv("EXECUTION_ENVIRONMENT") == "test"
 }
 
-/***
+/*
+**
 function findCustomJiraMandatoryFlags
 return: map[string]interface{} : list of mandatory fields and value associated
 input: none
 Read the config file and extract the jira fields than the mandatory field inside it
-***/
+**
+*/
 func findCustomJiraMandatoryFlags(yamlFile []byte) map[string]interface{} {
 	config := make(map[interface{}]interface{})
 	yamlCustomJiraMandatoryField := make(map[interface{}]interface{})
@@ -414,12 +442,14 @@ func findCustomJiraMandatoryFlags(yamlFile []byte) map[string]interface{} {
 	return jsonCustomJiraMandatoryField
 }
 
-/***
+/*
+**
 function convertYamltoJson
 input map[interface{}]interface{}, type from unmarshalling yaml
 return map[string]interface{} ticket type from unmarshalling json
 convert the type we get from yaml to a json one
-***/
+**
+*/
 func convertYamltoJson(m map[interface{}]interface{}) map[string]interface{} {
 	res := map[string]interface{}{}
 	for k, v := range m {
@@ -433,13 +463,266 @@ func convertYamltoJson(m map[interface{}]interface{}) map[string]interface{} {
 	return res
 }
 
-/***
+/*
+**
 function CheckConfigFileFormat
 input path string, path to the config file
 return []byte config file
 Try to read the yaml file. If this fails the config file is not valid yaml
-***/
-func CheckConfigFileFormat(path string)([]byte, string) {
+**
+*/
+func CheckConfigFileFormat(yamlFile []byte) map[string]interface{} {
+
+	// Check that each field in the file are supported by the tool
+	config := make(map[interface{}]interface{})
+
+	err := yaml.Unmarshal(yamlFile, &config)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file", err)
+	}
+
+	// extract and check snyk fields
+	snykValues := config["snyk"]
+	if !checkSnykValue(snykValues) {
+		log.Fatal()
+	}
+
+	// extract and check jira fields
+	jiraValues := config["jira"]
+	success, customFields := checkJiraValue(jiraValues)
+	if !success {
+		log.Fatal()
+	}
+
+	return customFields
+}
+
+func checkSnykValue(snykValues interface{}) bool {
+
+	isSnykConfigOk := true
+
+	unMarshalledSnykValues := make(map[interface{}]interface{})
+
+	marshalledSnykValues, err := yaml.Marshal(snykValues)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'snyk' config", err)
+	}
+
+	err = yaml.Unmarshal(marshalledSnykValues, &unMarshalledSnykValues)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'snyk' config", err)
+	}
+
+	unMarshalledSnykValuesJson := convertYamltoJson(unMarshalledSnykValues)
+
+	for key, value := range unMarshalledSnykValuesJson {
+
+		// first check the key is supported
+		switch key {
+		// check the type of the value is valid
+		case "projectID":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "api":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "orgID":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "projectCriticality":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "projectLifecycle":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "projectEnvironment":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "severity":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "type":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "maturityFilter":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "priorityScoreThreshold":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "int" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be an integer", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "ifUpgradeAvailableOnly":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "bool" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a boolean", key, reflect.TypeOf(value).String())
+				return false
+			}
+		default:
+			log.Printf("*** ERROR *** Please check the format config file, the snyk key %s is not supported by this tool", key)
+			return false
+		}
+	}
+
+	return isSnykConfigOk
+}
+
+func checkJiraValue(JiraValues interface{}) (bool, map[string]interface{}) {
+
+	isJiraConfigOk := true
+
+	yamlCustomJiraMandatoryField := make(map[interface{}]interface{})
+	unMarshalledJiraValues := make(map[interface{}]interface{})
+	customMandatoryJiraFields := make(map[string]interface{})
+
+	marshalledJiraValues, err := yaml.Marshal(JiraValues)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'snyk' config", err)
+	}
+
+	err = yaml.Unmarshal(marshalledJiraValues, &unMarshalledJiraValues)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'snyk' config", err)
+	}
+
+	unMarshalledJiraValuesJson := convertYamltoJson(unMarshalledJiraValues)
+
+	for key, value := range unMarshalledJiraValuesJson {
+
+		// first check the key is supported
+		switch key {
+		// check the type of the value is valid
+		case "jiraProjectID":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "int" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be an integer", key, reflect.TypeOf(value).String())
+				return false, nil
+			}
+		case "jiraProjectKey":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false, nil
+			}
+		case "jiraTicketType":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false, nil
+			}
+		case "assigneeId":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "int" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be an integer", key, reflect.TypeOf(value).String())
+				return false, nil
+			}
+		case "labels":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false, nil
+			}
+		case "priorityIsSeverity":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "bool" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false, nil
+			}
+		case "customMandatoryFields":
+			customJiraMandatoryField_ := unMarshalledJiraValues["customMandatoryFields"]
+			isJiraConfigOk_, customMandatoryJiraFields_ := checkMandatoryField(customJiraMandatoryField_, yamlCustomJiraMandatoryField)
+			isJiraConfigOk = isJiraConfigOk_
+			customMandatoryJiraFields = customMandatoryJiraFields_
+
+		default:
+			log.Printf("*** ERROR *** Please check the format config file, the jira key %s is not supported by this tool", key)
+			return false, nil
+		}
+	}
+
+	return isJiraConfigOk, customMandatoryJiraFields
+}
+
+func checkMandatoryField(customJiraMandatoryField_ interface{}, yamlCustomJiraMandatoryField map[interface{}]interface{}) (bool, map[string]interface{}) {
+
+	jsonCustomJiraMandatoryField := make(map[string]interface{})
+	fields := make(map[string]interface{})
+
+	marshalCustomJiraMandatoryField, err := yaml.Marshal(customJiraMandatoryField_)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'customMandatoryFields' config", err)
+	}
+
+	err = yaml.Unmarshal(marshalCustomJiraMandatoryField, &yamlCustomJiraMandatoryField)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'customMandatoryFields' config", err)
+	}
+
+	// converting the type, the yaml type is not compatible with the json one
+	// json doesn't understand map[interface{}]interface{} => it will fail
+	// when marshalling the ticket in a json format
+	jsonCustomJiraMandatoryField = convertYamltoJson(yamlCustomJiraMandatoryField)
+
+	for i, s := range jsonCustomJiraMandatoryField {
+
+		value, ok := s.(map[string]interface{})
+		if ok {
+			v, ok := value["value"].(string)
+			if ok {
+				if strings.HasPrefix(v, JiraPrefix) {
+					s, err = supportJiraFormats(v, debug{PrintDebug: false})
+					if err != nil {
+						log.Printf("*** ERROR *** Error while extracting the mandatory Jira fields configuration\n %s", err)
+						return false, nil
+					}
+				}
+			}
+		} else {
+			log.Println(fmt.Sprintf("*** ERROR *** Expected mandatory Jira fields configuration to be in format map[string]interface{}, received type: %T for field %s ", s, i))
+			return false, nil
+		}
+		fields[i] = s
+	}
+	return true, fields
+}
+
+/*
+**
+function CheckConfigFileFormat
+input path string, path to the config file
+return []byte config file
+Try to read the yaml file. If this fails the config file is not valid yaml
+**
+*/
+func CheckConfigPresent(path string) ([]byte, string) {
 
 	if len(path) == 0 {
 		path = "."

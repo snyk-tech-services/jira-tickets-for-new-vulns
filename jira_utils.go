@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -191,16 +192,16 @@ func formatCodeJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 	return jiraTicket
 }
 
-/***
+/*
+**
 function addMandatoryFieldToTicket
 input []byte ticket, ticket previously created without any mandatory fields
 input map[string]interface{} customMandatoryField, the new mandatory field
 input debug
 return []byte ticket
-Loop through the mandatory fields
-create a list of key value pair for each
-and add it to the ticket
-***/
+Add the mandatory fields extracted during setup to the ticket
+**
+*/
 func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]interface{}, customDebug debug) []byte {
 
 	unmarshalledTicket := make(map[string]interface{})
@@ -225,19 +226,6 @@ func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]in
 	}
 
 	for i, s := range customMandatoryField {
-
-		value, ok := s.(map[string]interface{})
-		if ok {
-			v, ok := value["value"].(string)
-			if ok {
-				if strings.HasPrefix(v, JiraPrefix) {
-					s = supportJiraFormats(v, customDebug)
-				}
-			}
-		} else {
-			customDebug.Debug(fmt.Sprintf("*** ERROR *** Expected mandatory Jira fields configuration to be in format map[string]interface{}, received type: %T for field %s ", s, i))
-		}
-
 		fields[i] = s
 	}
 
@@ -251,17 +239,21 @@ func addMandatoryFieldToTicket(ticket []byte, customMandatoryField map[string]in
 	return newMarshalledTicket
 }
 
-/***
+/*
+**
 function supportJiraFormats
 input interface{} v, previous custom value
 input debug
 return interface{}
 replace any custom values which start with "jiraValue-" with the proper formatting for jira
 Usage: customfield_10601:
-      value: jira-MultiGroupPicker-Value1,Value2
+
+	value: jira-MultiGroupPicker-Value1,Value2
+
 https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-create-issue-7897248/
-***/
-func supportJiraFormats(v string, customDebug debug) (result interface{}) {
+**
+*/
+func supportJiraFormats(v string, customDebug debug) (result interface{}, err error) {
 
 	valueSplit := strings.Split(v, "-")
 
@@ -276,7 +268,11 @@ func supportJiraFormats(v string, customDebug debug) (result interface{}) {
 			list = append(list, data)
 		}
 
+		if len(list) == 0 {
+			return nil, errors.New("Custom field format JiraMultiSelect not recognized, please check the config file.")
+		}
 		result = list
+
 	case JiraMultiGroupPicker:
 		list := make([]map[string]string, 0)
 		// add each selection to the collection
@@ -287,6 +283,10 @@ func supportJiraFormats(v string, customDebug debug) (result interface{}) {
 			list = append(list, data)
 		}
 
+		if len(list) == 0 {
+			return nil, errors.New("Custom field format JiraMultiGroupPicker not recognized, please check the config file.")
+		}
+
 		result = list
 	case JiraLabels:
 		list := []string{}
@@ -294,14 +294,27 @@ func supportJiraFormats(v string, customDebug debug) (result interface{}) {
 			list = append(list, x)
 		}
 
+		if len(list) == 0 {
+			return nil, errors.New("Custom field format JiraLabels not recognized, please check the config file.")
+		}
+
 		result = list
 
 	case JiraSimpleField:
 
+		if len(valueSplit[2]) == 0 {
+			return nil, errors.New("Custom field format JiraSimpleField not recognized, please check the config file.")
+		}
+
 		result = valueSplit[2]
+
+	default:
+		return nil, errors.New("Custom field format not recognized, please check the config file.")
 	}
 
-	customDebug.Debug(fmt.Sprintf("*** INFO *** Custom field value '%s' replaced with '%s' ", v, result))
+	if customDebug.PrintDebug {
+		customDebug.Debug(fmt.Sprintf("*** INFO *** Custom field value '%s' replaced with '%s' ", v, result))
+	}
 
-	return result
+	return result, nil
 }

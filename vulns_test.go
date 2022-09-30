@@ -106,7 +106,7 @@ func TestNoVulnOrLicense(t *testing.T) {
 	var maturityLevels []string
 
 	response, skippedIssues, _ := getVulnsWithoutTicket(flags, "123", maturityLevels, tickets, cD)
-	//fmt.Println(response)
+
 	assert.Equal(0, len(response))
 	assert.Equal(0, len(skippedIssues))
 

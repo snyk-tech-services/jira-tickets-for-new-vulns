@@ -28,9 +28,6 @@ func main() {
 
 	customDebug.Debug("*** INFO *** options.optionalFlags: ", options.optionalFlags)
 
-	// check flags are set according to rules
-	options.checkFlags()
-
 	maturityFilter := createMaturityFilter(strings.Split(options.optionalFlags.maturityFilterString, ","))
 	numberIssueCreated := 0
 	notCreatedJiraIssues := ""
