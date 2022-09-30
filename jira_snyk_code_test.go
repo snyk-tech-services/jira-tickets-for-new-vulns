@@ -267,7 +267,7 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeId(t *testing.T) {
 	}
 
 	assert.Equal(NotCreatedIssueId, "")
-	fmt.Println(numberIssueCreated)
+	assert.Equal(1, numberIssueCreated)
 	assert.NotNil(tickets)
 	assert.Equal(string(readFixture("./fixtures/snyk_code_fixtures/results/codeTicketWithAssigneeId.json")), string(mirroredResponse.Body))
 
