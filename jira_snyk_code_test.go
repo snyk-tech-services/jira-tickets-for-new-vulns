@@ -442,7 +442,7 @@ func TestGetSnykCodeIssueWithoutTicketsWithPagination(t *testing.T) {
 
 	// setting mandatory options
 	Mf := MandatoryFlags{}
-	Mf.orgID = "123"
+	Mf.orgID = "xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx"
 	Mf.endpointAPI = server.URL
 	Mf.apiToken = "123"
 	Mf.jiraProjectID = "123"
@@ -458,7 +458,7 @@ func TestGetSnykCodeIssueWithoutTicketsWithPagination(t *testing.T) {
 	Of.assigneeID = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
-	Of.projectID = ""
+	Of.projectID = "xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx"
 	Of.maturityFilterString = ""
 	Of.ifUpgradeAvailableOnly = false
 
@@ -477,7 +477,11 @@ func TestGetSnykCodeIssueWithoutTicketsWithPagination(t *testing.T) {
 
 	response, _ := getSnykCodeIssueWithoutTickets(flags, "1234", tickets, cD)
 
-	assert.Equal(2, len(response))
+	assert.Equal(4, len(response))
+	assert.NotEmpty(response["bbbbbbb-83dd-xx65-8730-2xxx4467e00q"], "bbbbbbb-83dd-xx65-8730-2xxx4467e00q id exists in map")
+	assert.NotEmpty(response["xxbac5ed-83dd-xx65-8730-2xxx4467e00q"], "xxbac5ed-83dd-xx65-8730-2xxx4467e00q exists in map")
+	assert.NotEmpty(response["xxbac5ed-critical2-xx65-8730-2xxx4467e00q"], "xxbac5ed-critical2-xx65-8730-2xxx4467e00q exists in map")
+	assert.NotEmpty(response["xxbac5ed-critical1-xx65-8730-2xxx4467e00q"], "xxbac5ed-critical1-xx65-8730-2xxx4467e00q exists in map")
 
 	return
 

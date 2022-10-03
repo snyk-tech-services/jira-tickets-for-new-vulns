@@ -1,0 +1,25 @@
+{
+  "jsonapi": { "version": "1.0" },
+  "data": [
+    {
+      "type": "issue_summary",
+      "id": "xxbac5ed-critical1-xx65-8730-2xxx4467e00q",
+      "attributes": {
+        "issueType": "code",
+				"title": "Use of Hardcoded Credentials",
+				"severity": "critical",
+				"ignored": false,
+				"cwe": [
+					"CWE-798",
+					"CWE-259"
+				]
+      },
+      "links": {
+        "self": "/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental?limit=10&severity=critical&starting_after=v1.eyJwcmlvcml0eVNjb3JlIjo1NTgsImlkIjoiNjU5MDc3Mjg1In0%3D"
+      }
+    }
+  ],
+  "links": {
+    "previous": "/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental&severity=critical&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D"
+  }
+}

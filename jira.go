@@ -72,14 +72,18 @@ func getJiraTickets(Mf MandatoryFlags, projectID string, customDebug debug) (map
 	return tickRefs, err
 }
 
-/***
+/*
+**
 function openJiraTicket
 argument lots
 return responseData: request response from snyk API
 return error: if request or ticket creation failure
 create a ticket for a specific vuln
+
 	ticket is created and send to snyk jira ticket creation API endpoint
-***/
+
+**
+*/
 func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, customDebug debug) ([]byte, *Tickets, error, string) {
 
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
@@ -104,7 +108,7 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 	jiraTicket.Fields.IssueTypes.Name = flags.optionalFlags.jiraTicketType
 
 	projectInfoId := projectInfo.K("id").String().Value
-	var jiraApiUrl = flags.mandatoryFlags.endpointAPI+"/v1/org/"+flags.mandatoryFlags.orgID+"/project/"+projectInfoId+"/issue/"+vulnID+"/jira-issue"
+	var jiraApiUrl = flags.mandatoryFlags.endpointAPI + "/v1/org/" + flags.mandatoryFlags.orgID + "/project/" + projectInfoId + "/issue/" + vulnID + "/jira-issue"
 
 	if projectInfoId == "" {
 		return nil, nil, errors.New("Failure, Could not retrieve project ID"), jiraApiUrl
@@ -228,7 +232,7 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 
 		RequestFailed = false
 
-		customDebug.Debug("*** INFO *** Trying to open ticket for vuln:", jsonVuln.K("issueData").K("title"))
+		customDebug.Debug("*** INFO *** Trying to open ticket for vuln:", jsonVuln.K("issueData").K("title").String().Value)
 		responseDataAggregatedByte, ticket, err, jiraApiUrl := openJiraTicket(flags, projectInfo, vulnForJira, customDebug)
 		if err != nil {
 			customDebug.Debugf("*** ERROR *** Failed to open a Jira ticket via Snyk API: %s\nERROR:%s", jiraApiUrl, err)
