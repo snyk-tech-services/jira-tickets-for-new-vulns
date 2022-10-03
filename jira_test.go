@@ -696,7 +696,6 @@ func TestAddMandatoryFieldToTicketCustomFieldLabel(t *testing.T) {
 
 	newTicket := addMandatoryFieldToTicket(ticket, customMandatoryJiraFields, cD)
 
-	println("newTicket ", newTicket)
 	newTicketFixture := readFixture("./fixtures/ticketJsonWithMandatoryFieldCustomJiraValueLabel.json")
 
 	assert.Equal(string(newTicket), string(newTicketFixture))
