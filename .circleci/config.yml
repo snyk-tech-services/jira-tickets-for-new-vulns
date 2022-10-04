@@ -13,7 +13,7 @@ jobs:
   build-test-monitor:
       docker:
         # specify the version
-        - image: circleci/golang:1.13
+        - image: cimg/go:1.19.0
 
       steps:
         - checkout
@@ -27,7 +27,7 @@ jobs:
   build-test:
       docker:
         # specify the version
-        - image: circleci/golang:1.13
+        - image: cimg/go:1.19.0
 
       steps:
         - checkout
@@ -36,7 +36,7 @@ jobs:
   build-test-from-fork:
       docker:
         # specify the version
-        - image: circleci/golang:1.13
+        - image: cimg/go:1.19.0
 
       steps:
         - checkout

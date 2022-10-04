@@ -85,7 +85,7 @@ func getProjectsIds(options flags, customDebug debug) ([]string, error) {
 	var projectId []string
 	if len(options.optionalFlags.projectID) == 0 {
 		filters := "projectCriticality: " + options.optionalFlags.projectCriticality + "\n projectEnvironment: " + options.optionalFlags.projectEnvironment + "\n projectLifecycle: " + options.optionalFlags.projectLifecycle
-		log.Println("*** INFO *** Project ID not specified - listing all projects that match the following filers: ", filters)
+		log.Println("*** INFO *** Project ID not specified - listing all projects that match the following filters: ", filters)
 
 		projects, err := getOrgProjects(options, customDebug)
 		if err != nil {

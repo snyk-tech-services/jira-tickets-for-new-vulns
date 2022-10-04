@@ -362,7 +362,7 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 			}
 
 			if len(jsonData.K("links").K("next").String().Value) > 0 {
-				url = endpointAPI + jsonData.K("links").K("next").String().Value
+				url = endpointAPI + "/v3" + jsonData.K("links").K("next").String().Value
 			} else {
 				break
 			}

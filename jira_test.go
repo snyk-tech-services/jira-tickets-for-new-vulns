@@ -674,7 +674,7 @@ func TestAddMandatoryFieldToTicketCustomField(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": map[string]interface{}{"value": "jiraValue-MultiGroupPicker-Value1,Value2"}, "transition": map[string]interface{}{"id": 5}}
+	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": []map[string]string{map[string]string{"name": "Value1"}, map[string]string{"name": "Value2"}}, "transition": map[string]interface{}{"id": 5}}
 
 	newTicket := addMandatoryFieldToTicket(ticket, customMandatoryJiraFields, cD)
 
@@ -692,11 +692,10 @@ func TestAddMandatoryFieldToTicketCustomFieldLabel(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": map[string]interface{}{"value": "jiraValue-Labels-Value1,Value2"}, "transition": map[string]interface{}{"id": 5}}
+	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": []string{"Value1", "Value2"}, "transition": map[string]interface{}{"id": 5}}
 
 	newTicket := addMandatoryFieldToTicket(ticket, customMandatoryJiraFields, cD)
 
-	println("newTicket ", newTicket)
 	newTicketFixture := readFixture("./fixtures/ticketJsonWithMandatoryFieldCustomJiraValueLabel.json")
 
 	assert.Equal(string(newTicket), string(newTicketFixture))
@@ -711,11 +710,10 @@ func TestAddMandatoryFieldToTicketCustomFieldSimpleField(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": map[string]interface{}{"value": "jiraValue-simpleField-some value to add to the ticket"}, "transition": map[string]interface{}{"id": 5}}
+	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": "some value to add to the ticket", "transition": map[string]interface{}{"id": 5}}
 
 	newTicket := addMandatoryFieldToTicket(ticket, customMandatoryJiraFields, cD)
 
-	println("newTicket ", string(newTicket))
 	newTicketFixture := readFixture("./fixtures/ticketJsonWithMandatoryFieldCustomJiraValueSimpleField.json")
 
 	assert.Equal(string(newTicket), string(newTicketFixture))

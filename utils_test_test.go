@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-/// test flags setting
+// / test flags setting
 func TestSetOptionFunc(t *testing.T) {
 
 	assert := assert.New(t)
@@ -49,7 +49,7 @@ func TestSetOptionFunc(t *testing.T) {
 	assert.Equal(mandatoryResult, &options.mandatoryFlags)
 }
 
-//checking that the option override the configFile
+// checking that the option override the configFile
 func TestSetOptionMixFunc(t *testing.T) {
 
 	assert := assert.New(t)
@@ -133,6 +133,7 @@ func TestSetOption(t *testing.T) {
 		priorityScoreThreshold: 20,
 		projectID:              "",
 		severity:               "critical",
+		ifUpgradeAvailableOnly: true,
 	}
 
 	customMandatoryJiraFields := map[string]interface{}{"Something": map[string]interface{}{"Value": "This is a summary"}, "transition": map[string]interface{}{"id": 5}}
@@ -182,8 +183,7 @@ func TestSetOptionWithCustomMandatoryField(t *testing.T) {
 		severity:               "critical",
 	}
 
-	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": map[string]interface{}{"value": "jiraValue-simpleField-some value to add to the ticket"}}
-
+	customMandatoryJiraFields := map[string]interface{}{"customfield_10601": "some value to add to the ticket", "customfield_10602": []string{"Value1", "Value2"}, "customfield_10603": []map[string]string{map[string]string{"name": "Value1"}, map[string]string{"name": "Value2"}}}
 	assert.Equal(optionalResult, &options.optionalFlags)
 	assert.Equal(mandatoryResult, &options.mandatoryFlags)
 	assert.Equal(customMandatoryJiraFields, options.customMandatoryJiraFields)
