@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/michael-go/go-jsn/jsn"
@@ -290,6 +291,7 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 	}
 
 	for _, severityIndexValue := range severity {
+		fmt.Println("test1")
 
 		url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues?project_id=" + projectID + "&version=2021-08-20~experimental"
 		if len(flags.optionalFlags.severity) > 0 {
