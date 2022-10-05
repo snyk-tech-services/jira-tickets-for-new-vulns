@@ -11,7 +11,7 @@ Aimed to be executed at regular interval or with a trigger of your choice (webho
 
 ## Installation
 You can either download the binaries fron the from [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
-or 
+or
 Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
 ## Usage - Quick start
@@ -291,9 +291,9 @@ jira:
     customMandatoryFields:
         key:
             value: 5
-        customfield_10601: 
+        customfield_10601:
           value: jiraValue-MultiGroupPicker-Value1,Value2
-        customfield_10602: 
+        customfield_10602:
           value: jiraValue-simpleField-something to add to the ticket
 ```
 

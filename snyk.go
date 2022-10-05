@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 
@@ -55,7 +56,8 @@ func getOrgProjects(flags flags, customDebug debug) (jsn.Json, error) {
 		marshalledBody, err = json.Marshal(body)
 		if err != nil {
 			log.Printf("*** ERROR *** Not able to read attributes %s\n", projectsAPI)
-			errorMessage := "Failure, Not able to read attributes\n"
+			errorMessage := fmt.Sprintf("Failure, Not able to read attributes\n")
+			writeErrorFile("getOrgProjects", errorMessage, customDebug)
 			err = errors.New(errorMessage)
 			verb = "GET"
 			marshalledBody = nil
@@ -66,21 +68,23 @@ func getOrgProjects(flags flags, customDebug debug) (jsn.Json, error) {
 	if err != nil {
 		filters := "projectCriticality: " + flags.optionalFlags.projectCriticality + "\n projectEnvironment: " + flags.optionalFlags.projectEnvironment + "\n projectLifecycle: " + flags.optionalFlags.projectLifecycle
 		log.Printf("*** ERROR *** Could not list the Project(s) for endpoint %s\n Applied Filters: %s\n", projectsAPI, filters)
-		errorMessage := "Failure, Could not list the Project(s) for endpoint " + projectsAPI + ".\n" + "Applied filters: " + filters
+		errorMessage := fmt.Sprintf("Failure, Could not list the Project(s) for endpoint %s .\n Applied filters: %s\n", projectsAPI, filters)
+		writeErrorFile("getOrgProjects", errorMessage, customDebug)
 		err = errors.New(errorMessage)
 	}
 
 	project, err := jsn.NewJson(responseData)
 	if err != nil {
 		log.Printf("*** ERROR *** Could not get read the response from endpoint %s\n", projectsAPI)
-		errorMessage := "Failure, Could not get read the response from endpoint " + projectsAPI + "\n"
+		errorMessage := fmt.Sprintf("Failure, Could not get read the response from endpoint %s ", projectsAPI)
+		writeErrorFile("getOrgProjects", errorMessage, customDebug)
 		err = errors.New(errorMessage)
 	}
 
 	return project, err
 }
 
-func getProjectsIds(options flags, customDebug debug) ([]string, error) {
+func getProjectsIds(options flags, customDebug debug, notCreatedLogFile string) ([]string, error) {
 
 	var projectId []string
 	if len(options.optionalFlags.projectID) == 0 {
@@ -89,6 +93,8 @@ func getProjectsIds(options flags, customDebug debug) ([]string, error) {
 
 		projects, err := getOrgProjects(options, customDebug)
 		if err != nil {
+			message := fmt.Sprintf("error while getting projects ID for org %s", options.mandatoryFlags.orgID)
+			writeErrorFile("getProjectsIds", message, customDebug)
 			return nil, err
 		}
 
@@ -98,7 +104,9 @@ func getProjectsIds(options flags, customDebug debug) ([]string, error) {
 		}
 
 		if len(projectId) == 0 {
-			return projectId, errors.New("Failure, Could not retrieve project ID")
+			ErrorMessage := fmt.Sprintf("Failure, Could not retrieve project ID")
+			writeErrorFile("getProjectsIds", ErrorMessage, customDebug)
+			return projectId, errors.New(ErrorMessage)
 		}
 		return projectId, nil
 	}
@@ -112,14 +120,16 @@ func getProjectDetails(Mf MandatoryFlags, projectID string, customDebug debug) (
 	responseData, err := makeSnykAPIRequest("GET", Mf.endpointAPI+"/v1/org/"+Mf.orgID+"/project/"+projectID, Mf.apiToken, nil, customDebug)
 	if err != nil {
 		log.Printf("*** ERROR *** Could not get the Project detail for endpoint %s\n", Mf.endpointAPI)
-		errorMessage := "Failure, Could not get the Project detail for endpoint " + Mf.endpointAPI + "\n"
+		errorMessage := fmt.Sprintf("Failure, Could not get the Project detail for endpoint %s\n", Mf.endpointAPI)
 		err = errors.New(errorMessage)
+		writeErrorFile("getProjectDetails", errorMessage, customDebug)
 	}
 
 	project, err := jsn.NewJson(responseData)
 	if err != nil {
-		errorMessage := "Failure, Could not read the Project detail for endpoint " + Mf.endpointAPI + "\n"
+		errorMessage := fmt.Sprintf("Failure, Could not read the Project detail for endpoint %s\n", Mf.endpointAPI)
 		err = errors.New(errorMessage)
+		writeErrorFile("getProjectDetails", errorMessage, customDebug)
 	}
 
 	return project, err

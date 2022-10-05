@@ -42,7 +42,7 @@ func TestEndToEndFunc(t *testing.T) {
 	os.Stdout = rescueStdout
 
 	// Checking the log file
-	path, found := findLogFile()
+	path, found := findLogFile("listOfTicketCreated")
 
 	assert.FileExists(t, path)
 	assert.True(t, found)

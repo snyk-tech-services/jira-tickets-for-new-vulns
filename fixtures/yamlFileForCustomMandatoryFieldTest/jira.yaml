@@ -13,7 +13,7 @@ jira:
     customMandatoryFields:
         customfield_10601:
             value: jiraValue-simpleField-some value to add to the ticket
-        customfield_10602: 
+        customfield_10602:
             value: jiraValue-Labels-Value1,Value2
         customfield_10603:
             value: jiraValue-MultiGroupPicker-Value1,Value2

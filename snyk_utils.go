@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -86,10 +87,10 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 			if count >= 2 {
 				customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed too many times\n", endpointURL)
 				customDebug.Debugf("*** ERROR *** Ticket for this issue cannot be created. Skipping\n")
-				errorMessage := "*** ERROR *** Request on endpoint " + endpointURL + " failed too many times with 50x error\n" + "*** ERROR *** Ticket for this issue cannot be created. Skipping\n"
+				errorMessage := fmt.Sprintf("*** ERROR *** Request on endpoint %s failed too many times with 50x error\n *** ERROR *** Ticket for this issue cannot be created. Skipping\n", endpointURL)
 				// writing into the file
-				writeErrorFile(errorMessage, customDebug)
-				return nil, errors.New("Failed too many time with 50x errors") // skipping this
+				writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
+				return nil, errors.New("Failed too many times with 50x errors") // skipping this
 			}
 
 			count = count + 1
@@ -99,22 +100,30 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 
 	if response.StatusCode == 404 {
 		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		errorMessage := fmt.Sprintf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
 		return nil, errors.New("Not found, Request failed")
 	} else if response.StatusCode == 422 {
 		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
 		customDebug.Debugf("*** INFO *** Please check that all expected fields are present in the config file\n")
 		customDebug.Debugf("*** INFO *** Details : %s\n", string(responseData))
+		errorMessage := fmt.Sprintf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
 		return nil, errors.New("Unprocessable Entity, Request failed")
 	} else if response.StatusCode > 400 {
 		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
 		customDebug.Debugf("*** INFO *** Please check that all expected fields are present in the config file\n")
 		customDebug.Debugf("*** INFO *** Details : %s\n", string(responseData))
+		errorMessage := fmt.Sprintf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
 		return nil, errors.New("Request failed")
 	}
 
 	if err != nil {
 		if strings.Contains(strings.ToLower(string(responseData)), "error") {
 			customDebug.Debug(err)
+			errorMessage := fmt.Sprintf("*** INFO *** Retrying without the priority field\n")
+			writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
 			customDebug.Debug("*** INFO *** Retrying without the priority field")
 		}
 		return nil, errors.New("Request failed")

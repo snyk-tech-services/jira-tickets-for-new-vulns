@@ -86,11 +86,17 @@ func TestOpenJiraTicketCodeOnly(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	responseDataAggregatedByte, ticket, err, jiraApiUrl := openJiraTicket(flags, projectInfo, codeIssueForJira, cD)
+
+	fmt.Println(responseDataAggregatedByte, ticket, err, jiraApiUrl)
 
 	assert.NotNil(t, ticket)
 	assert.NotNil(t, jiraApiUrl)
 	assert.NotNil(t, responseDataAggregatedByte)
+
+	removeLogFile()
 
 }
 
@@ -139,6 +145,8 @@ func TestOpenJiraTicketCodeOnlyWithLabel(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, codeIssueForJira, cD)
 
 	var mirroredResponse mirroredResponse
@@ -150,6 +158,8 @@ func TestOpenJiraTicketCodeOnlyWithLabel(t *testing.T) {
 	assert.Equal(1, numberIssueCreated)
 	assert.NotNil(tickets)
 	assert.Equal(string(readFixture("./fixtures/snyk_code_fixtures/results/codeTicketWithLabels.json")), string(mirroredResponse.Body))
+
+	removeLogFile()
 
 	return
 }
@@ -199,6 +209,8 @@ func TestOpenJiraTicketCodeOnlyWithSeverity(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, codeIssueForJira, cD)
 
 	var mirroredResponse mirroredResponse
@@ -210,6 +222,8 @@ func TestOpenJiraTicketCodeOnlyWithSeverity(t *testing.T) {
 	assert.Equal(numberIssueCreated, 1)
 	assert.NotNil(tickets)
 	assert.Equal(string(readFixture("./fixtures/snyk_code_fixtures/results/codeTicketWithSeverity.json")), string(mirroredResponse.Body))
+
+	removeLogFile()
 
 	return
 }
@@ -259,6 +273,8 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeId(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, codeIssueForJira, cD)
 
 	var mirroredResponse mirroredResponse
@@ -266,10 +282,12 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeId(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(NotCreatedIssueId, "")
-	fmt.Println(numberIssueCreated)
+	assert.NotNil(NotCreatedIssueId, "")
+	assert.NotNil(numberIssueCreated)
 	assert.NotNil(tickets)
 	assert.Equal(string(readFixture("./fixtures/snyk_code_fixtures/results/codeTicketWithAssigneeId.json")), string(mirroredResponse.Body))
+
+	removeLogFile()
 
 	return
 }
@@ -314,12 +332,16 @@ func TestGetSnykCodeIssueWithoutTickets(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	var tickets map[string]string
 	tickets = make(map[string]string)
 	// Simulate an existing ticket for that vuln
 	tickets["xxbac5ed-83dd-xx65-8730-2xxx4467e0xx"] = "FPI-454"
 
 	response, _ := getSnykCodeIssueWithoutTickets(flags, "789", tickets, cD)
+
+	removeLogFile()
 
 	assert.Equal(2, len(response))
 
@@ -372,7 +394,12 @@ func TestGetSnykCodeIssueWithoutTicketsWithIgnored(t *testing.T) {
 	// Simulate an existing ticket for that vuln
 	tickets["xxbac5ed-83dd-xx65-8730-2xxx4467e0xx"] = "FPI-454"
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	response, _ := getSnykCodeIssueWithoutTickets(flags, "7891", tickets, cD)
+
+	removeLogFile()
+
 	assert.Equal(1, len(response))
 
 	return
@@ -424,7 +451,11 @@ func TestGetSnykCodeIssueWithoutTicketsWithSeverityFilter(t *testing.T) {
 	// Simulate an existing ticket for that vuln
 	tickets["xxbac5ed-83dd-xx65-8730-2xxx4467e0xx"] = "FPI-454"
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	response, _ := getSnykCodeIssueWithoutTickets(flags, "789", tickets, cD)
+
+	removeLogFile()
 	assert.Equal(1, len(response))
 
 	return
@@ -474,6 +505,8 @@ func TestGetSnykCodeIssueWithoutTicketsWithPagination(t *testing.T) {
 	tickets = make(map[string]string)
 	// Simulate an existing ticket for that vuln
 	tickets["xxbac5ed-83dd-xx65-8730-2xxx4467e0xx"] = "FPI-454"
+
+	CreateLogFile(cD, "ErrorsFile_")
 
 	response, _ := getSnykCodeIssueWithoutTickets(flags, "1234", tickets, cD)
 
