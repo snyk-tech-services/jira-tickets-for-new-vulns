@@ -26,7 +26,7 @@ return path : string
 find log file and return path
 **
 */
-func findLogFile() (string, bool) {
+func findLogFile(fileType string) (string, bool) {
 
 	// list all file in the directory
 	fileInfo, err := ioutil.ReadDir(".")
@@ -34,12 +34,12 @@ func findLogFile() (string, bool) {
 		log.Fatal()
 	}
 
-	// Look for the one starting with listOfTicketCreated
+	// Look for the one starting with listOfTicketCreated or ErrorsFile
 	path := "./"
 	found := false
 	for _, file := range fileInfo {
 		if !file.IsDir() {
-			if strings.HasPrefix(file.Name(), "listOfTicketCreated") {
+			if strings.HasPrefix(file.Name(), fileType) {
 				path += file.Name()
 				found = true
 				break
@@ -61,7 +61,17 @@ clean logs after test
 func removeLogFile() {
 
 	// Find log file
-	path, found := findLogFile()
+	path, found := findLogFile("ErrorsFile")
+
+	if found {
+		// Delete the file created for the test
+		e := os.Remove(path)
+		if e != nil {
+			log.Fatal(e)
+		}
+	}
+
+	path, found = findLogFile("listOfTicketCreated")
 
 	if found {
 		// Delete the file created for the test
