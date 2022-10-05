@@ -45,6 +45,8 @@ func TestGetVulnsWithoutTicketFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	var tickets map[string]string
 	tickets = make(map[string]string)
 	// Simulate an existing ticket for that vuln
@@ -54,6 +56,8 @@ func TestGetVulnsWithoutTicketFunc(t *testing.T) {
 	response, skippedIssues, _ := getVulnsWithoutTicket(flags, "123", maturityLevels, tickets, cD)
 	assert.Equal(0, len(skippedIssues))
 	assert.Equal(2, len(response))
+
+	removeLogFile()
 
 	return
 }
@@ -101,6 +105,8 @@ func TestNoVulnOrLicense(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	var tickets map[string]string
 	tickets = make(map[string]string)
 	var maturityLevels []string
@@ -109,6 +115,8 @@ func TestNoVulnOrLicense(t *testing.T) {
 
 	assert.Equal(0, len(response))
 	assert.Equal(0, len(skippedIssues))
+
+	removeLogFile()
 
 	return
 }
@@ -157,10 +165,14 @@ func TestGetVulnsWithoutTicketErrorRetrievingDataFunc(t *testing.T) {
 	tickets["SNYK-JS-PACRESOLVER-1564857"] = "FPI-794"
 	var maturityLevels []string
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	response, skippedIssues, _ := getVulnsWithoutTicket(flags, "123", maturityLevels, tickets, cD)
 
 	assert.Equal(2, len(response))
 	assert.GreaterOrEqual(len(skippedIssues), 1)
+
+	removeLogFile()
 	return
 }
 
@@ -204,9 +216,13 @@ func TestGetLicenseWithoutTicketFunc(t *testing.T) {
 
 	var maturityLevels []string
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	response, skippedIssues, _ := getVulnsWithoutTicket(flags, "456", maturityLevels, nil, cD)
 	assert.Equal(0, len(skippedIssues))
 	assert.Equal(1, len(response))
+
+	removeLogFile()
 
 	return
 }

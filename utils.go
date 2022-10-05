@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -194,7 +195,7 @@ func (opt *flags) setOption(args []string) {
 		v.AddConfigPath(".")
 	}
 
-	configFile, configFileLocation := CheckConfigPresent(*configFilePtr)
+	configFile, configFileLocation := ReadFile(*configFilePtr, true)
 
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -256,13 +257,13 @@ argument: debug
 Check if the file exist if not create it
 **
 */
-func CreateLogFile(customDebug debug) string {
+func CreateLogFile(customDebug debug, fileType string) string {
 
 	// Get date
 	date := getDate()
 
 	// Set filename
-	filename := "listOfTicketCreated_" + date + ".json"
+	filename := fileType + date + ".json"
 
 	// If the file doesn't exist, create it, or append to the file
 	_, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -348,31 +349,43 @@ func writeLogFile(logFile map[string]map[string]interface{}, filename string, cu
 	return
 }
 
-func writeErrorFile(errorText string, customDebug debug) {
+func Sprintf2(format string, a ...interface{}) string {
+	a = append(a, "\r")
+	return fmt.Sprintf(format, a...)
+}
 
-	// Get date
-	date := getDateDayOnly()
+func writeErrorFile(function string, errorText string, customDebug debug) {
 
-	// Set filename
-	filename := "Error_" + date + ".json"
+	errorsInterface := make(map[string]interface{})
 
-	// If the file doesn't exist => create it, append to the file otherwise
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	// Get filePath
+	filename, err := FindFile("ErrorsFile")
+
+	// Read the file, unMarshallto get a map[]interface{} and append the new error and Marshall to create a json
+	// ReadFile
+	jsonErrofile, _ := ReadFile(filename, false)
+
+	// unMarshall
+	err = json.Unmarshal(jsonErrofile, &errorsInterface)
 	if err != nil {
-		customDebug.Debug("*** ERROR *** Could not open file ", filename)
-		return
+		log.Println("*** ERROR *** Please check the format config file", err)
 	}
 
-	errorTextByte := []byte(errorText + "\n")
-
-	if _, err := f.Write(errorTextByte); err != nil {
-		customDebug.Debug("*** ERROR *** Could write in file")
-		return
+	// Add the new error
+	if errorsInterface[function] != nil {
+		errorsInterface[function] = Sprintf2(errorText, errorsInterface[function])
+	} else {
+		errorsInterface[function] = errorText
 	}
 
-	if err := f.Close(); err != nil {
-		customDebug.Debug("*** ERROR ***  Could not close file")
-		return
+	NewErrorsList, err := json.Marshal(errorsInterface)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'jira' config", err)
+	}
+
+	err = ioutil.WriteFile(filename, NewErrorsList, 0644)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return
@@ -716,24 +729,49 @@ func checkMandatoryField(customJiraMandatoryField_ interface{}, yamlCustomJiraMa
 
 /*
 **
-function CheckConfigFileFormat
+function ReadFile
 input path string, path to the config file
 return []byte config file
 Try to read the yaml file. If this fails the config file is not valid yaml
 **
 */
-func CheckConfigPresent(path string) ([]byte, string) {
+func ReadFile(path string, config bool) ([]byte, string) {
 
 	if len(path) == 0 {
 		path = "."
 	}
 
-	file := path + "/jira.yaml"
-
-	yamlFile, err := ioutil.ReadFile(file)
-	if err != nil {
-		fmt.Printf("*** ERROR *** Could not read config file at location: %s. Please ensure the file exists and is formatted correctly.\nERROR: %s\n", file, err.Error())
+	var err error
+	filePath := path + "/jira.yaml"
+	if !config {
+		filePath, err = FindFile("ErrorsFile")
 	}
 
-	return yamlFile, file
+	file, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		fmt.Printf("*** ERROR *** Could not read file at location: %s. Please ensure the file exists and is formatted correctly.\nERROR: %s\n", filePath, err.Error())
+	}
+
+	return file, filePath
+}
+
+func FindFile(fileName string) (string, error) {
+
+	// list all file in the directory
+	fileInfo, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Fatal()
+	}
+
+	// Look for the one starting with listOfTicketCreated or ErrorsFile
+	for _, file := range fileInfo {
+		if !file.IsDir() {
+			if strings.HasPrefix(file.Name(), fileName) {
+				filePath := "./" + file.Name()
+				return filePath, nil
+			}
+		}
+	}
+	errorMessage := fmt.Sprintf("Failure, Could not find File %s", fileName)
+	return "", errors.New(errorMessage)
 }

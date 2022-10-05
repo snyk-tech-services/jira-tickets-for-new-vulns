@@ -29,12 +29,16 @@ func TestGetProjectDetailsFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	response, _ := getProjectDetails(Mf, "123", cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
 	comparison, _ := jsondiff.Compare(readFixture("./fixtures/project.json"), marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
+
+	removeLogFile()
 
 	return
 }
@@ -58,8 +62,12 @@ func TestGetProjectDetailsErrorFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	_, err := getProjectDetails(Mf, "123", cD)
 	assert.Contains(err.Error(), "Failure, Could not read the Project detail for endpoint")
+
+	removeLogFile()
 
 	return
 }
@@ -92,12 +100,16 @@ func TestGetOrgProjects(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	response, _ := getOrgProjects(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
 	comparison, _ := jsondiff.Compare(readFixture("./fixtures/org.json"), marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
+
+	removeLogFile()
 
 	return
 }
@@ -129,12 +141,16 @@ func TestGetOrgProjectsCriticality(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	response, _ := getOrgProjects(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
 	comparison, _ := jsondiff.Compare(readFixture("./fixtures/org.json"), marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
+
+	removeLogFile()
 
 	return
 }
@@ -166,12 +182,16 @@ func TestGetOrgProjectsEnvironment(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	response, _ := getOrgProjects(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
 	comparison, _ := jsondiff.Compare(readFixture("./fixtures/org.json"), marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
+
+	removeLogFile()
 
 	return
 }
@@ -203,12 +223,16 @@ func TestGetOrgProjectsLifecycle(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
+	CreateLogFile(cD, "ErrorsFile_")
+
 	response, _ := getOrgProjects(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
 	comparison, _ := jsondiff.Compare(readFixture("./fixtures/org.json"), marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
+
+	removeLogFile()
 
 	return
 }
@@ -252,12 +276,19 @@ func TestGetProjectsIdsAllProjects(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 
-	list, er := getProjectsIds(flags, cD)
+	CreateLogFile(cD, "ErrorsFile_")
+
+	filenameNotCreated := CreateLogFile(cD, "ErrorsFile_")
+
+	list, er := getProjectsIds(flags, cD, filenameNotCreated)
 	listString := "[" + strings.Join(list, ",") + "]"
 
 	if er != nil {
 		log.Fatal()
 	}
+
+	// Delete the file created for the test
+	removeLogFile()
 
 	ResultList := readFixture("./fixtures/results/projectIdsList.txt")
 	assert.Equal(string(ResultList), listString)
