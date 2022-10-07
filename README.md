@@ -159,9 +159,9 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
 - `--configFile` *optional*
 
-  Path the  required `jira.yaml` file if not located in the root.
+  Path the directory where `jira.yaml` file is located (by default we will check current directory)
 
-  *Example*: `--configFile=/path/to/jira.yaml`
+  *Example*: `--configFile=/directory-name`
 
 ## Restrictions
 The tool does not support IAC project. It will open issue only for code and open source projects and ignore all other project type.
