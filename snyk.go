@@ -16,7 +16,8 @@ type ProjectsFilter struct {
 }
 
 type ProjectsFilterBody struct {
-	Attributes ProjectsFiltersAttributes `json:"attributes"`
+	Attributes *ProjectsFiltersAttributes `json:"attributes,omitempty"`
+	Monitored  bool                       `json:"isMonitored"`
 }
 
 type ProjectsFiltersAttributes struct {
@@ -30,23 +31,25 @@ func getOrgProjects(flags flags, customDebug debug) (jsn.Json, error) {
 	// a POST API call but historically we used GET here. The following code maintains backwards compatibility for
 	// existing cases where people aren't filtering projects by attributes, as it appears the API does not return
 	// the full project list with empty attribute filters in the request body.
-	verb := "GET"
-	body := ProjectsFilter{}
+	verb := "POST"
+	// filter out inactive projects
+
 	projectsAPI := flags.mandatoryFlags.endpointAPI + "/v1/org/" + flags.mandatoryFlags.orgID + "/projects"
 
-	if len(flags.optionalFlags.projectCriticality) > 0 {
-		body.Filters.Attributes.Criticality = strings.Split(flags.optionalFlags.projectCriticality, ",")
-		verb = "POST"
+	attributes := &ProjectsFiltersAttributes{
+		Criticality: strings.Split(flags.optionalFlags.projectCriticality, ""),
+		Environment: strings.Split(flags.optionalFlags.projectEnvironment, ","),
+		Lifecycle:   strings.Split(flags.optionalFlags.projectLifecycle, ","),
 	}
 
-	if len(flags.optionalFlags.projectEnvironment) > 0 {
-		body.Filters.Attributes.Environment = strings.Split(flags.optionalFlags.projectEnvironment, ",")
-		verb = "POST"
+	// filter out inactive projects
+	projectFilters := &ProjectsFilterBody{
+		Attributes: attributes,
+		Monitored:  true,
 	}
 
-	if len(flags.optionalFlags.projectLifecycle) > 0 {
-		body.Filters.Attributes.Lifecycle = strings.Split(flags.optionalFlags.projectLifecycle, ",")
-		verb = "POST"
+	body := &ProjectsFilter{
+		Filters: *projectFilters,
 	}
 
 	var marshalledBody []byte
@@ -55,6 +58,7 @@ func getOrgProjects(flags flags, customDebug debug) (jsn.Json, error) {
 	if verb == "POST" {
 		marshalledBody, err = json.Marshal(body)
 		if err != nil {
+			// FIXME: don't fall back, we should error instead
 			log.Printf("*** ERROR *** Not able to read attributes %s\n", projectsAPI)
 			errorMessage := fmt.Sprintf("Failure, Not able to read attributes\n")
 			writeErrorFile("getOrgProjects", errorMessage, customDebug)
