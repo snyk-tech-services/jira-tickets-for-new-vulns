@@ -33,19 +33,29 @@ func getOrgProjects(flags flags, customDebug debug) (jsn.Json, error) {
 	// the full project list with empty attribute filters in the request body.
 	verb := "POST"
 	// filter out inactive projects
-
-	projectsAPI := flags.mandatoryFlags.endpointAPI + "/v1/org/" + flags.mandatoryFlags.orgID + "/projects"
-
-	attributes := &ProjectsFiltersAttributes{
-		Criticality: strings.Split(flags.optionalFlags.projectCriticality, ""),
-		Environment: strings.Split(flags.optionalFlags.projectEnvironment, ","),
-		Lifecycle:   strings.Split(flags.optionalFlags.projectLifecycle, ","),
-	}
-
 	// filter out inactive projects
 	projectFilters := &ProjectsFilterBody{
-		Attributes: attributes,
-		Monitored:  true,
+		Monitored: true,
+	}
+	projectsAPI := flags.mandatoryFlags.endpointAPI + "/v1/org/" + flags.mandatoryFlags.orgID + "/projects"
+	if len(flags.optionalFlags.projectCriticality) > 0 || len(flags.optionalFlags.projectEnvironment) > 0 || len(flags.optionalFlags.projectLifecycle) > 0 {
+		attributes := &ProjectsFiltersAttributes{}
+
+		if len(flags.optionalFlags.projectCriticality) > 0 {
+			attributes.Criticality = strings.Split(flags.optionalFlags.projectCriticality, ",")
+		}
+
+		if len(flags.optionalFlags.projectEnvironment) > 0 {
+			attributes.Environment = strings.Split(flags.optionalFlags.projectEnvironment, ",")
+		}
+
+		if len(flags.optionalFlags.projectLifecycle) > 0 {
+			attributes.Lifecycle = strings.Split(flags.optionalFlags.projectLifecycle, ",")
+		}
+
+		// filter out inactive projects
+		projectFilters.Attributes = attributes
+
 	}
 
 	body := &ProjectsFilter{
