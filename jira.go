@@ -101,7 +101,7 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 		jiraTicket = formatCodeJiraTicket(jsonVuln, projectInfo)
 		vulnID = jsonVuln.K("data").K("id").String().Value
 	} else {
-		jiraTicket = formatJiraTicket(jsonVuln, projectInfo)
+		jiraTicket = formatJiraTicket(jsonVuln, projectInfo, flags.optionalFlags)
 	}
 
 	if len(vulnID) == 0 {

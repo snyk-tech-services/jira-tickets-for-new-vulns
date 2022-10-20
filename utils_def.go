@@ -37,5 +37,6 @@ type optionalFlags struct {
 	priorityScoreThreshold int
 	debug                  bool
 	dryRun                 bool
+	cveInTitle             bool
 	ifUpgradeAvailableOnly bool
 }

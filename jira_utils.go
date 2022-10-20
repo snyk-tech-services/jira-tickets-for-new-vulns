@@ -63,7 +63,7 @@ func getJiraTicketId(responseData []byte) *JiraDetailForTicket {
 	return jiraIssueDetails
 }
 
-func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
+func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json, flags optionalFlags) *JiraIssue {
 
 	issueData := jsonVuln.K("issueData")
 
@@ -109,10 +109,14 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 	}
 
 	var identifiers []string
+	var cveIdentifiers []string
 	issueData.K("identifiers").IterMap(
 		func(k string, v jsn.Json) bool {
 			for _, value := range v.Array().Elements() {
 				identifiers = append(identifiers, value.String().Value)
+				if k == "CVE" {
+					cveIdentifiers = append(cveIdentifiers, value.String().Value)
+				}
 			}
 			return true // false to break
 		})
@@ -141,9 +145,15 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
 	// Sanitizing known issue where JIRA FW doesn't like this string....
 	descriptionBody = strings.ReplaceAll(descriptionBody, "/etc/passwd", "")
 
+	// Build Summary
+	summary := projectInfo.K("name").String().Value + " - " + issueData.K("title").String().Value
+	if flags.cveInTitle == true && len(cveIdentifiers) > 0 {
+		summary = fmt.Sprintf("%s - %s", summary, strings.Join(cveIdentifiers, ", "))
+	}
+
 	jiraTicket := &JiraIssue{
 		Field{
-			Summary:     projectInfo.K("name").String().Value + " - " + issueData.K("title").String().Value,
+			Summary:     summary,
 			Description: descriptionBody,
 		},
 	}

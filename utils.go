@@ -88,7 +88,7 @@ Function setOption
 set the optional flags structure
 **
 */
-func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper.Viper) {
+func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, cveInTitlePtr bool, v viper.Viper) {
 
 	Of.projectID = v.GetString("snyk.projectID")
 	Of.projectCriticality = v.GetString("snyk.projectCriticality")
@@ -104,6 +104,7 @@ func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper
 	Of.priorityScoreThreshold = v.GetInt("snyk.priorityScoreThreshold")
 	Of.debug = debugPtr
 	Of.dryRun = dryRunPtr
+	Of.cveInTitle = cveInTitlePtr
 	Of.ifUpgradeAvailableOnly = v.GetBool("snyk.ifUpgradeAvailableOnly")
 }
 
@@ -133,6 +134,7 @@ func (opt *flags) setOption(args []string) {
 	var apiTokenPtr *string
 	var debugPtr *bool
 	var dryRunPtr *bool
+	var cveInTitlePtr *bool
 	var configFilePtr *string
 
 	// Using viper to bind config file and flags
@@ -160,6 +162,7 @@ func (opt *flags) setOption(args []string) {
 	fs.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	debugPtr = fs.Bool("debug", false, "Optional. Boolean. enable debug mode")
 	dryRunPtr = fs.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
+	cveInTitlePtr = fs.Bool("cveInTitle", false, "Optional. Boolean. adds the CVEs to the jira ticket title")
 	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Open tickets only for upgradable issues")
 	configFilePtr = fs.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
 	fs.Parse(args)
@@ -210,7 +213,7 @@ func (opt *flags) setOption(args []string) {
 
 	// Setting the flags structure
 	opt.mandatoryFlags.setMandatoryFlags(apiTokenPtr, *v)
-	opt.optionalFlags.setoptionalFlags(*debugPtr, *dryRunPtr, *v)
+	opt.optionalFlags.setoptionalFlags(*debugPtr, *dryRunPtr, *cveInTitlePtr, *v)
 
 	// check the flags rules
 	opt.checkFlags()
@@ -241,7 +244,7 @@ To work properly with jira these needs to be respected:
 */
 func (flags *flags) checkFlags() {
 	if flags.mandatoryFlags.jiraProjectID != "" && flags.mandatoryFlags.jiraProjectKey != "" {
-		log.Fatalf(("*** ERROR *** You passed both jiraProjectID and jiraProjectKey in parameters\n Please, Use jiraProjectID OR jiraProjectKey, not both"))
+		log.Fatalf("*** ERROR *** You passed both jiraProjectID and jiraProjectKey in parameters\n Please, Use jiraProjectID OR jiraProjectKey, not both")
 	}
 
 	if flags.optionalFlags.priorityScoreThreshold < 0 || flags.optionalFlags.priorityScoreThreshold > 1000 {
@@ -257,6 +260,7 @@ argument: debug
 Check if the file exist if not create it
 **
 */
+
 func CreateLogFile(customDebug debug, fileType string) string {
 
 	// Get date

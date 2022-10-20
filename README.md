@@ -133,6 +133,12 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
   *Example*: `--debug=true`
 
+- `--cveInTitle` *optional*
+
+  Enables the CVEs as suffix in the Jira ticket title.
+
+  *Example*: `--cveInTitle=true`
+
 - `--ifUpgradeAvailableOnly` *optional*
 
   Only create tickets for `vuln` issues that are upgradable.`--type` must be set to `all` or `vuln` for this to work.
