@@ -1,5 +1,5 @@
 schema: 1
-snyk: 
+snyk:
     orgID: 0e9373a6-f858-11ec-b939-0242ac120002
     severity: critical # threshold for jira ticket creation
     maturityFilter: proof-of-concept
@@ -10,4 +10,5 @@ jira:
     jiraProjectID: 15698
     assigneeId: 1238769
     priorityIsSeverity: true
+    cveInTitle: true
 

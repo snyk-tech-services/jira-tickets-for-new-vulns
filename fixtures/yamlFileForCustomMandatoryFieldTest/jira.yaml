@@ -10,6 +10,7 @@ jira:
     jiraProjectID: 15698
     assigneeId: 1238769
     priorityIsSeverity: true
+    cveInTitle: false
     customMandatoryFields:
         customfield_10601:
             value: jiraValue-simpleField-some value to add to the ticket

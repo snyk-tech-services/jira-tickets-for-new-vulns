@@ -43,6 +43,7 @@ func TestSetOptionFunc(t *testing.T) {
 		priorityScoreThreshold: 20,
 		projectID:              "",
 		severity:               "critical",
+		cveInTitle:             true,
 	}
 
 	assert.Equal(optionalResult, &options.optionalFlags)
@@ -90,6 +91,7 @@ func TestSetOptionMixFunc(t *testing.T) {
 		priorityScoreThreshold: 20,
 		projectID:              "",
 		severity:               "critical",
+		cveInTitle:             true,
 	}
 
 	assert.Equal(optionalResult, &options.optionalFlags)
