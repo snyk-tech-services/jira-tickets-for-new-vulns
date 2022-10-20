@@ -106,6 +106,7 @@ func (Of *optionalFlags) setOptionalFlags(debugPtr bool, dryRunPtr bool, v viper
 	Of.dryRun = dryRunPtr
 	Of.cveInTitle = v.GetBool("jira.cveInTitle")
 	Of.ifUpgradeAvailableOnly = v.GetBool("snyk.ifUpgradeAvailableOnly")
+	Of.canAutoPR = v.GetBool("snyk.canAutoPR")
 }
 
 /*
@@ -163,6 +164,7 @@ func (opt *flags) setOption(args []string) {
 	dryRunPtr = fs.Bool("dryRun", false, "Optional. Boolean. Creates a file with all the tickets without open them on jira")
 	fs.Bool("cveInTitle", false, "Optional. Boolean. Adds the CVEs to the jira ticket title")
 	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Opens tickets only for upgradable issues")
+	fs.Bool("canAutoPR", false, "Optional. Boolean. Opens tickets for issues that are fixable or upgradable (no effect when using ifUpgradeAvailableOnly)")
 	configFilePtr = fs.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
 	fs.Parse(args)
 
@@ -187,6 +189,7 @@ func (opt *flags) setOption(args []string) {
 	v.BindPFlag("jira.priorityIsSeverity", fs.Lookup("priorityIsSeverity"))
 	v.BindPFlag("snyk.priorityScoreThreshold", fs.Lookup("priorityScoreThreshold"))
 	v.BindPFlag("snyk.ifUpgradeAvailableOnly", fs.Lookup("ifUpgradeAvailableOnly"))
+	v.BindPFlag("snyk.canAutoPR", fs.Lookup("canAutoPR"))
 
 	// Set and parse config file
 	v.SetConfigName("jira") // config file name without extension
@@ -598,6 +601,12 @@ func checkSnykValue(snykValues interface{}) bool {
 				return false
 			}
 		case "ifUpgradeAvailableOnly":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "bool" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a boolean", key, reflect.TypeOf(value).String())
+				return false
+			}
+		case "canAutoPR":
 			valueType := reflect.TypeOf(value).String()
 			if valueType != "bool" {
 				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a boolean", key, reflect.TypeOf(value).String())

@@ -36,6 +36,7 @@ func TestGetVulnsWithoutTicketFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -96,6 +97,7 @@ func TestNoVulnOrLicense(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -150,6 +152,7 @@ func TestGetVulnsWithoutTicketErrorRetrievingDataFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -205,6 +208,7 @@ func TestGetLicenseWithoutTicketFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf

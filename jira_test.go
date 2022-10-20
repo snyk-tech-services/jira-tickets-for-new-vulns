@@ -48,6 +48,7 @@ func TestOpenJiraTicketFunc(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -102,6 +103,7 @@ func TestOpenJiraTicketWithProjectKeyFunc(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -156,6 +158,7 @@ func TestOpenJiraTicketErrorAndRetryFunc(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -214,6 +217,7 @@ func TestOpenJiraMultipleTicketsErrorAndRetryFunc(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -288,6 +292,7 @@ func TestOpenJiraMultipleTicketsErrorAndRetryAndFailFunc(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -363,6 +368,7 @@ func TestOpenJiraMultipleTicketsFailureFunc(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -439,6 +445,7 @@ func TestOpenJiraTicketWithAssigneeIDFunc(t *testing.T) {
 	Of.dryRun = false
 	Of.cveInTitle = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -503,6 +510,7 @@ func TestOpenJiraTicketDryRun(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = true
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -561,6 +569,7 @@ func TestOpenJiraMultipleTicketsIsUpgradableFunc(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = true
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -576,6 +585,158 @@ func TestOpenJiraMultipleTicketsIsUpgradableFunc(t *testing.T) {
 	fmt.Println(NotCreatedIssueId)
 	assert.NotNil(tickets)
 	assert.Equal("VulnID SNYK-JS-MINIMIST-559765 ticket not created : Skipping creating ticket for Remote Code Execution (RCE) because no upgrade is available.", NotCreatedIssueId)
+	assert.Equal(NumberIssueCreated, 1)
+
+	// Read fixture file line by line
+	file, err := os.Open("./fixtures/results/jiraMultipleTicketsOpeningResultsIsUpgradable")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	// assert if the line is not in the jira response
+	for scanner.Scan() {
+		assert.Contains(jiraResponse, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
+
+	// Delete the file created for the test
+	removeLogFile()
+
+	return
+}
+
+func TestOpenJiraMultipleTicketsCanAutoPRFunc(t *testing.T) {
+	assert := assert.New(t)
+	server := HTTPResponseCheckOpenJiraMultipleTickets()
+
+	defer server.Close()
+
+	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
+	vulnsForJira := make(map[string]interface{})
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPathList.json"), &vulnsForJira)
+	if err != nil {
+		panic(err)
+	}
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = true
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = true
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+	CreateLogFile(cD, "ErrorsFile_")
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+
+	fmt.Println(NotCreatedIssueId)
+	assert.NotNil(tickets)
+	assert.Equal("", NotCreatedIssueId)
+	assert.Equal(NumberIssueCreated, 2)
+
+	// Read fixture file line by line
+	file, err := os.Open("./fixtures/results/jiraMultipleTicketsOpeningResultsIsUpgradable")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	// assert if the line is not in the jira response
+	for scanner.Scan() {
+		assert.Contains(jiraResponse, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
+
+	// Delete the file created for the test
+	removeLogFile()
+
+	return
+}
+
+func TestOpenJiraSingleTicketCanAutoPRFunc(t *testing.T) {
+	assert := assert.New(t)
+	server := HTTPResponseCheckOpenJiraMultipleTickets()
+
+	defer server.Close()
+
+	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
+	vulnsForJira := make(map[string]interface{})
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPathList2.json"), &vulnsForJira)
+	if err != nil {
+		panic(err)
+	}
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = true
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = true
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+	CreateLogFile(cD, "ErrorsFile_")
+
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+
+	fmt.Println(NotCreatedIssueId)
+	assert.NotNil(tickets)
+	assert.Equal("VulnID SNYK-JS-MINIMIST-559765 ticket not created : Skipping creating ticket for Remote Code Execution (RCE) because no fix is available.", NotCreatedIssueId)
 	assert.Equal(NumberIssueCreated, 1)
 
 	// Read fixture file line by line
@@ -638,6 +799,7 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 	Of.dryRun = true
 	Of.cveInTitle = true
 	Of.ifUpgradeAvailableOnly = true
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -657,6 +819,68 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 	assert.Equal(jiraResponse, "")
 	assert.Equal(numberIssueCreated, 0)
 	assert.Equal(NotCreatedIssueId, "")
+
+	return
+
+}
+
+func TestOpenJiraTicketDryRunCanAutoPR(t *testing.T) {
+
+	assert := assert.New(t)
+	server := HTTPResponseStubAndMirrorRequest("/v1/org/123/project/12345678-1234-1234-1234-123456789012/issue/SNYK-JS-MINIMIST-559764/jira-issue", "", "")
+
+	defer server.Close()
+
+	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
+	vulnsForJira := make(map[string]interface{})
+	err := json.Unmarshal(readFixture("./fixtures/vulnForJiraAggregatedWithPath.json"), &vulnsForJira)
+	if err != nil {
+		panic(err)
+	}
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = false
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = true
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = true
+	Of.cveInTitle = true
+	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = true
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	CreateLogFile(cD, "ErrorsFile_")
+
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+
+	removeLogFile()
+
+	assert.NotNil(tickets)
+	assert.Equal(jiraResponse, "")
+	assert.Equal(numberIssueCreated, 0)
+	assert.Equal(NotCreatedIssueId, "VulnID SNYK-JS-MINIMIST-559764 ticket not created : Skipping creating ticket for Remote Code Execution (RCE) because no fix is available.")
 
 	return
 
@@ -800,6 +1024,7 @@ func TestOpenJiraTicketError50xAndRetryFunc(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf

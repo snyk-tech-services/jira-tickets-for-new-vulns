@@ -77,6 +77,7 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 	Of.dryRun = false
 	Of.cveInTitle = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -137,6 +138,7 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 	Of.dryRun = false
 	Of.cveInTitle = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
