@@ -87,7 +87,7 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
   *Example*: `--severity=critical`
 - `--maturityFilter` *optional*
 
-  Can be one or multiple values: `mature`, `proof-of-concept`, `no-known-exploit`, `no-data`.
+  Can be one or multiple values: `mature`, `proof-of-concept`, `no-known-exploit`, `no-data`. **Note: Not supported for Snyk Code**
 
   *Example*: `--maturityFilter=[mature,no-data]`
 - `--type` *optional*
