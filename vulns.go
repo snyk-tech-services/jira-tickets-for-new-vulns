@@ -343,9 +343,14 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 				if len(e.K("id").String().Value) != 0 {
 					if _, found := tickets[e.K("id").String().Value]; !found {
 
+						// checking if the issue is ignored
+						if e.K("attributes").K("ignored").Bool().Value == true {
+							continue
+						}
+
 						id := e.K("id").String().Value
 
-						url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues/detail/code/" + id + "?project_id=" + projectID + "&version=2021-08-20~experimental"
+						url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues/detail/code/" + id + "?project_id=" + projectID + "&version=2022-04-06~experimental"
 
 						// get the details of this code issue id
 						responseIssueDetail, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
@@ -370,9 +375,11 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 						}
 						json.Unmarshal(bytes, &issueDetail)
 
-						// checking if the issue is ignored
-						if e.K("attributes").K("ignored").Bool().Value == true {
-							continue
+						if flags.optionalFlags.priorityScoreThreshold > 0 {
+							if flags.optionalFlags.priorityScoreThreshold > jsonIssueDetail.K("data").K("attributes").K("priorityScore").Int().Value {
+								customDebug.Debug(fmt.Sprintf("*** INFO *** Filtering out issue based on priority score priorityScoreThreshold=%d, issue priorityScore=%d", flags.optionalFlags.priorityScoreThreshold, jsonIssueDetail.K("data").K("attributes").K("priorityScore").Int().Value))
+								continue
+							}
 						}
 
 						issueDetail["title"] = e.K("attributes").K("title").String().Value

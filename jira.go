@@ -105,8 +105,7 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 	}
 
 	if len(vulnID) == 0 {
-		message := fmt.Sprintf("*** ERROR *** Failed to create ticket, vuln ID is empty\n")
-		writeErrorFile("openJiraTicket", message, customDebug)
+		writeErrorFile("openJiraTicket", "*** ERROR *** Failed to create ticket, vuln ID is empty\n", customDebug)
 		return nil, nil, errors.New("*** ERROR *** Failed to create ticket, vuln ID is empty"), ""
 	}
 
@@ -123,8 +122,7 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 	var jiraApiUrl = flags.mandatoryFlags.endpointAPI + endpoint
 
 	if projectInfoId == "" {
-		message := fmt.Sprintf("Failure, Could not retrieve project ID \n")
-		writeErrorFile("openJiraTicket", message, customDebug)
+		writeErrorFile("openJiraTicket", "Failure, Could not retrieve project ID \n", customDebug)
 		return nil, nil, errors.New("Failure, Could not retrieve project ID"), endpoint
 	}
 
@@ -166,8 +164,7 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 	ticket, err := json.Marshal(jiraTicket)
 	if err != nil {
 		customDebug.Debug("*** ERROR *** Error while creating the ticket")
-		message := fmt.Sprintf("*** ERROR *** Error while creating the ticket\n")
-		writeErrorFile("openJiraTicket", message, customDebug)
+		writeErrorFile("openJiraTicket", "*** ERROR *** Error while creating the ticket\n", customDebug)
 		return nil, nil, errors.New("Failure, Failure to create ticket(s)"), endpoint
 	}
 
