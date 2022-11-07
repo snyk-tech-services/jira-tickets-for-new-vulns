@@ -38,4 +38,5 @@ type optionalFlags struct {
 	debug                  bool
 	dryRun                 bool
 	ifUpgradeAvailableOnly bool
+	ignored                bool
 }

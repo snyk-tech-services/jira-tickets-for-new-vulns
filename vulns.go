@@ -62,6 +62,9 @@ func getVulnsWithoutTicket(flags flags, projectID string, maturityFilter []strin
 	if len(maturityFilter) > 0 {
 		body.Filters.ExploitMaturity = maturityFilter
 	}
+	if flags.optionalFlags.ignored == true {
+		body.Filters.Ignored = flags.optionalFlags.ignored
+	}
 
 	body.Filters.Priority.Score.Min = 0
 	body.Filters.Priority.Score.Max = 1000

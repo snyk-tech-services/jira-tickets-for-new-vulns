@@ -139,6 +139,13 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
   *Example*: `--ifUpgradeAvailableOnly=true`
 
+
+- `--ignored` *optional*
+
+  Only create tickets for `vuln` issues that are ignored.
+
+  *Example*: `--ignored=true`
+
 - `--projectCriticality` *optional*
 
   Include only projects whose [Snyk business criticality attribute](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-information/project-attributes#business-criticality) contains one or more of the specified values.
