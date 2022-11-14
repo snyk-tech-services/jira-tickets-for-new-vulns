@@ -88,7 +88,7 @@ Function setOption
 set the optional flags structure
 **
 */
-func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper.Viper) {
+func (Of *optionalFlags) setOptionalFlags(debugPtr bool, dryRunPtr bool, v viper.Viper) {
 
 	Of.projectID = v.GetString("snyk.projectID")
 	Of.projectCriticality = v.GetString("snyk.projectCriticality")
