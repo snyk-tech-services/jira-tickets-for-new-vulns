@@ -17,7 +17,9 @@ func TestFormatJiraTicketFunc(t *testing.T) {
 	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
 	issueData, _ := jsn.NewJson(readFixture("./fixtures/vulnForJiraAggregatedWithPathForTicketTest.json"))
 
-	jiraTicket := formatJiraTicket(issueData, projectInfo)
+	flags := optionalFlags{}
+
+	jiraTicket := formatJiraTicket(issueData, projectInfo, flags)
 
 	// Convert jira ticket into a string
 	ticket := fmt.Sprintf("%v", jiraTicket)

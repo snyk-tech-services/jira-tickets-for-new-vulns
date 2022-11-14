@@ -13,7 +13,7 @@ Aimed to be executed at regular interval or with a trigger of your choice (webho
 **This repository is in maintenance mode, no new features are being developed. Bug & security fixes will continue to be delivered. Open source contributions are welcome for small features & fixes (no breaking changes)**
 
 ## Installation
-You can either download the binaries fron the from [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
+You can either download the binaries from the [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
 or
 Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
@@ -115,6 +115,12 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
   *Example*: `--labels=app-1234`
 
+- `--duedate` *optional*
+
+  Set [Jira ticket labels](https://confluence.atlassian.com/jirasoftwareserver/editing-and-collaborating-on-issues-939938928.html)
+
+  *Example*: `--duedate=2022-12-01`
+- 
 - `--priorityScoreThreshold` *optional*
 
   Your minimum [Snyk priority score](https://docs.snyk.io/features/fixing-and-prioritizing-issues/starting-to-fix-vulnerabilities/snyk-priority-score) threshold. Can be a number between `0` and `1000`.
@@ -170,12 +176,12 @@ The tool does not support IAC project. It will open issue only for code and open
 Option to get the JIRA ticket priority set based on issue severity.
 Defaults map to:
 
-Issue severity | JIRA Priority
------ | -----
-critical | Highest
-high | High
-medium | Medium
-low | Low
+|  Issue severity  | JIRA priority |
+|:----------------:|:-------------:|
+|     critical     |    Highest    |
+|       high       |     High      |
+|      medium      |    Medium     |
+|       low        |      Low      |  
 
 Use `SNYK_JIRA_PRIORITY_FOR_XXX_VULN` env var to override the default an set your value.
 > *Example*:
@@ -306,4 +312,3 @@ Notes:
       Using the config file above, running `./snyk-jira-sync-macOs --Org=1234 --configFile=./path/to/folder --token=123`
       the org ID used by the tool will be `1234` and not `a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513`
   - See 'Extended options' for default values
-

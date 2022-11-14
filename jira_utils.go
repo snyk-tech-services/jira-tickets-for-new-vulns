@@ -63,7 +63,7 @@ func getJiraTicketId(responseData []byte) *JiraDetailForTicket {
 	return jiraIssueDetails
 }
 
-func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json) *JiraIssue {
+func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json, flags optionalFlags) *JiraIssue {
 
 	issueData := jsonVuln.K("issueData")
 
