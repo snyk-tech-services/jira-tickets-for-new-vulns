@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 
 	bfconfluence "github.com/kentaro-m/blackfriday-confluence"
@@ -93,22 +94,37 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json, flags optionalFla
 		pkgVersionsArray = append(pkgVersionsArray, fmt.Sprintf(e.String().Value))
 	}
 
-	snykBreadcrumbs := "\n[See this issue on Snyk](" + projectInfo.K("browseUrl").String().Value + ")\n"
+	snykBreadcrumbs := "\n\n[See this issue on Snyk](" + projectInfo.K("browseUrl").String().Value + ")\n"
 	moreAboutThisIssue := "\n\n[More About this issue](" + issueData.K("url").String().Value + ")\n"
 
 	pkgVersions := "\n pkgVersions: "
-	pkgVersions += strings.Join(pkgVersionsArray, ",")
+	pkgVersions += "[" + strings.Join(pkgVersionsArray, ", ")
 	pkgVersions += "]\n\r"
 
 	descriptionFromIssue := ""
 
 	if issueData.K("type").String().Value == "license" {
-		descriptionFromIssue = `This dependency is infriguing your organization license policy.
+		descriptionFromIssue = `This dependency is infringing your organization license policy.
 								Refer to the Reporting tab for possible instructions from your legal team.`
 	}
 
-	issueDetails := []string{"\r\n **** Issue details: ****\n\r",
+	var identifiers []string
+	issueData.K("identifiers").IterMap(
+		func(k string, v jsn.Json) bool {
+			for _, value := range v.Array().Elements() {
+				identifiers = append(identifiers, value.String().Value)
+			}
+			return true // false to break
+		})
+
+	if len(identifiers) == 0 {
+		identifiers = append(identifiers, "N/A")
+	} else {
+		sort.Strings(identifiers)
+	}
+	issueDetails := []string{"\r\n** Issue details: **\n\r",
 		"\n cvssScore: ", fmt.Sprintf("%.2f", issueData.K("cvssScore").Float64().Value),
+		"\n identifiers: ", strings.Join(identifiers, ", "),
 		"\n exploitMaturity: ", issueData.K("exploitMaturity").String().Value,
 		"\n severity: ", issueData.K("severity").String().Value,
 		pkgVersions,

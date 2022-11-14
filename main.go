@@ -23,7 +23,7 @@ func main() {
 	filenameNotCreated := CreateLogFile(customDebug, "ErrorsFile_")
 
 	// Get the project ids associated with org
-	// If project Id is not specified => get all the projects
+	// If project ID is not specified => get all the projects
 	projectIDs, er := getProjectsIds(options, customDebug, filenameNotCreated)
 	if er != nil {
 		log.Fatal(er)

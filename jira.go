@@ -111,6 +111,11 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 		return nil, nil, errors.New("*** ERROR *** Failed to create ticket, vuln ID is empty"), ""
 	}
 
+	if len(vulnID) == 0 {
+		writeErrorFile("openJiraTicket", "*** ERROR *** Failed to create ticket, vuln ID is empty\n", customDebug)
+		return nil, nil, errors.New("*** ERROR *** Failed to create ticket, vuln ID is empty"), ""
+	}
+
 	if flags.mandatoryFlags.jiraProjectKey != "" {
 		jiraTicket.Fields.Projects.Key = flags.mandatoryFlags.jiraProjectKey
 	} else if flags.mandatoryFlags.jiraProjectID != "" {

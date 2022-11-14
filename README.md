@@ -1,13 +1,16 @@
 
-### Sync your Snyk monitored projects and open automatically JIRA tickets for new issues and existing one(s) without ticket already created.
-Cron it every X minutes/hours and fix the issues.
+### Open Jira tickets for new & existing Snyk project issues
+
+Sync your Snyk monitored projects and open automatically JIRA tickets for new issues and existing one(s) without ticket already created.
+Run this after `snyk monitor` in CI or every day/hour for non CLI projects.
 Aimed to be executed at regular interval or with a trigger of your choice (webhooks).
 
 
 [![CircleCI](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns.svg?style=svg)](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns)
-[![Not Maintained](https://img.shields.io/badge/Maintenance%20Level-Not%20Maintained-yellow.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
+[![Inactively Maintained](https://img.shields.io/badge/Maintenance%20Level-Inactively%20Maintained-yellowgreen.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
 
-**This repository is not in active development and critical bug fixes only will be considered.**
+
+**This repository is in maintenance mode, no new features are being developed. Bug & security fixes will continue to be delivered. Open source contributions are welcome for small features & fixes (no breaking changes)**
 
 ## Installation
 You can either download the binaries fron the from [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
@@ -84,7 +87,7 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
   *Example*: `--severity=critical`
 - `--maturityFilter` *optional*
 
-  Can be one or multiple values: `mature`, `proof-of-concept`, `no-known-exploit`, `no-data`.
+  Can be one or multiple values: `mature`, `proof-of-concept`, `no-known-exploit`, `no-data`. **Note: Not supported for Snyk Code**
 
   *Example*: `--maturityFilter=[mature,no-data]`
 - `--type` *optional*
@@ -156,9 +159,9 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
 - `--configFile` *optional*
 
-  Path the  required `jira.yaml` file if not located in the root.
+  Path the directory where `jira.yaml` file is located (by default we will check current directory)
 
-  *Example*: `--configFile=/path/to/jira.yaml`
+  *Example*: `--configFile=/directory-name`
 
 ## Restrictions
 The tool does not support IAC project. It will open issue only for code and open source projects and ignore all other project type.

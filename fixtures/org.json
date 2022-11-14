@@ -18,6 +18,7 @@
                 "high": 13,
                 "medium": 15
             },
+            "isMonitored": true,
             "attributes":{
                 "criticality": ["critical"],
                 "lifecycle": ["production"],
@@ -53,12 +54,13 @@
                 "high": 13,
                 "medium": 21
             },
+            "isMonitored": true,
             "attributes":{
                 "criticality": [],
                 "lifecycle": [],
                 "environment": []
             },
-             "remoteRepoUrl": "https://github.com/clojure/clojure.git",
+            "remoteRepoUrl": "https://github.com/clojure/clojure.git",
             "lastTestedDate": "2019-02-05T07:01:00.000Z",
             "owner": {
                 "id": "42ce0e0f-6288-4874-9266-ef799e7f31bb",
@@ -88,6 +90,7 @@
                 "high": 0,
                 "medium": 0
             },
+            "isMonitored": false,
             "attributes":{
                 "criticality": [],
                 "lifecycle": [],
