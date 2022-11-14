@@ -31,6 +31,7 @@ type Field struct {
 	Assignees   *Assignee     `json:"assignee,omitempty"`
 	Priority    *PriorityType `json:"priority,omitempty"`
 	Labels      []string      `json:"labels,omitempty"`
+	DueDate     string        `json:"dueDate,omitempty"`
 }
 
 // Assignee is the account ID of the Jira user to assign tickets to
@@ -128,6 +129,10 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 
 	if flags.optionalFlags.labels != "" {
 		jiraTicket.Fields.Labels = strings.Split(flags.optionalFlags.labels, ",")
+	}
+
+	if flags.optionalFlags.dueDate != "" {
+		jiraTicket.Fields.DueDate = flags.optionalFlags.dueDate
 	}
 
 	if flags.optionalFlags.assigneeID != "" {

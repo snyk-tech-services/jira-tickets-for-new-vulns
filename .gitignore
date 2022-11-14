@@ -3,3 +3,5 @@ dist/
 jira-ticket-for-new-vulns*
 ErrorsFile*
 listOfTicketCreated*
+.DS_Store
+.idea/
