@@ -100,6 +100,7 @@ func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper
 	Of.maturityFilterString = v.GetString("snyk.maturityFilter")
 	Of.assigneeID = v.GetString("jira.assigneeID")
 	Of.labels = v.GetString("jira.labels")
+	Of.dueDate = v.GetString("jira.dueDate")
 	Of.priorityIsSeverity = v.GetBool("jira.priorityIsSeverity")
 	Of.priorityScoreThreshold = v.GetInt("snyk.priorityScoreThreshold")
 	Of.debug = debugPtr
@@ -154,15 +155,20 @@ func (opt *flags) setOption(args []string) {
 	fs.String("severity", "low", "Optional. Your severity threshold")
 	fs.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
 	fs.String("type", "all", "Optional. Your issue type (all|vuln|license)")
-	fs.String("assigneeId", "", "Optional. The Jira user accountId to assign issues to.")
+	fs.String("assigneeId", "", "Optional. The Jira user accountId to assign issues to")
 	fs.String("labels", "", "Optional. Jira ticket labels")
+	fs.String("dueDate", "", "Optional. The built-in Due Date field")
 	fs.Bool("priorityIsSeverity", false, "Boolean. Use issue severity as priority")
 	fs.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	debugPtr = fs.Bool("debug", false, "Optional. Boolean. enable debug mode")
 	dryRunPtr = fs.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
 	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Open tickets only for upgradable issues")
 	configFilePtr = fs.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
-	fs.Parse(args)
+	errParse := fs.Parse(args)
+	if errParse != nil {
+		log.Println("*** ERROR *** Error parsing command line arguments: ", errParse.Error())
+		os.Exit(1)
+	}
 
 	// Have to set one by one because the name in the config file doesn't correspond to the flag name
 	// This can be done at any time
@@ -181,6 +187,7 @@ func (opt *flags) setOption(args []string) {
 	v.BindPFlag("snyk.maturityFilter", fs.Lookup("maturityFilter"))
 	v.BindPFlag("jira.assigneeID", fs.Lookup("assigneeId"))
 	v.BindPFlag("jira.labels", fs.Lookup("labels"))
+	v.BindPFlag("jira.dueDate", fs.Lookup("dueDate"))
 	v.BindPFlag("jira.priorityIsSeverity", fs.Lookup("priorityIsSeverity"))
 	v.BindPFlag("snyk.priorityScoreThreshold", fs.Lookup("priorityScoreThreshold"))
 	v.BindPFlag("snyk.ifUpgradeAvailableOnly", fs.Lookup("ifUpgradeAvailableOnly"))
@@ -210,7 +217,7 @@ func (opt *flags) setOption(args []string) {
 
 	// Setting the flags structure
 	opt.mandatoryFlags.setMandatoryFlags(apiTokenPtr, *v)
-	opt.optionalFlags.setoptionalFlags(*debugPtr, *dryRunPtr, *v)
+	opt.optionalFlags.setOptionalFlags(*debugPtr, *dryRunPtr, *v)
 
 	// check the flags rules
 	opt.checkFlags()
@@ -658,6 +665,12 @@ func checkJiraValue(JiraValues interface{}) (bool, map[string]interface{}) {
 				return false, nil
 			}
 		case "labels":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false, nil
+			}
+		case "dueDate":
 			valueType := reflect.TypeOf(value).String()
 			if valueType != "string" {
 				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())

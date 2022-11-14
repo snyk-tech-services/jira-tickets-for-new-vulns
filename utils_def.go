@@ -33,6 +33,7 @@ type optionalFlags struct {
 	maturityFilterString   string
 	assigneeID             string
 	labels                 string
+	dueDate                string
 	priorityIsSeverity     bool
 	priorityScoreThreshold int
 	debug                  bool
