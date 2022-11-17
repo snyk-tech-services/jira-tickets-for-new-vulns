@@ -11,6 +11,7 @@ jira:
     jiraProjectID: 15698
     assigneeId: 1238769
     priorityIsSeverity: true
+    cveInTitle: false
     customMandatoryFields:
         Something:
             Value: This is a summary

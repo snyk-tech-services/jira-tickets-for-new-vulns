@@ -105,6 +105,7 @@ func (Of *optionalFlags) setOptionalFlags(debugPtr bool, dryRunPtr bool, v viper
 	Of.priorityScoreThreshold = v.GetInt("snyk.priorityScoreThreshold")
 	Of.debug = debugPtr
 	Of.dryRun = dryRunPtr
+	Of.cveInTitle = v.GetBool("jira.cveInTitle")
 	Of.ifUpgradeAvailableOnly = v.GetBool("snyk.ifUpgradeAvailableOnly")
 }
 
@@ -161,8 +162,9 @@ func (opt *flags) setOption(args []string) {
 	fs.Bool("priorityIsSeverity", false, "Boolean. Use issue severity as priority")
 	fs.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	debugPtr = fs.Bool("debug", false, "Optional. Boolean. enable debug mode")
-	dryRunPtr = fs.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
-	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Open tickets only for upgradable issues")
+	dryRunPtr = fs.Bool("dryRun", false, "Optional. Boolean. Creates a file with all the tickets without open them on jira")
+	fs.Bool("cveInTitle", false, "Optional. Boolean. Adds the CVEs to the jira ticket title")
+	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Opens tickets only for upgradable issues")
 	configFilePtr = fs.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
 	errParse := fs.Parse(args)
 	if errParse != nil {
@@ -188,6 +190,7 @@ func (opt *flags) setOption(args []string) {
 	v.BindPFlag("jira.assigneeID", fs.Lookup("assigneeId"))
 	v.BindPFlag("jira.labels", fs.Lookup("labels"))
 	v.BindPFlag("jira.dueDate", fs.Lookup("dueDate"))
+	v.BindPFlag("jira.cveInTitle", fs.Lookup("cveInTitle"))
 	v.BindPFlag("jira.priorityIsSeverity", fs.Lookup("priorityIsSeverity"))
 	v.BindPFlag("snyk.priorityScoreThreshold", fs.Lookup("priorityScoreThreshold"))
 	v.BindPFlag("snyk.ifUpgradeAvailableOnly", fs.Lookup("ifUpgradeAvailableOnly"))
@@ -248,7 +251,7 @@ To work properly with jira these needs to be respected:
 */
 func (flags *flags) checkFlags() {
 	if flags.mandatoryFlags.jiraProjectID != "" && flags.mandatoryFlags.jiraProjectKey != "" {
-		log.Fatalf(("*** ERROR *** You passed both jiraProjectID and jiraProjectKey in parameters\n Please, Use jiraProjectID OR jiraProjectKey, not both"))
+		log.Fatalf("*** ERROR *** You passed both jiraProjectID and jiraProjectKey in parameters\n Please, Use jiraProjectID OR jiraProjectKey, not both")
 	}
 
 	if flags.optionalFlags.priorityScoreThreshold < 0 || flags.optionalFlags.priorityScoreThreshold > 1000 {
@@ -264,6 +267,7 @@ argument: debug
 Check if the file exist if not create it
 **
 */
+
 func CreateLogFile(customDebug debug, fileType string) string {
 
 	// Get date
@@ -679,7 +683,13 @@ func checkJiraValue(JiraValues interface{}) (bool, map[string]interface{}) {
 		case "priorityIsSeverity":
 			valueType := reflect.TypeOf(value).String()
 			if valueType != "bool" {
-				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a boolean", key, reflect.TypeOf(value).String())
+				return false, nil
+			}
+		case "cveInTitle":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "bool" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a boolean", key, reflect.TypeOf(value).String())
 				return false, nil
 			}
 		case "customMandatoryFields":

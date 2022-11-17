@@ -437,6 +437,7 @@ func TestOpenJiraTicketWithAssigneeIDFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.cveInTitle = false
 	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
@@ -635,6 +636,7 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = true
+	Of.cveInTitle = true
 	Of.ifUpgradeAvailableOnly = true
 
 	flags := flags{}

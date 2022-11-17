@@ -15,11 +15,39 @@ import (
 
 // Test openJiraTickets function
 func TestFormatCodeTicketFunc(t *testing.T) {
+	server := HTTPResponseCodeIssueStubAndMirrorRequest()
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+	Mf.jiraProjectKey = ""
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.severity = ""
+	Of.priorityScoreThreshold = 0
+	Of.issueType = ""
+	Of.debug = true
+	Of.jiraTicketType = "Bug"
+	Of.assigneeID = ""
+	Of.labels = ""
+	Of.priorityIsSeverity = false
+	Of.cveInTitle = false
+	Of.projectID = ""
+	Of.maturityFilterString = ""
+	Of.dryRun = false
+	Of.ifUpgradeAvailableOnly = false
+
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
 
 	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
 	data, _ := jsn.NewJson(readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueAllDetailsForJiraForTicketTest.json"))
 
-	jiraTicket := formatCodeJiraTicket(data, projectInfo)
+	jiraTicket := formatCodeJiraTicket(data, projectInfo, flags)
 
 	// Convert jira ticket into a string
 	ticket := fmt.Sprintf("%v", jiraTicket)
@@ -73,6 +101,7 @@ func TestOpenJiraTicketCodeOnly(t *testing.T) {
 	Of.assigneeID = ""
 	Of.labels = ""
 	Of.priorityIsSeverity = false
+	Of.cveInTitle = false
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
@@ -263,6 +292,7 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeId(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.cveInTitle = true
 	Of.ifUpgradeAvailableOnly = false
 
 	flags := flags{}
