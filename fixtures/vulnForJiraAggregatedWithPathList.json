@@ -38,6 +38,7 @@
     "isIgnored": false,
     "fixInfo": {
       "isUpgradable": true,
+      "isFixable": true,
       "isPinnable": false,
       "isPatchable": false,
       "isPartiallyFixable": true,
