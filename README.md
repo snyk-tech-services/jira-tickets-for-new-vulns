@@ -172,7 +172,7 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
 - `--canAutoPR` *optional*
 
-  Only create tickets for `vuln` issues that are upgradable or fixable (no effect when using `ifUpgradeAvailableOnly`).`--type` must be set to `all` or `vuln` for this to work.
+  Only create tickets for `vuln` issues that are fixable (no effect when using `ifUpgradeAvailableOnly`).`--type` must be set to `all` or `vuln` for this to work.
 
   *Example*: `--canAutoPR=true`
 
