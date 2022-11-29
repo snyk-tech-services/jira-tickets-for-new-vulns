@@ -170,6 +170,12 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
   *Example*: `--configFile=/directory-name`
 
+- `--ifAutoFixableOnly` *optional*
+
+  Only create tickets for `vuln` issues that are fixable (no effect when using `ifUpgradeAvailableOnly`).`--type` must be set to `all` or `vuln` for this to work.
+
+  *Example*: `--ifAutoFixableOnly=true`
+
 ## Restrictions
 The tool does not support IAC project. It will open issue only for code and open source projects and ignore all other project type.
 

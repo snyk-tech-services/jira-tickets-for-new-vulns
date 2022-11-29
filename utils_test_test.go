@@ -136,6 +136,7 @@ func TestSetOption(t *testing.T) {
 		projectID:              "",
 		severity:               "critical",
 		ifUpgradeAvailableOnly: true,
+		ifAutoFixableOnly:      true,
 	}
 
 	customMandatoryJiraFields := map[string]interface{}{"Something": map[string]interface{}{"Value": "This is a summary"}, "transition": map[string]interface{}{"id": 5}}
