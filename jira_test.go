@@ -736,7 +736,7 @@ func TestOpenJiraSingleTicketCanAutoPRFunc(t *testing.T) {
 
 	fmt.Println(NotCreatedIssueId)
 	assert.NotNil(tickets)
-	assert.Equal("VulnID SNYK-JS-MINIMIST-559765 ticket not created : Skipping creating ticket for Remote Code Execution (RCE) because no upgrade is available and no fix is available.", NotCreatedIssueId)
+	assert.Equal("VulnID SNYK-JS-MINIMIST-559765 ticket not created : Skipping creating ticket for Remote Code Execution (RCE) because no fix is available.", NotCreatedIssueId)
 	assert.Equal(NumberIssueCreated, 1)
 
 	// Read fixture file line by line
@@ -880,7 +880,7 @@ func TestOpenJiraTicketDryRunCanAutoPR(t *testing.T) {
 	assert.NotNil(tickets)
 	assert.Equal(jiraResponse, "")
 	assert.Equal(numberIssueCreated, 0)
-	assert.Equal(NotCreatedIssueId, "")
+	assert.Equal(NotCreatedIssueId, "VulnID SNYK-JS-MINIMIST-559764 ticket not created : Skipping creating ticket for Remote Code Execution (RCE) because no fix is available.")
 
 	return
 

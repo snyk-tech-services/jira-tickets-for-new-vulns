@@ -251,9 +251,9 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 				continue
 			}
 		} else if flags.optionalFlags.canAutoPR {
-			// skip ticket creating if the vuln is not fixable and not upgradable
-			if !(jsonVuln.K("fixInfo").K("isFixable").Bool().Value || jsonVuln.K("fixInfo").K("isUpgradable").Bool().Value) {
-				message := fmt.Sprintf("Skipping creating ticket for %s because no upgrade is available and no fix is available.", jsonVuln.K("issueData").K("title").String().Value)
+			// skip ticket creating if the vuln is not fixable
+			if jsonVuln.K("fixInfo").K("isFixable").Bool().Value == false {
+				message := fmt.Sprintf("Skipping creating ticket for %s because no fix is available.", jsonVuln.K("issueData").K("title").String().Value)
 				fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, "canAutoPR", errors.New(message), "", customDebug)
 				continue
 			}
