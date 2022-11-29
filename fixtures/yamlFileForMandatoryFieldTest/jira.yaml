@@ -6,6 +6,7 @@ snyk:
     type: vuln #what snyk issue types should we consider to ticket
     priorityScoreThreshold: 20
     ifUpgradeAvailableOnly: true
+    canAutoPR: true
 jira:
     jiraTicketType: Task
     jiraProjectID: 15698
