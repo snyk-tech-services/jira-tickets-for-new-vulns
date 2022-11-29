@@ -164,7 +164,7 @@ func (opt *flags) setOption(args []string) {
 	dryRunPtr = fs.Bool("dryRun", false, "Optional. Boolean. Creates a file with all the tickets without open them on jira")
 	fs.Bool("cveInTitle", false, "Optional. Boolean. Adds the CVEs to the jira ticket title")
 	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Opens tickets only for upgradable issues")
-	fs.Bool("canAutoPR", false, "Optional. Boolean. Opens tickets for issues that are fixable (no effect when using ifUpgradeAvailableOnly)")
+	fs.Bool("canAutoPR", false, "Optional. Boolean. Opens tickets for issues that are fixable or upgradable (no effect when using ifUpgradeAvailableOnly)")
 	configFilePtr = fs.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
 	fs.Parse(args)
 

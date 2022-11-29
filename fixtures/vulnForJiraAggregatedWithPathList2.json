@@ -1,4 +1,4 @@
-{ 
+{
   "SNYK-JS-MINIMIST-559764" : {
     "id": "SNYK-JS-MINIMIST-559764",
     "issueType": "vuln",
@@ -38,7 +38,6 @@
     "isIgnored": false,
     "fixInfo": {
       "isUpgradable": true,
-      "isFixable": true,
       "isPinnable": false,
       "isPatchable": false,
       "isPartiallyFixable": true,
