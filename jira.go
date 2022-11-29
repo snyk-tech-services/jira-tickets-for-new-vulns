@@ -224,7 +224,7 @@ func displayErrorForIssue(vulnForJira interface{}, reason string, error error, e
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
 	vulnID := jsonVuln.K("id").String().Value
 	message := fmt.Sprintf("VulnID %s ticket not created : Request to %s failed with : %s", vulnID, endpointAPI, error)
-	if reason == "ifUpgradeAvailableOnly" {
+	if reason == "ifUpgradeAvailableOnly" || reason == "canAutoPR" {
 		message = fmt.Sprintf("VulnID %s ticket not created : %s", vulnID, error)
 	}
 	log.Printf("*** ERROR *** " + message)
@@ -248,6 +248,13 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 			if jsonVuln.K("fixInfo").K("isUpgradable").Bool().Value == false {
 				message := fmt.Sprintf("Skipping creating ticket for %s because no upgrade is available.", jsonVuln.K("issueData").K("title").String().Value)
 				fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, "ifUpgradeAvailableOnly", errors.New(message), "", customDebug)
+				continue
+			}
+		} else if flags.optionalFlags.canAutoPR {
+			// skip ticket creating if the vuln is not fixable and not upgradable
+			if !(jsonVuln.K("fixInfo").K("isFixable").Bool().Value || jsonVuln.K("fixInfo").K("isUpgradable").Bool().Value) {
+				message := fmt.Sprintf("Skipping creating ticket for %s because no upgrade is available and no fix is available.", jsonVuln.K("issueData").K("title").String().Value)
+				fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, "canAutoPR", errors.New(message), "", customDebug)
 				continue
 			}
 		}

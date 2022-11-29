@@ -39,6 +39,7 @@ func TestFormatCodeTicketFunc(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -106,6 +107,7 @@ func TestOpenJiraTicketCodeOnly(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -165,6 +167,7 @@ func TestOpenJiraTicketCodeOnlyWithLabel(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -229,6 +232,7 @@ func TestOpenJiraTicketCodeOnlyWithSeverity(t *testing.T) {
 	Of.maturityFilterString = ""
 	Of.dryRun = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -294,6 +298,7 @@ func TestOpenJiraTicketCodeOnlyWithAssigneeId(t *testing.T) {
 	Of.dryRun = false
 	Of.cveInTitle = true
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -353,6 +358,7 @@ func TestGetSnykCodeIssueWithoutTickets(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -410,6 +416,7 @@ func TestGetSnykCodeIssueWithoutTicketsWithIgnored(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -467,6 +474,7 @@ func TestGetSnykCodeIssueWithoutTicketsWithSeverityFilter(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -522,6 +530,7 @@ func TestGetSnykCodeIssueWithoutTicketsWithPagination(t *testing.T) {
 	Of.projectID = "xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx"
 	Of.maturityFilterString = ""
 	Of.ifUpgradeAvailableOnly = false
+	Of.canAutoPR = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
