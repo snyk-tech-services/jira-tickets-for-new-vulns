@@ -39,4 +39,5 @@ type optionalFlags struct {
 	dryRun                 bool
 	cveInTitle             bool
 	ifUpgradeAvailableOnly bool
+	ifAutoFixableOnly      bool
 }
