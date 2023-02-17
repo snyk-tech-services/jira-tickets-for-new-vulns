@@ -17,6 +17,7 @@ const JiraMultiSelect = "MultiSelect"
 const JiraMultiGroupPicker = "MultiGroupPicker"
 const JiraLabels = "Labels"
 const JiraSimpleField = "simpleField"
+const JiraComponents = "Components"
 
 type JiraIssueForTicket struct {
 	Id  string `json:Id,omitempty"`
@@ -355,6 +356,18 @@ func supportJiraFormats(v string, customDebug debug) (result interface{}, err er
 		}
 
 		result = valueSplit[2]
+
+	case JiraComponents:
+		list := []map[string]string{}
+		for _, x := range strings.Split(valueSplit[2], ",") {
+			list = append(list, map[string]string{"id": x})
+		}
+
+		if len(list) == 0 {
+			return nil, errors.New("Custom field format JiraComponents not recognized, please check the config file.")
+		}
+
+		result = list
 
 	default:
 		return nil, errors.New("Custom field format not recognized, please check the config file.")
