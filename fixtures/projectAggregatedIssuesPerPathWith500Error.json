@@ -22,7 +22,7 @@
         "id": "SNYK-JS-PACRESOLVER-1564857",
         "title": "Remote Code Execution (RCE)",
         "severity": "high",
-        "url": "https://snyk.io/vuln/SNYK-JS-PACRESOLVER-1564857",
+        "url": "https://security.snyk.io/vuln/SNYK-JS-PACRESOLVER-1564857",
         "identifiers": { "CVE": ["CVE-2021-23406"], "CWE": ["CWE-94"] },
         "credit": ["Tim Perry"],
         "exploitMaturity": "proof-of-concept",
@@ -69,7 +69,7 @@
         "id": "SNYK-JS-DOTPROP-543489",
         "title": "Prototype Pollution",
         "severity": "medium",
-        "url": "https://snyk.io/vuln/SNYK-JS-DOTPROP-543489",
+        "url": "https://security.snyk.io/vuln/SNYK-JS-DOTPROP-543489",
         "identifiers": {
           "CVE": ["CVE-2020-8116"],
           "CWE": ["CWE-400"],
@@ -114,7 +114,7 @@
         "id": "SNYK-JS-ACORN-559469",
         "title": "Regular Expression Denial of Service (ReDoS)",
         "severity": "high",
-        "url": "https://snyk.io/vuln/SNYK-JS-ACORN-559469",
+        "url": "https://security.snyk.io/vuln/SNYK-JS-ACORN-559469",
         "identifiers": {
           "CVE": [],
           "CWE": ["CWE-400"],
@@ -162,7 +162,7 @@
         "id": "SNYK-JS-ACORN-559470",
         "title": "Regular Expression Denial of Service (ReDoS)",
         "severity": "high",
-        "url": "https://snyk.io/vuln/SNYK-JS-ACORN-559470",
+        "url": "https://security.snyk.io/vuln/SNYK-JS-ACORN-559470",
         "identifiers": {
           "CVE": [],
           "CWE": ["CWE-400"],
