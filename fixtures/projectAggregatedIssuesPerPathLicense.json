@@ -14,7 +14,7 @@
         "id": "snyk:lic:npm:goof:GPL-2.0",
         "title": "GPL-2.0 license",
         "severity": "high",
-        "url": "https://snyk.io/vuln/snyk:lic:npm:goof:GPL-2.0",
+        "url": "https://security.snyk.io/vuln/snyk:lic:npm:goof:GPL-2.0",
         "exploitMaturity": "no-data",
         "semver": { "vulnerable": [">=0"] },
         "publicationTime": "2021-07-02T00:14:22.812Z",

@@ -28,7 +28,7 @@ func TestSetOptionFunc(t *testing.T) {
 		orgID:         "0e9373a6-f858-11ec-b939-0242ac120002",
 		apiToken:      "123",
 		jiraProjectID: "15698",
-		endpointAPI:   "https://snyk.io/api",
+		endpointAPI:   "https://api.snyk.io",
 	}
 
 	optionalResult := &optionalFlags{
@@ -63,7 +63,7 @@ func TestSetOptionMixFunc(t *testing.T) {
 		"--token=123",
 		"--type=license",
 		"--assigneeId=654",
-		"--api=http://snyk.io/api",
+		"--api=http://api.snyk.io",
 		"--configFile=./fixtures",
 		"--orgID=0e9373a6-f858-11ec-b939-0242ac120002",
 		"--jiraProjectID=15699",
@@ -76,7 +76,7 @@ func TestSetOptionMixFunc(t *testing.T) {
 		orgID:         "0e9373a6-f858-11ec-b939-0242ac120002",
 		apiToken:      "123",
 		jiraProjectID: "15699",
-		endpointAPI:   "http://snyk.io/api",
+		endpointAPI:   "http://api.snyk.io",
 	}
 
 	optionalResult := &optionalFlags{
