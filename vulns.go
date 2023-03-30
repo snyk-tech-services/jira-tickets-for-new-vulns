@@ -314,9 +314,9 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 
 	for _, severityIndexValue := range severity {
 
-		url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues?project_id=" + projectID + "&version=2021-08-20~experimental"
+		url := endpointAPI + "/rest/orgs/" + flags.mandatoryFlags.orgID + "/issues?project_id=" + projectID + "&version=2021-08-20~experimental"
 		if len(flags.optionalFlags.severity) > 0 {
-			url = endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues?project_id=" + projectID + "&severity=" + severityIndexValue + "&version=2021-08-20~experimental"
+			url = endpointAPI + "/rest/orgs/" + flags.mandatoryFlags.orgID + "/issues?project_id=" + projectID + "&severity=" + severityIndexValue + "&version=2021-08-20~experimental"
 		}
 
 		for {
@@ -350,7 +350,7 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 
 						id := e.K("id").String().Value
 
-						url := endpointAPI + "/v3/orgs/" + flags.mandatoryFlags.orgID + "/issues/detail/code/" + id + "?project_id=" + projectID + "&version=2022-04-06~experimental"
+						url := endpointAPI + "/rest/orgs/" + flags.mandatoryFlags.orgID + "/issues/detail/code/" + id + "?project_id=" + projectID + "&version=2022-04-06~experimental"
 
 						// get the details of this code issue id
 						responseIssueDetail, err := makeSnykAPIRequest("GET", url, flags.mandatoryFlags.apiToken, nil, customDebug)
@@ -398,7 +398,7 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 			}
 
 			if len(jsonData.K("links").K("next").String().Value) > 0 {
-				url = endpointAPI + "/v3" + jsonData.K("links").K("next").String().Value
+				url = endpointAPI + "/rest" + jsonData.K("links").K("next").String().Value
 			} else {
 				break
 			}

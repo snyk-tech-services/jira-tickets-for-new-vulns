@@ -146,7 +146,7 @@ func (opt *flags) setOption(args []string) {
 
 	fs.String("orgID", "", "Your Snyk Organization ID (check under Settings)")
 	fs.String("projectID", "", "Optional. Your Project ID. Will sync all projects Of your organization if not provided")
-	fs.String("api", "https://snyk.io/api", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
+	fs.String("api", "https://api.snyk.io", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
 	apiTokenPtr = fs.String("token", "", "Your API token")
 	fs.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
 	fs.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
