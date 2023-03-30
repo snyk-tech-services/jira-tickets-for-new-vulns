@@ -460,73 +460,73 @@ func HTTPResponseCodeIssueStubAndMirrorRequest() *httptest.Server {
 			resp = []byte("404 - url mismatch")
 		} else if r.RequestURI == "/v1/org/123/project/456/issue/xxbac5ed-83dd-xx65-8730-2xxx4467e00d/jira-issue" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/results/singleCodeJiraTicketOpeningResponse")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=456&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=456&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeData.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=high&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=high&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataHighIssuesWithPaginationPage1.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=critical&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=critical&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataCriticalIssuesWithPaginationPage1.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental&severity=critical&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental&severity=critical&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataCriticalIssuesWithPaginationPage2.json")
-		} else if r.RequestURI == "/v3//orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental&severity=critical&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
+		} else if r.RequestURI == "/rest//orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental&severity=critical&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataCriticalIssuesWithPaginationPage3.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental?limit=10&severity=critical&starting_after=v1.eyJwcmlvcml0eVNjb3JlIjo1NTgsImlkIjoiNjU5MDc3Mjg1In0%3D" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental?limit=10&severity=critical&starting_after=v1.eyJwcmlvcml0eVNjb3JlIjo1NTgsImlkIjoiNjU5MDc3Mjg1In0%3D" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataCriticalIssuesWithPaginationPage3.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=1234&version=2021-08-20~experimental?limit=10&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=1234&version=2021-08-20~experimental?limit=10&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeData.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=low&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=789&severity=low&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataLowIssues.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=high&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=789&severity=high&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataHighIssues.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=critical&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=789&severity=critical&version=2021-08-20~experimental" {
 			w.WriteHeader(http.StatusNotFound)
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=7891&severity=low&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=7891&severity=low&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataLowIssues.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=7891&severity=high&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=7891&severity=high&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataHighIssuesIgnored.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=7891&severity=critical&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=7891&severity=critical&version=2021-08-20~experimental" {
 			w.WriteHeader(http.StatusNotFound)
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=1234&severity=high&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=1234&severity=high&version=2021-08-20~experimental" {
 			w.WriteHeader(http.StatusNotFound)
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=medium&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=medium&version=2021-08-20~experimental" {
 			w.WriteHeader(http.StatusNotFound)
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=1234&severity=low&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=1234&severity=low&version=2021-08-20~experimental" {
 			w.WriteHeader(http.StatusNotFound)
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=medium&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=789&severity=medium&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataMediumIssues.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=low&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=low&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataEmpty.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=7891&severity=medium&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=7891&severity=medium&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataMediumIssues.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=456&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=456&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=1234&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=1234&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetailsForPagination.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-critical2-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-critical2-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetailsForPagination.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-critical1-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-critical1-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetailsForPagination.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/bbbbbbb-83dd-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/bbbbbbb-83dd-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetailsForPagination.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=456&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=456&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails2.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=456&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=456&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails3.json")
 		} else if r.RequestURI == "/v1/org/123/project/456/issue/SNYK-JS-MINIMIST-559764/jira-issue" {
 			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=789&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=789&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=789&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=789&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails2.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=789&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=789&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails3.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=7891&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=7891&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetailsWithIgnore.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=7891&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=7891&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails2.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=7891&version=2022-04-06~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=7891&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails3.json")
 		} else {
 			fmt.Println("**** TEST ERROR *** Could not match URL", r.RequestURI)

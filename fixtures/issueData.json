@@ -2,7 +2,7 @@
     "id": "SNYK-JS-PACRESOLVER-1564857",
     "title": "Remote Code Execution (RCE)",
     "severity": "high",
-    "url": "https://snyk.io/vuln/SNYK-JS-PACRESOLVER-1564857",
+    "url": "https://security.snyk.io/vuln/SNYK-JS-PACRESOLVER-1564857",
     "identifiers": { "CVE": ["CVE-2021-23406"], "CWE": ["CWE-94"] },
     "credit": ["Tim Perry"],
     "exploitMaturity": "proof-of-concept",
