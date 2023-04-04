@@ -12,7 +12,7 @@ _Instructions on how to run this locally, background context, what to review, qu
 
 ### More information
 
-- [Link to documentation](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/wiki/)
+- [Link to documentation](https://github.com/circleci/jira-tickets-for-new-vulns/wiki/)
 
 ### Screenshots
 

@@ -8,16 +8,16 @@ Run this after `snyk monitor` in CI or every day/hour for non CLI projects.
 Aimed to be executed at regular interval or with a trigger of your choice (webhooks).
 
 
-[![CircleCI](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns.svg?style=svg)](https://circleci.com/gh/snyk-tech-services/jira-tickets-for-new-vulns)
+[![CircleCI](https://circleci.com/gh/circleci/jira-tickets-for-new-vulns.svg?style=svg)](https://circleci.com/gh/circleci/jira-tickets-for-new-vulns)
 [![Inactively Maintained](https://img.shields.io/badge/Maintenance%20Level-Inactively%20Maintained-yellowgreen.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
 
 
 **This repository is in maintenance mode, no new features are being developed. Bug & security fixes will continue to be delivered. Open source contributions are welcome for small features & fixes (no breaking changes)**
 
 ## Installation
-You can either download the binaries from the [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
+You can either download the binaries from the [the release page](https://github.com/circleci/jira-tickets-for-new-vulns/releases)
 or
-Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
+Use `go install github.com/circleci/jira-tickets-for-new-vulns@latest`
 
 ## Usage - Quick start
 - `--orgID` *required*
