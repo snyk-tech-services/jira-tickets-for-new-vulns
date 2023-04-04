@@ -1,6 +1,8 @@
 
 ### Open Jira tickets for new & existing Snyk project issues
 
+> NOTE: Repository is not maintained by Snyk anymore, so we basically own it now.
+
 Sync your Snyk monitored projects and open automatically JIRA tickets for new issues and existing one(s) without ticket already created.
 Run this after `snyk monitor` in CI or every day/hour for non CLI projects.
 Aimed to be executed at regular interval or with a trigger of your choice (webhooks).

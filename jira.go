@@ -31,7 +31,7 @@ type Field struct {
 	Assignees   *Assignee     `json:"assignee,omitempty"`
 	Priority    *PriorityType `json:"priority,omitempty"`
 	Labels      []string      `json:"labels,omitempty"`
-	DueDate     string        `json:"dueDate,omitempty"`
+	DueDate     string        `json:"duedate,omitempty"`
 }
 
 // Assignee is the account ID of the Jira user to assign tickets to
