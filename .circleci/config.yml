@@ -44,10 +44,7 @@ jobs:
 
   publish-github-release:
     docker:
-      - image: gcr.io/snyk-technical-services/cicd-github
-        auth:
-          username: _json_key
-          password: $GCLOUD_GCR_SNYK_TS_READER
+      - image: aarlaudsnyk/utility-containers
     steps:
       - checkout
       - attach_workspace:
