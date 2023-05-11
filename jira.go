@@ -279,12 +279,15 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 		if !flags.optionalFlags.dryRun {
 
 			if RequestFailed == true {
+				previousPriorityIsSeverity := flags.optionalFlags.priorityIsSeverity
 				for numberOfRetries := 0; numberOfRetries < MaxNumberOfRetry; numberOfRetries++ {
 
 					customDebug.Debug("*** INFO *** Retrying with priorityIsSeverity set to false, max retries=", MaxNumberOfRetry)
 
 					flags.optionalFlags.priorityIsSeverity = false
 					responseDataAggregatedByte, ticket, err, jiraApiUrl = openJiraTicket(flags, projectInfo, vulnForJira, customDebug)
+					// restore previous priorityIsSeverity value
+					flags.optionalFlags.priorityIsSeverity = previousPriorityIsSeverity
 					if err != nil {
 						fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, "api", err, jiraApiUrl, customDebug)
 					} else {
