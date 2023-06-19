@@ -72,11 +72,11 @@ func TestGetProjectDetailsErrorFunc(t *testing.T) {
 	return
 }
 
-// Test get projevs with error 500
+// Test get projects with error 500
 
 // Test GetProjectDetails function
-func TestGetOrgProjects(t *testing.T) {
-	expectedTestURL := "/v1/org/123/projects"
+func TestsnykProjectsAPICall(t *testing.T) {
+	expectedTestURL := "/rest/orgs/123/projects&version=2022-07-08~beta&status=active"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -102,7 +102,7 @@ func TestGetOrgProjects(t *testing.T) {
 
 	CreateLogFile(cD, "ErrorsFile_")
 
-	response, _ := getOrgProjects(flags, cD)
+	response, _ := snykProjectsAPICall(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
@@ -115,8 +115,8 @@ func TestGetOrgProjects(t *testing.T) {
 }
 
 // Test GetProjectDetails function with a criticality filter
-func TestGetOrgProjectsCriticality(t *testing.T) {
-	expectedTestURL := "/v1/org/123/projects"
+func TestsnykProjectsAPICallCriticality(t *testing.T) {
+	expectedTestURL := "/rest/orgs/123/projects&version=2022-07-08~beta&status=active&businessCriticality=critical"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -143,7 +143,7 @@ func TestGetOrgProjectsCriticality(t *testing.T) {
 
 	CreateLogFile(cD, "ErrorsFile_")
 
-	response, _ := getOrgProjects(flags, cD)
+	response, _ := snykProjectsAPICall(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
@@ -156,8 +156,8 @@ func TestGetOrgProjectsCriticality(t *testing.T) {
 }
 
 // Test GetProjectDetails function with an environment filter
-func TestGetOrgProjectsEnvironment(t *testing.T) {
-	expectedTestURL := "/v1/org/123/projects"
+func TestsnykProjectsAPICallEnvironment(t *testing.T) {
+	expectedTestURL := "/rest/orgs/123/projects&version=2022-07-08~beta&status=active&environment=frontend,external"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -184,7 +184,7 @@ func TestGetOrgProjectsEnvironment(t *testing.T) {
 
 	CreateLogFile(cD, "ErrorsFile_")
 
-	response, _ := getOrgProjects(flags, cD)
+	response, _ := snykProjectsAPICall(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
@@ -197,8 +197,8 @@ func TestGetOrgProjectsEnvironment(t *testing.T) {
 }
 
 // Test GetProjectDetails function with a lifecycle filter
-func TestGetOrgProjectsLifecycle(t *testing.T) {
-	expectedTestURL := "/v1/org/123/projects"
+func TestsnykProjectsAPICallLifecycle(t *testing.T) {
+	expectedTestURL := "/rest/orgs/123/projects&version=2022-07-08~beta&status=active&lifecycle=production"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -225,7 +225,7 @@ func TestGetOrgProjectsLifecycle(t *testing.T) {
 
 	CreateLogFile(cD, "ErrorsFile_")
 
-	response, _ := getOrgProjects(flags, cD)
+	response, _ := snykProjectsAPICall(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
@@ -240,7 +240,7 @@ func TestGetOrgProjectsLifecycle(t *testing.T) {
 // Test getProjectsIds function
 func TestGetProjectsIdsAllProjects(t *testing.T) {
 
-	expectedTestURL := "/v1/org/123/projects"
+	expectedTestURL := "/rest/orgs/123/projects&version=2022-07-08~beta&status=active"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 

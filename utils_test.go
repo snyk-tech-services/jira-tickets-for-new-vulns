@@ -370,8 +370,7 @@ func HTTPResponseEndToEnd() *httptest.Server {
 	var resp []byte
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if string(r.RequestURI) == "/v1/org/123/projects" {
-
+		if string(r.RequestURI) == "/rest/orgs/123/projects&version=2022-07-08~beta&status=active" {
 			resp = readFixture("./fixtures/orgEndToEnd.json")
 
 		} else if r.RequestURI == "/v1/org/123/project/123" {
