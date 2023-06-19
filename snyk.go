@@ -1,10 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/michael-go/go-jsn/jsn"
 )
@@ -25,96 +25,75 @@ type ProjectsFiltersAttributes struct {
 	Lifecycle   []string `json:"lifecycle,omitempty"`
 }
 
-type Link struct {
-	NEXT string `json:"next"`
-}
-
-type ProjectWithId struct {
-	ID string `json:"id"`
-}
-
-type ProjectsData struct {
-	DATA  []ProjectWithId `json:"data"`
-	LINKS Link `json:"links"`
-}
-
-func snykProjectsAPICall(flags flags, customDebug debug) ([]string, error) {
-	// Doing this for test propose
-	endpointAPI := "https://api.snyk.io"
-	if IsTestRun() {
-		endpointAPI = flags.mandatoryFlags.endpointAPI
-	}
-
-	// https://apidocs.snyk.io/?version=2022-07-08~beta#get-/orgs/-org_id-
+func getOrgProjects(flags flags, customDebug debug) ([]jsn.Json, error) {
+	// According to https://snyk.docs.apiary.io/#reference/projects/all-projects/list-all-projects this should be
+	// a POST API call but historically we used GET here. The following code maintains backwards compatibility for
+	// existing cases where people aren't filtering projects by attributes, as it appears the API does not return
+	// the full project list with empty attribute filters in the request body.
 	verb := "GET"
-	endpoint := fmt.Sprintf("%s/rest/orgs/%s/projects&version=2022-07-08~beta&status=active", endpointAPI, flags.mandatoryFlags.orgID)
+	api_version := "2022-07-08~beta"
 
-	if len(flags.optionalFlags.projectCriticality) > 0 {
-		endpoint += fmt.Sprintf("&businessCriticality=%v", flags.optionalFlags.projectCriticality)
-	}
+	baseURL := flags.mandatoryFlags.endpointAPI + "/rest"
 
-	if len(flags.optionalFlags.projectEnvironment) > 0 {
-		endpoint += fmt.Sprintf("&environment=%v", flags.optionalFlags.projectEnvironment)
-	}
+	projectsAPI := "/orgs/" + flags.mandatoryFlags.orgID + "/projects?version=" + api_version + "&status=active"
+	if len(flags.optionalFlags.projectCriticality) > 0 || len(flags.optionalFlags.projectEnvironment) > 0 || len(flags.optionalFlags.projectLifecycle) > 0 {
 
-	if len(flags.optionalFlags.projectLifecycle) > 0 {
-		endpoint += fmt.Sprintf("&lifecycle=%v", flags.optionalFlags.projectLifecycle)
+		// TODO update examples to accurately reflect lowercase comma separated not square brackets
+		if len(flags.optionalFlags.projectCriticality) > 0 {
+			projectsAPI += "&businessCriticality=" + strings.Replace(flags.optionalFlags.projectCriticality, ",", "%2C", -1)
+		}
+
+		if len(flags.optionalFlags.projectEnvironment) > 0 {
+			projectsAPI += "&environment=" + strings.Replace(flags.optionalFlags.projectEnvironment, ",", "%2C", -1)
+		}
+
+		if len(flags.optionalFlags.projectLifecycle) > 0 {
+			projectsAPI += "&lifecycle=" + strings.Replace(flags.optionalFlags.projectLifecycle, ",", "%2C", -1)
+		}
 	}
 
 	var err error
-	var projectIds []string
 
-	for {
-		// get the list of code issue for this project
-		responseData, err := makeSnykAPIRequest(verb, endpoint, flags.mandatoryFlags.apiToken, nil, customDebug)
+	if verb == "POST" {
 		if err != nil {
-			filters := "projectCriticality: " + flags.optionalFlags.projectCriticality + "\n projectEnvironment: " + flags.optionalFlags.projectEnvironment + "\n projectLifecycle: " + flags.optionalFlags.projectLifecycle
-			log.Printf("*** ERROR *** Could not list the Project(s) for endpoint %s\n Applied Filters: %s\n", endpoint, filters)
-			errorMessage := fmt.Sprintf("Failure, Could not list the Project(s) for endpoint %s .\n Applied filters: %s\n", endpoint, filters)
-			writeErrorFile("snykProjectsAPICall", errorMessage, customDebug)
+			// FIXME: don't fall back, we should error instead
+			log.Printf("*** ERROR *** Not able to read attributes %s\n", projectsAPI)
+			errorMessage := fmt.Sprintf("Failure, Not able to read attributes\n")
+			writeErrorFile("getOrgProjects", errorMessage, customDebug)
 			err = errors.New(errorMessage)
-		}
-		var projectsData ProjectsData
-
-		err = json.Unmarshal(responseData, &projectsData)
-		if err != nil {
-			log.Printf("*** ERROR *** Could not get read the response from endpoint %s\n", endpoint)
-			errorMessage := fmt.Sprintf("Failure, Could not get read the response from endpoint %s ", endpoint)
-			writeErrorFile("snykProjectsAPICall", errorMessage, customDebug)
-			err = errors.New(errorMessage)
-		}
-
-		for _, project := range projectsData.DATA {
-			if err != nil {
-				fmt.Println("Error:", err)
-				return nil, err
-			}
-			projectIds = append(projectIds, project.ID)
-		}
-
-		if len(projectsData.LINKS.NEXT) > 0 {
-			endpoint = endpointAPI + "/rest" + projectsData.LINKS.NEXT
-		} else {
-			break
+			verb = "GET"
 		}
 	}
 
-	return projectIds, err
+	projectList, err := makeSnykAPIRequest_REST(verb, baseURL, projectsAPI, flags.mandatoryFlags.apiToken, nil, customDebug)
+	if err != nil {
+		filters := "projectCriticality: " + flags.optionalFlags.projectCriticality + "\n projectEnvironment: " + flags.optionalFlags.projectEnvironment + "\n projectLifecycle: " + flags.optionalFlags.projectLifecycle
+		log.Printf("*** ERROR *** Could not list the Project(s) for endpoint %s\n Applied Filters: %s\n", projectsAPI, filters)
+		errorMessage := fmt.Sprintf("Failure, Could not list the Project(s) for endpoint %s .\n Applied filters: %s\n", projectsAPI, filters)
+		writeErrorFile("getOrgProjects", errorMessage, customDebug)
+		err = errors.New(errorMessage)
+	}
+
+	return projectList, err
 }
 
 func getProjectsIds(options flags, customDebug debug, notCreatedLogFile string) ([]string, error) {
 
 	var projectIds []string
-	if len(options.optionalFlags.projectID) > 0 {
-
+	if len(options.optionalFlags.projectID) == 0 {
 		filters := "projectCriticality: " + options.optionalFlags.projectCriticality + "\n projectEnvironment: " + options.optionalFlags.projectEnvironment + "\n projectLifecycle: " + options.optionalFlags.projectLifecycle
 		log.Println("*** INFO *** Project ID not specified - listing all projects that match the following filters: ", filters)
 
-		projectIds, err := snykProjectsAPICall(options, customDebug)
+		projects, err := getOrgProjects(options, customDebug)
 		if err != nil {
 			message := fmt.Sprintf("error while getting projects ID for org %s", options.mandatoryFlags.orgID)
 			writeErrorFile("getProjectsIds", message, customDebug)
 			return nil, err
+		}
+	
+		for _, project := range projects {
+			projectID := project.K("id").String().Value
+			projectIds = append(projectIds, projectID)
 		}
 
 		if len(projectIds) == 0 {
@@ -125,7 +104,7 @@ func getProjectsIds(options flags, customDebug debug, notCreatedLogFile string) 
 		return projectIds, nil
 	}
 
-	projectIds = append(projectIds, string(options.optionalFlags.projectID))
+	projectIds = append(projectIds, options.optionalFlags.projectID)
 
 	return projectIds, nil
 }

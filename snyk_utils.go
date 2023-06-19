@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/michael-go/go-jsn/jsn"
 )
 
 func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body []byte, customDebug debug) ([]byte, error) {
@@ -130,4 +132,62 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 	}
 	time.Sleep(1)
 	return responseData, err
+}
+
+
+// This does not have general testing or capabilities at present.
+// So far, is being tested only with GET https://api.snyk.io/rest/orgs/[OrgID]/projects
+// Need to investigate and update error handling TODO
+// currently no retry logic TODO
+func makeSnykAPIRequest_REST(verb string, baseURL string, endpointURL string, snykToken string, body []byte, customDebug debug) ([]jsn.Json, error) {
+	var err error
+	allData := []jsn.Json{}
+	bodyBuffer := bytes.NewBuffer(nil)
+
+	url := baseURL + endpointURL
+	client := &http.Client{}
+
+	for url != "" { 
+		if verb == "POST" && body != nil {
+			bodyBuffer = bytes.NewBuffer(body)
+		}
+
+		request, err := http.NewRequest(verb, url, bodyBuffer)
+		if err != nil {
+			customDebug.Debugf("*** ERROR *** could not create requests to '%s' failed with error %s\n", url, err.Error())
+			return []jsn.Json{}, err
+		}
+	
+		request.Header.Add("Accept", "application/vnd.api+json")
+		request.Header.Add("Authorization", snykToken)
+		request.Header.Set("User-Agent", "tech-services/snyk-jira-tickets-for-new-vulns")
+
+		response, err := client.Do(request)
+		if err != nil {
+			customDebug.Debugf("*** ERROR *** Request on endpoint '%s' failed with error %s\n", url, err.Error())
+			return []jsn.Json{}, err
+		}
+		defer response.Body.Close()
+
+		customDebug.Debugf("*** INFO *** Sending %s request to %s", verb, url)
+
+		jsonResponse, err := jsn.NewJson(response.Body)
+		if err != nil {
+			customDebug.Debugf("*** ERROR *** failed to load load json from response from endpoint %s with error %s\n", url, err.Error())
+		}
+
+		data := jsonResponse.K("data").Array()
+		allData = append(allData, data.Elements()...)
+
+		// Check if there is a next link, if not empty string ends the loop
+		next := jsonResponse.K("links").K("next").String()
+		if !next.IsValid {
+			url = ""
+		} else {
+			url = baseURL + next.Value
+		}
+	}
+
+	time.Sleep(1)
+	return allData, err
 }

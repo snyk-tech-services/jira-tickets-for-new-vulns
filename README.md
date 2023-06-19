@@ -154,21 +154,21 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
 - `--projectCriticality` *optional*
 
-  Include only projects whose [Snyk business criticality attribute](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-information/project-attributes#business-criticality) contains one or more of the specified values.
+  Include only projects whose [Snyk business criticality attribute](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-information/project-attributes#business-criticality) contains one or more of the specified values. This should be all lower case, comma separated with no spaces.
 
-  *Example*: `--projectCriticality=[Critical,Medium]`
+  *Example*: `--projectCriticality=critical,medium`
 
 - `--projectEnvironment` *optional*
 
-  Include only projects whose [Snyk environment attribute](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-information/project-attributes#environment) contains one or more of the specified values.
+  Include only projects whose [Snyk environment attribute](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-information/project-attributes#environment) contains one or more of the specified values. This should be all lower case, comma separated with no spaces.
 
-  *Example*: `--projectLifecycle=[backend,frontend]`
+  *Example*: `--projectEnvironment=backend,frontend`
 
 - `--projectLifecycle` *optional*
 
-  Include only projects whose [Snyk lifecycle attribute](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-information/project-attributes#lifecycle-stage) contains one or more of the specified values.
+  Include only projects whose [Snyk lifecycle attribute](https://docs.snyk.io/introducing-snyk/introduction-to-snyk-projects/view-project-information/project-attributes#lifecycle-stage) contains one or more of the specified values. This should be all lower case, comma separated with no spaces.
 
-  *Example*: `--projectLifecycle=[development,production]`
+  *Example*: `--projectLifecycle=development,production`
 
 - `--configFile` *optional*
 

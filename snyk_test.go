@@ -72,11 +72,11 @@ func TestGetProjectDetailsErrorFunc(t *testing.T) {
 	return
 }
 
-// Test get projects with error 500
+// Test get projevs with error 500
 
 // Test GetProjectDetails function
-func TestsnykProjectsAPICall(t *testing.T) {
-	expectedTestURL := "/rest/orgs/123/projects&version=2022-07-08~beta&status=active"
+func TestGetOrgProjects(t *testing.T) {
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -102,11 +102,13 @@ func TestsnykProjectsAPICall(t *testing.T) {
 
 	CreateLogFile(cD, "ErrorsFile_")
 
-	response, _ := snykProjectsAPICall(flags, cD)
+	response, _ := getOrgProjects(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
-	comparison, _ := jsondiff.Compare(readFixture("./fixtures/org.json"), marshalledResp, &opts)
+
+	fixture := readFixtureData("./fixtures/org.json")
+	comparison, _ := jsondiff.Compare(fixture, marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
 
 	removeLogFile()
@@ -115,8 +117,8 @@ func TestsnykProjectsAPICall(t *testing.T) {
 }
 
 // Test GetProjectDetails function with a criticality filter
-func TestsnykProjectsAPICallCriticality(t *testing.T) {
-	expectedTestURL := "/rest/orgs/123/projects&version=2022-07-08~beta&status=active&businessCriticality=critical"
+func TestGetOrgProjectsCriticality(t *testing.T) {
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&businessCriticality=critical"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -143,11 +145,11 @@ func TestsnykProjectsAPICallCriticality(t *testing.T) {
 
 	CreateLogFile(cD, "ErrorsFile_")
 
-	response, _ := snykProjectsAPICall(flags, cD)
+	response, _ := getOrgProjects(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
-	comparison, _ := jsondiff.Compare(readFixture("./fixtures/org.json"), marshalledResp, &opts)
+	comparison, _ := jsondiff.Compare(readFixtureData("./fixtures/org.json"), marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
 
 	removeLogFile()
@@ -156,8 +158,8 @@ func TestsnykProjectsAPICallCriticality(t *testing.T) {
 }
 
 // Test GetProjectDetails function with an environment filter
-func TestsnykProjectsAPICallEnvironment(t *testing.T) {
-	expectedTestURL := "/rest/orgs/123/projects&version=2022-07-08~beta&status=active&environment=frontend,external"
+func TestGetOrgProjectsEnvironment(t *testing.T) {
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&environment=frontend%2Cexternal"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -184,11 +186,11 @@ func TestsnykProjectsAPICallEnvironment(t *testing.T) {
 
 	CreateLogFile(cD, "ErrorsFile_")
 
-	response, _ := snykProjectsAPICall(flags, cD)
+	response, _ := getOrgProjects(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
-	comparison, _ := jsondiff.Compare(readFixture("./fixtures/org.json"), marshalledResp, &opts)
+	comparison, _ := jsondiff.Compare(readFixtureData("./fixtures/org.json"), marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
 
 	removeLogFile()
@@ -197,8 +199,8 @@ func TestsnykProjectsAPICallEnvironment(t *testing.T) {
 }
 
 // Test GetProjectDetails function with a lifecycle filter
-func TestsnykProjectsAPICallLifecycle(t *testing.T) {
-	expectedTestURL := "/rest/orgs/123/projects&version=2022-07-08~beta&status=active&lifecycle=production"
+func TestGetOrgProjectsLifecycle(t *testing.T) {
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&lifecycle=production"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -225,11 +227,11 @@ func TestsnykProjectsAPICallLifecycle(t *testing.T) {
 
 	CreateLogFile(cD, "ErrorsFile_")
 
-	response, _ := snykProjectsAPICall(flags, cD)
+	response, _ := getOrgProjects(flags, cD)
 
 	opts := jsondiff.DefaultConsoleOptions()
 	marshalledResp, _ := json.Marshal(response)
-	comparison, _ := jsondiff.Compare(readFixture("./fixtures/org.json"), marshalledResp, &opts)
+	comparison, _ := jsondiff.Compare(readFixtureData("./fixtures/org.json"), marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
 
 	removeLogFile()
@@ -240,7 +242,7 @@ func TestsnykProjectsAPICallLifecycle(t *testing.T) {
 // Test getProjectsIds function
 func TestGetProjectsIdsAllProjects(t *testing.T) {
 
-	expectedTestURL := "/rest/orgs/123/projects&version=2022-07-08~beta&status=active"
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 

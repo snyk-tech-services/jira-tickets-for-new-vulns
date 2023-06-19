@@ -370,7 +370,7 @@ func HTTPResponseEndToEnd() *httptest.Server {
 	var resp []byte
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if string(r.RequestURI) == "/rest/orgs/123/projects&version=2022-07-08~beta&status=active" {
+		if string(r.RequestURI) == "/rest/orgs/123/projects?version=2022-07-08~beta&status=active" {
 			resp = readFixture("./fixtures/orgEndToEnd.json")
 
 		} else if r.RequestURI == "/v1/org/123/project/123" {
@@ -449,6 +449,27 @@ func readFixture(path string) []byte {
 		panic(err)
 	}
 	return data
+}
+
+// In the REST api tests, we just want the data array, not the full fixture.
+type Fixture struct {
+	Data json.RawMessage `json:"data"`
+}
+
+func readFixtureData(path string) []byte {
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatalf("failed reading file: %s", err)
+	}
+
+	var fixture Fixture
+
+	err = json.Unmarshal(data, &fixture)
+	if err != nil {
+		log.Fatalf("failed unmarshalling json: %s", err)
+	}
+
+	return fixture.Data
 }
 
 func HTTPResponseCodeIssueStubAndMirrorRequest() *httptest.Server {

@@ -57,9 +57,49 @@
 					}
 				}
 			}
+		},
+		{
+			"type": "project",
+			"id": "57cbc2c9-1a1b-45ca-94bb-55c644c217d4",
+			"attributes": {
+				"name": "xyz-snyk/goof:package.json",
+				"created": "2023-04-11T03:57:59.256Z",
+				"origin": "bitbucket-connect-app",
+				"type": "npm",
+				"status": "active",
+				"targetReference": "master",
+				"businessCriticality": [
+					"critical"
+				],
+				"lifecycle": [
+					"development"
+				],
+				"environment": [
+					"frontend"
+				],
+				"tags": []
+			},
+			"relationships": {
+				"target": {
+					"data": {
+						"type": "target",
+						"id": "08fbfe72-8d02-4936-a8f2-5ba8e438dee5"
+					},
+					"links": {
+						"self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/08fbfe72-8d02-4936-a8f2-5ba8e438dee5"
+					}
+				},
+				"importingUser": {
+					"data": {
+						"type": "user",
+						"id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+					},
+					"links": {
+						"self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+					}
+				}
+			}
 		}
 	],
-	"links": {
-		"next": "/orgs/5ebcd4d3-6138-4788-99ec-e3f2245095b7/projects?version=2022-07-08~beta&limit=10&starting_after=v1.eyJpZCI6NDI4OTU2MTl9"
-	}
+	"links": {}
 }
