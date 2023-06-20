@@ -76,7 +76,7 @@ func TestGetProjectDetailsErrorFunc(t *testing.T) {
 
 // Test GetProjectDetails function
 func TestGetOrgProjects(t *testing.T) {
-	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active"
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&limit=100"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -118,7 +118,7 @@ func TestGetOrgProjects(t *testing.T) {
 
 // Test GetProjectDetails function with a criticality filter
 func TestGetOrgProjectsCriticality(t *testing.T) {
-	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&businessCriticality=critical"
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&limit=100&businessCriticality=critical"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -159,7 +159,7 @@ func TestGetOrgProjectsCriticality(t *testing.T) {
 
 // Test GetProjectDetails function with an environment filter
 func TestGetOrgProjectsEnvironment(t *testing.T) {
-	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&environment=frontend%2Cexternal"
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&limit=100&environment=frontend%2Cexternal"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -200,7 +200,7 @@ func TestGetOrgProjectsEnvironment(t *testing.T) {
 
 // Test GetProjectDetails function with a lifecycle filter
 func TestGetOrgProjectsLifecycle(t *testing.T) {
-	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&lifecycle=production"
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&limit=100&lifecycle=production"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
@@ -242,7 +242,7 @@ func TestGetOrgProjectsLifecycle(t *testing.T) {
 // Test getProjectsIds function
 func TestGetProjectsIdsAllProjects(t *testing.T) {
 
-	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active"
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&limit=100"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 
