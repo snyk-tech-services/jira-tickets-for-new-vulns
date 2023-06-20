@@ -1,0 +1,260 @@
+{
+    "jsonapi": {
+        "version": "1.0"
+    },
+    "data": [
+        {
+            "type": "project",
+            "id": "b9a0a1ad-e491-40bd-86ee-c65359f68573",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:todolist-goof/exploits/tomcat-rce/Dockerfile",
+                "created": "2023-05-15T21:41:36.524Z",
+                "origin": "github-enterprise",
+                "type": "dockerfile",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "de553d9a-4e7a-4920-a51a-658c55affb81",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:todolist-goof/Dockerfile",
+                "created": "2023-05-15T21:41:36.520Z",
+                "origin": "github-enterprise",
+                "type": "dockerfile",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "7ccfd8ba-9805-41ab-88a4-85a0a9f8bab9",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:log4shell-goof/log4shell-server/Dockerfile",
+                "created": "2023-05-15T21:41:36.329Z",
+                "origin": "github-enterprise",
+                "type": "dockerfile",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "ba5783db-e454-48b5-8664-6d04fab7dd20",
+            "attributes": {
+                "name": "xyz-snyk/juice-shop:Dockerfile",
+                "created": "2023-05-15T21:41:34.984Z",
+                "origin": "github-enterprise",
+                "type": "dockerfile",
+                "status": "active",
+                "targetReference": "master",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "dbdc972a-052d-4557-bd76-ef584b3b372d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/dbdc972a-052d-4557-bd76-ef584b3b372d"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "1e0ccd51-c01f-42e4-a2a4-3791ecf89d40",
+            "attributes": {
+                "name": "xyz/java-goof:todolist-goof/k8s/noegress.yaml",
+                "created": "2023-05-11T17:50:02.320Z",
+                "origin": "gitlab",
+                "type": "k8sconfig",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "b681db4d-6017-4376-a60b-e6385518b748"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/b681db4d-6017-4376-a60b-e6385518b748"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "f094a6f4-3222-4ea8-b465-54d254fdf3b5",
+            "attributes": {
+                "name": "xyz/java-goof:todolist-goof/k8s/metallb-config.yaml",
+                "created": "2023-05-11T17:50:02.195Z",
+                "origin": "gitlab",
+                "type": "k8sconfig",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "b681db4d-6017-4376-a60b-e6385518b748"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/b681db4d-6017-4376-a60b-e6385518b748"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "2a9ab2c8-137f-4134-abcf-0f12f128c52b",
+            "attributes": {
+                "name": "xyz/java-goof:todolist-goof/k8s/java-goof3.yaml",
+                "created": "2023-05-11T17:50:02.159Z",
+                "origin": "gitlab",
+                "type": "k8sconfig",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "b681db4d-6017-4376-a60b-e6385518b748"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/b681db4d-6017-4376-a60b-e6385518b748"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        }
+    ],
+    "links": {}
+}

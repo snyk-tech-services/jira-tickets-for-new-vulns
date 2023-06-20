@@ -168,6 +168,7 @@ func makeSnykAPIRequest_REST(verb string, baseURL string, endpointURL string, sn
 			return []jsn.Json{}, err
 		}
 		defer response.Body.Close()
+    	fmt.Println("Response Status Code:", response.StatusCode)
 
 		customDebug.Debugf("*** INFO *** Sending %s request to %s", verb, url)
 

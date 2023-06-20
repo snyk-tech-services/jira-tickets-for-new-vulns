@@ -420,6 +420,35 @@ func HTTPResponseEndToEnd() *httptest.Server {
 
 }
 
+func HTTPResponseRestPagination() *httptest.Server {
+
+	var resp []byte
+	var status = http.StatusOK
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if string(r.RequestURI) == "/rest/orgs/xyz-paging/projects?version=2022-07-08~beta&status=active" {
+			resp = readFixture("./fixtures/rest_pagination1.json")
+
+		} else if r.RequestURI == "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2022-07-08~beta&status=active&limit=10&starting_after=test-get-page2" {
+
+			resp = readFixture("./fixtures/rest_pagination2.json")
+
+		} else if r.RequestURI == "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2022-07-08~beta&status=active&limit=10&starting_after=test-get-page3" {
+
+			resp = readFixture("./fixtures/rest_pagination3.json")
+			
+		} else {
+			fmt.Println("Error while mocking request", r.URL)
+			status = http.StatusNotFound
+		}
+
+		w.WriteHeader(status)
+		w.Write(resp)
+
+	}))
+
+}
+
 // HTTPResponseStubAndMirrorRequest Stubbing HTTP response
 func HTTPResponseStubAndMirrorCodeRequest() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
