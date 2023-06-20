@@ -168,13 +168,41 @@ func makeSnykAPIRequest_REST(verb string, baseURL string, endpointURL string, sn
 			return []jsn.Json{}, err
 		}
 		defer response.Body.Close()
-    	fmt.Println("Response Status Code:", response.StatusCode)
+    	// fmt.Println("Response Status Code:", response.StatusCode)
 
 		customDebug.Debugf("*** INFO *** Sending %s request to %s", verb, url)
 
 		jsonResponse, err := jsn.NewJson(response.Body)
 		if err != nil {
 			customDebug.Debugf("*** ERROR *** failed to load load json from response from endpoint %s with error %s\n", url, err.Error())
+		}
+
+		if response.StatusCode == 404 {
+			customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+			errorMessage := fmt.Sprintf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+			writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
+			return nil, errors.New("Not found, Request failed")
+		} else if response.StatusCode == 400 {
+			customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+			customDebug.Debugf("*** INFO *** Please check that all expected fields are present in the config file\n")
+			customDebug.Debugf("*** INFO *** Details : %s\n", jsonResponse.Pretty())
+			errorMessage := fmt.Sprintf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+			writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
+			return nil, errors.New("Unprocessable Entity, Request failed")
+		} else if response.StatusCode == 401 || response.StatusCode == 403 {
+			customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+			customDebug.Debugf("*** INFO *** Please valid API token and permissions\n")
+			customDebug.Debugf("*** INFO *** Details : %s\n", jsonResponse.Pretty())
+			errorMessage := fmt.Sprintf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+			writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
+			return nil, errors.New("Authentication or permission error, Request failed")
+		} else if response.StatusCode > 400 {
+			customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+			customDebug.Debugf("*** INFO *** Please check that all expected fields are present in the config file\n")
+			customDebug.Debugf("*** INFO *** Details : %s\n", jsonResponse.Pretty())
+			errorMessage := fmt.Sprintf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+			writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
+			return nil, errors.New("Request failed")
 		}
 
 		data := jsonResponse.K("data").Array()

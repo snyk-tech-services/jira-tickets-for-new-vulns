@@ -3,8 +3,6 @@ package main
 import (
 	"encoding/json"
 	"testing"
-	//"fmt"
-	//"bytes"
 
 	"github.com/michael-go/go-jsn/jsn"
 	"github.com/nsf/jsondiff"
