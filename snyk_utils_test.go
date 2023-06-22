@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/michael-go/go-jsn/jsn"
-
+	"github.com/nsf/jsondiff"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -77,4 +77,27 @@ func TestMakeSnykRequestFunc(t *testing.T) {
 	assert.Equal(expectedGETResponse, jsonResponse.Pretty())
 
 	return
+}
+
+
+func TestRESTPaginationFunc(t *testing.T) {
+
+	assert := assert.New(t)
+	cD := debug{}
+	cD.setDebug(false)
+	server := HTTPResponseRestPagination()
+
+	defer server.Close()
+
+	response, err := makeSnykAPIRequest_REST("GET", server.URL, "/rest/orgs/xyz-paging/projects?version=2022-07-08~beta&status=active", "123", nil, cD)
+	if err != nil {
+		panic(err)
+	}
+
+	marshalledResp, _ := json.Marshal(response)
+	fixture := readFixture("./fixtures/paginated_projects.json")
+
+	opts := jsondiff.DefaultConsoleOptions()
+	comparison, _ := jsondiff.Compare(fixture, marshalledResp, &opts)
+	assert.Equal("FullMatch", comparison.String())
 }

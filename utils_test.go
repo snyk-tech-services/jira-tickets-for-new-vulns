@@ -370,8 +370,7 @@ func HTTPResponseEndToEnd() *httptest.Server {
 	var resp []byte
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if string(r.RequestURI) == "/v1/org/123/projects" {
-
+		if string(r.RequestURI) == "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&limit=100" {
 			resp = readFixture("./fixtures/orgEndToEnd.json")
 
 		} else if r.RequestURI == "/v1/org/123/project/123" {
@@ -421,6 +420,35 @@ func HTTPResponseEndToEnd() *httptest.Server {
 
 }
 
+func HTTPResponseRestPagination() *httptest.Server {
+
+	var resp []byte
+	var status = http.StatusOK
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if string(r.RequestURI) == "/rest/orgs/xyz-paging/projects?version=2022-07-08~beta&status=active" {
+			resp = readFixture("./fixtures/rest_pagination1.json")
+
+		} else if r.RequestURI == "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2022-07-08~beta&status=active&limit=10&starting_after=test-get-page2" {
+
+			resp = readFixture("./fixtures/rest_pagination2.json")
+
+		} else if r.RequestURI == "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2022-07-08~beta&status=active&limit=10&starting_after=test-get-page3" {
+
+			resp = readFixture("./fixtures/rest_pagination3.json")
+			
+		} else {
+			fmt.Println("Error while mocking request", r.URL)
+			status = http.StatusNotFound
+		}
+
+		w.WriteHeader(status)
+		w.Write(resp)
+
+	}))
+
+}
+
 // HTTPResponseStubAndMirrorRequest Stubbing HTTP response
 func HTTPResponseStubAndMirrorCodeRequest() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -450,6 +478,27 @@ func readFixture(path string) []byte {
 		panic(err)
 	}
 	return data
+}
+
+// In the REST api tests, we just want the data array, not the full fixture.
+type Fixture struct {
+	Data json.RawMessage `json:"data"`
+}
+
+func readFixtureData(path string) []byte {
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatalf("failed reading file: %s", err)
+	}
+
+	var fixture Fixture
+
+	err = json.Unmarshal(data, &fixture)
+	if err != nil {
+		log.Fatalf("failed unmarshalling json: %s", err)
+	}
+
+	return fixture.Data
 }
 
 func HTTPResponseCodeIssueStubAndMirrorRequest() *httptest.Server {
