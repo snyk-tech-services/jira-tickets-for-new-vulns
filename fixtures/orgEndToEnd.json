@@ -1,41 +1,63 @@
 {
-    "org": {
-        "name": "defaultOrg",
-        "id": "689ce7f9-7943-4a71-b704-2ba575f01089"
-    },
-    "projects": [
-          {
-            "id": "123",
-            "name": "test/goof:package.json",
-            "created": "2021-08-31T02:48:41.669Z",
-            "origin": "gitlab",
-            "type": "npm",
-            "readOnly": false,
-            "testFrequency": "daily",
-            "isMonitored": true,
-            "totalDependencies": 483,
-            "issueCountsBySeverity": {
-              "low": 7,
-              "high": 21,
-              "medium": 27,
-              "critical": 1
-            },
-            "imageTag": "0.0.3",
-            "imagePlatform": "",
-            "imageBaseImage": "",
-            "lastTestedDate": "2021-09-10T02:36:31.142Z",
-            "browseUrl": "https://app.snyk.io/org/test-playground/project/123",
-            "owner": null,
-            "importingUser": {
-              "id": "123",
-              "name": "someone withAName",
-              "username": "someone",
-              "email": "someonewithaname@bla.com"
-            },
-            "tags": [],
-            "attributes": { "criticality": [], "lifecycle": [], "environment": [] },
-            "branch": "master"
-          }
-        ]
-
+	"jsonapi": {
+		"version": "1.0"
+	},
+	"data": [
+		{
+			"type": "project",
+			"id": "123",
+			"meta": {},
+			"attributes": {
+				"name": "snyk-fixtures/yarn-2-goof",
+				"type": "sast",
+				"target_file": "",
+				"target_reference": "master",
+				"origin": "github",
+				"created": "2023-06-07T14:43:12.551Z",
+				"status": "active",
+				"business_criticality": [],
+				"environment": [],
+				"lifecycle": [],
+				"tags": [],
+				"settings": {
+					"recurring_tests": {
+						"frequency": "weekly"
+					},
+					"pull_requests": {
+						"fail_only_for_issues_with_fix": false
+					}
+				}
+			},
+			"relationships": {
+				"organization": {
+					"data": {
+						"type": "org",
+						"id": "5ebcd4d3-6138-4788-99ec-e3f2245095b7"
+					},
+					"links": {
+						"related": "/orgs/5ebcd4d3-6138-4788-99ec-e3f2245095b7"
+					}
+				},
+				"target": {
+					"data": {
+						"type": "target",
+						"id": "68e9e0ae-39e7-4751-bb10-553bea246da4"
+					},
+					"links": {
+						"related": "/orgs/5ebcd4d3-6138-4788-99ec-e3f2245095b7/targets/68e9e0ae-39e7-4751-bb10-553bea246da4"
+					}
+				},
+				"importer": {
+					"data": {
+						"type": "user",
+						"id": "d41bb894-f280-47a8-8804-0222fd9642c5"
+					},
+					"links": {
+						"related": "/orgs/5ebcd4d3-6138-4788-99ec-e3f2245095b7/users/d41bb894-f280-47a8-8804-0222fd9642c5"
+					}
+				}
+			}
+		}
+	],
+	"links": {}
 }
