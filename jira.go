@@ -248,14 +248,18 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 
 	for _, vulnForJira := range vulnsForJira {
 		jsonVuln, _ := jsn.NewJson(vulnForJira)
+
+		// determine if is code issue
+		issueType := jsonVuln.K("data").K("attributes").K("issueType").String().Value
+		isCodeIssue := strings.Contains(issueType, "code")
 		// skip ticket creating if the vuln is not upgradable
-		if flags.optionalFlags.ifUpgradeAvailableOnly {
+		if flags.optionalFlags.ifUpgradeAvailableOnly && isCodeIssue == false {
 			if jsonVuln.K("fixInfo").K("isUpgradable").Bool().Value == false {
 				message := fmt.Sprintf("Skipping creating ticket for %s because no upgrade is available.", jsonVuln.K("issueData").K("title").String().Value)
 				fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, "ifUpgradeAvailableOnly", errors.New(message), "", customDebug)
 				continue
 			}
-		} else if flags.optionalFlags.ifAutoFixableOnly {
+		} else if flags.optionalFlags.ifAutoFixableOnly && isCodeIssue == false {
 			// skip ticket creating if the vuln is not fixable
 			if jsonVuln.K("fixInfo").K("isFixable").Bool().Value == false {
 				message := fmt.Sprintf("Skipping creating ticket for %s because no fix is available.", jsonVuln.K("issueData").K("title").String().Value)
