@@ -673,8 +673,8 @@ func checkJiraValue(JiraValues interface{}) (bool, map[string]interface{}) {
 			}
 		case "assigneeId":
 			valueType := reflect.TypeOf(value).String()
-			if valueType != "int" {
-				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be an integer", key, reflect.TypeOf(value).String())
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be an string", key, reflect.TypeOf(value).String())
 				return false, nil
 			}
 		case "labels":
