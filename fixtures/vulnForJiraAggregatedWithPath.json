@@ -21,7 +21,7 @@
       "id": "SNYK-JS-MINIMIST-559764",
       "title": "Remote Code Execution (RCE)",
       "severity": "medium",
-      "url": "https://snyk.io/vuln/SNYK-JS-MINIMIST-559764",
+      "url": "https://security.snyk.io/vuln/SNYK-JS-MINIMIST-559764",
       "identifiers": { "CVE": ["CVE-2021-23406"], "CWE": ["CWE-94"] },
       "credit": ["Tim Perry"],
       "exploitMaturity": "proof-of-concept",
@@ -50,4 +50,3 @@
     "from" : [[{"name":"snyk","version":"1.228.3"},{"name":"proxy-agent","version":"3.1.0"},{"name":"pac-proxy-agent","version":"3.0.0"},{"name":"pac-resolver","version":"3.0.0"}]]
   }
 }
-

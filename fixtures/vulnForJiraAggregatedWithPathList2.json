@@ -89,7 +89,6 @@
     "isIgnored": false,
     "fixInfo": {
       "isUpgradable": false,
-      "isFixable": true,
       "isPinnable": false,
       "isPatchable": false,
       "isPartiallyFixable": true,

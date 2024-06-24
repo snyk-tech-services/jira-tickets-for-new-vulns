@@ -1,0 +1,974 @@
+[
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-06-02T16:26:58.539Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "@uidotdev/usehooks",
+      "origin": "cli",
+      "status": "active",
+      "tags": [],
+      "targetReference": "",
+      "type": "npm"
+    },
+    "id": "e9a803e9-8559-4cfa-bf31-15f823947b13",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "44842637-1d5b-4bac-a98c-1d7a3eb5df31",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/44842637-1d5b-4bac-a98c-1d7a3eb5df31"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-24T20:37:23.822Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "io.github.snyk:java-goof",
+      "origin": "cli",
+      "status": "active",
+      "tags": [],
+      "targetReference": "",
+      "type": "maven"
+    },
+    "id": "8c50de19-7f92-4b1f-8436-c59ca769eef2",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "8f51cfed-94c4-4a71-9bf8-57f1273e05bc",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/8f51cfed-94c4-4a71-9bf8-57f1273e05bc"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:43:54.604Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/juice-shop",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "master",
+      "type": "sast"
+    },
+    "id": "72e3e9a0-e07f-47d6-b2b6-4d5c2bc50ea2",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "dbdc972a-052d-4557-bd76-ef584b3b372d",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/dbdc972a-052d-4557-bd76-ef584b3b372d"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:42:12.925Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "sast"
+    },
+    "id": "9f284e76-7ab8-4b1c-a9f7-7740c3c85df9",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:45.458Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/juice-shop:k8s-src/juice-shop-service.yaml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "master",
+      "type": "k8sconfig"
+    },
+    "id": "fe2ceaa3-ad0c-42a0-bb3b-030d70ddd6bc",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "dbdc972a-052d-4557-bd76-ef584b3b372d",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/dbdc972a-052d-4557-bd76-ef584b3b372d"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:45.326Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/juice-shop:k8s-src/juice-shop-deploy.yaml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "master",
+      "type": "k8sconfig"
+    },
+    "id": "56d77e0f-e1b6-48b8-b911-42ece8104239",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "dbdc972a-052d-4557-bd76-ef584b3b372d",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/dbdc972a-052d-4557-bd76-ef584b3b372d"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:39.111Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:log4shell-goof/log4shell-server/pom.xml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "maven"
+    },
+    "id": "82ea4da3-4674-4934-8a86-d1dc4dd68f86",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:39.109Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/todolist-web-struts/pom.xml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "maven"
+    },
+    "id": "1a7f8353-1334-4f2f-ad1a-9f713ee70aa7",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:38.941Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:log4shell-goof/log4shell-client/pom.xml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "maven"
+    },
+    "id": "291a661b-c3ec-49c1-a48a-56acd55016ea",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:38.878Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/todolist-core/pom.xml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "maven"
+    },
+    "id": "7e6664a7-e770-4e3e-9cce-b4125c4701f8",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:38.844Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/todolist-web-common/pom.xml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "maven"
+    },
+    "id": "16dc0ee0-1971-4b31-9aad-04a58296c951",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:38.413Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/pom.xml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "maven"
+    },
+    "id": "15050f4d-bc1d-4ae1-9210-e57464784513",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:37.942Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/java-goof.yaml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "k8sconfig"
+    },
+    "id": "9802aad6-4bd4-49f2-a6a3-d348948741bd",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:37.691Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/noegress.yaml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "k8sconfig"
+    },
+    "id": "42c46b5f-bef9-45ea-a0c4-400df7f62e2b",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:37.618Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/metallb-config.yaml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "k8sconfig"
+    },
+    "id": "c7cfc320-d086-4b4b-9683-2f0acfa7d3bc",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:37.517Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/java-goof3.yaml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "k8sconfig"
+    },
+    "id": "365e2b8d-caf9-4cd0-91d1-706b6ec8cf2d",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:37.504Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/java-goof2.yaml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "k8sconfig"
+    },
+    "id": "cbf9df12-1045-4aaf-a8f7-7c48314f76c8",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:37.073Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/juice-shop:frontend/package.json",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "master",
+      "type": "npm"
+    },
+    "id": "763b5a42-aef4-46ac-81fc-55a666af540c",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "dbdc972a-052d-4557-bd76-ef584b3b372d",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/dbdc972a-052d-4557-bd76-ef584b3b372d"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:36.865Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/calico.yaml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "k8sconfig"
+    },
+    "id": "c6ab6d04-9bef-49d3-a05a-05c6198c12f1",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:36.717Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:log4shell-goof/log4shell-server/k8s/deploy.yaml",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "k8sconfig"
+    },
+    "id": "ff4b434e-b4c2-4a5b-b40e-d8413d71a4e5",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:36.524Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/exploits/tomcat-rce/Dockerfile",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "dockerfile"
+    },
+    "id": "b9a0a1ad-e491-40bd-86ee-c65359f68573",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:36.520Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:todolist-goof/Dockerfile",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "dockerfile"
+    },
+    "id": "de553d9a-4e7a-4920-a51a-658c55affb81",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:36.329Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/java-goof-new:log4shell-goof/log4shell-server/Dockerfile",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "dockerfile"
+    },
+    "id": "7ccfd8ba-9805-41ab-88a4-85a0a9f8bab9",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "5d483d79-d050-4aea-8edd-41cba965f677",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-15T21:41:34.984Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz-snyk/juice-shop:Dockerfile",
+      "origin": "github-enterprise",
+      "status": "active",
+      "tags": [],
+      "targetReference": "master",
+      "type": "dockerfile"
+    },
+    "id": "ba5783db-e454-48b5-8664-6d04fab7dd20",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "dbdc972a-052d-4557-bd76-ef584b3b372d",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/dbdc972a-052d-4557-bd76-ef584b3b372d"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-11T17:50:02.320Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz/java-goof:todolist-goof/k8s/noegress.yaml",
+      "origin": "gitlab",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "k8sconfig"
+    },
+    "id": "1e0ccd51-c01f-42e4-a2a4-3791ecf89d40",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "b681db4d-6017-4376-a60b-e6385518b748",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/b681db4d-6017-4376-a60b-e6385518b748"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-11T17:50:02.195Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz/java-goof:todolist-goof/k8s/metallb-config.yaml",
+      "origin": "gitlab",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "k8sconfig"
+    },
+    "id": "f094a6f4-3222-4ea8-b465-54d254fdf3b5",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "b681db4d-6017-4376-a60b-e6385518b748",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/b681db4d-6017-4376-a60b-e6385518b748"
+        }
+      }
+    },
+    "type": "project"
+  },
+  {
+    "attributes": {
+      "businessCriticality": [],
+      "created": "2023-05-11T17:50:02.159Z",
+      "environment": [],
+      "lifecycle": [],
+      "name": "xyz/java-goof:todolist-goof/k8s/java-goof3.yaml",
+      "origin": "gitlab",
+      "status": "active",
+      "tags": [],
+      "targetReference": "main",
+      "type": "k8sconfig"
+    },
+    "id": "2a9ab2c8-137f-4134-abcf-0f12f128c52b",
+    "relationships": {
+      "importingUser": {
+        "data": {
+          "id": "66bd4557-3a1b-4e33-80e0-dc418283753d",
+          "type": "user"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+        }
+      },
+      "target": {
+        "data": {
+          "id": "b681db4d-6017-4376-a60b-e6385518b748",
+          "type": "target"
+        },
+        "links": {
+          "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/b681db4d-6017-4376-a60b-e6385518b748"
+        }
+      }
+    },
+    "type": "project"
+  }
+]

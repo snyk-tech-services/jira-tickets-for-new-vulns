@@ -3,7 +3,7 @@
 "123": [
 {
 "Summary": "test/goof:package.json - Remote Code Execution (RCE)",
-"Description": "\r\n \\*\\*\\*\\* Issue details: \\*\\*\\*\\*\n\r\n cvssScore:  8.10\n exploitMaturity:  proof\\-of\\-concept\n severity:  high\n pkgVersions: 3.0.0\\]\n\r\n*Impacted Paths:*\n\\- \"snyk\"@\"1.228.3\" =\u003e \"proxy\\-agent\"@\"3.1.0\" =\u003e \"pac\\-proxy\\-agent\"@\"3.0.0\" =\u003e \"pac\\-resolver\"@\"3.0.0\"\n\r\n[See this issue on Snyk|https://app.snyk.io/org/test-playground/project/123]\n\n[More About this issue|https://snyk.io/vuln/SNYK-JS-PACRESOLVER-1564857]\n\n",
+"Description": "\r\n \\*\\*\\*\\* Issue details: \\*\\*\\*\\*\n\r\n cvssScore:  8.10\n exploitMaturity:  proof\\-of\\-concept\n severity:  high\n pkgVersions: 3.0.0\\]\n\r\n*Impacted Paths:*\n\\- \"snyk\"@\"1.228.3\" =\u003e \"proxy\\-agent\"@\"3.1.0\" =\u003e \"pac\\-proxy\\-agent\"@\"3.0.0\" =\u003e \"pac\\-resolver\"@\"3.0.0\"\n\r\n[See this issue on Snyk|https://app.snyk.io/org/test-playground/project/123]\n\n[More About this issue|https://security.snyk.io/vuln/SNYK-JS-PACRESOLVER-1564857]\n\n",
 "JiraIssueDetail": {
 "SNYK-JS-PACRESOLVER-1564857": {
 "JiraIssue": {
@@ -15,7 +15,7 @@
 },
 {
 "Summary": "test/goof:package.json - Prototype Pollution",
-"Description": "\r\n \\*\\*\\*\\* Issue details: \\*\\*\\*\\*\n\r\n cvssScore:  6.30\n exploitMaturity:  proof\\-of\\-concept\n severity:  medium\n pkgVersions: 4.2.0\\]\n\r\n*Impacted Paths:*\n\\- \"snyk\"@\"1.228.3\" =\u003e \"configstore\"@\"3.1.2\" =\u003e \"dot\\-prop\"@\"4.2.0\"\n\r\\- \"snyk\"@\"1.228.3\" =\u003e \"update\\-notifier\"@\"2.5.0\" =\u003e \"configstore\"@\"3.1.2\" =\u003e \"dot\\-prop\"@\"4.2.0\"\n\r\n[See this issue on Snyk|https://app.snyk.io/org/test-playground/project/123]\n\n[More About this issue|https://snyk.io/vuln/SNYK-JS-DOTPROP-543489]\n\n",
+"Description": "\r\n \\*\\*\\*\\* Issue details: \\*\\*\\*\\*\n\r\n cvssScore:  6.30\n exploitMaturity:  proof\\-of\\-concept\n severity:  medium\n pkgVersions: 4.2.0\\]\n\r\n*Impacted Paths:*\n\\- \"snyk\"@\"1.228.3\" =\u003e \"configstore\"@\"3.1.2\" =\u003e \"dot\\-prop\"@\"4.2.0\"\n\r\\- \"snyk\"@\"1.228.3\" =\u003e \"update\\-notifier\"@\"2.5.0\" =\u003e \"configstore\"@\"3.1.2\" =\u003e \"dot\\-prop\"@\"4.2.0\"\n\r\n[See this issue on Snyk|https://app.snyk.io/org/test-playground/project/123]\n\n[More About this issue|https://security.snyk.io/vuln/SNYK-JS-DOTPROP-543489]\n\n",
 "JiraIssueDetail": {
 "SNYK-JS-DOTPROP-543489": {
 "JiraIssue": {
@@ -27,7 +27,7 @@
 },
 {
 "Summary": "test/goof:package.json - Regular Expression Denial of Service (ReDoS)",
-"Description": "\r\n \\*\\*\\*\\* Issue details: \\*\\*\\*\\*\n\r\n cvssScore:  7.50\n exploitMaturity:  no\\-known\\-exploit\n severity:  high\n pkgVersions: 5.7.3\\]\n\r\n*Impacted Paths:*\n\\- \"@snyk/nodejs\\-runtime\\-agent\"@\"1.14.0\" =\u003e \"acorn\"@\"5.7.3\"\n\r\n[See this issue on Snyk|https://app.snyk.io/org/test-playground/project/123]\n\n[More About this issue|https://snyk.io/vuln/SNYK-JS-ACORN-559469]\n\n",
+"Description": "\r\n \\*\\*\\*\\* Issue details: \\*\\*\\*\\*\n\r\n cvssScore:  7.50\n exploitMaturity:  no\\-known\\-exploit\n severity:  high\n pkgVersions: 5.7.3\\]\n\r\n*Impacted Paths:*\n\\- \"@snyk/nodejs\\-runtime\\-agent\"@\"1.14.0\" =\u003e \"acorn\"@\"5.7.3\"\n\r\n[See this issue on Snyk|https://app.snyk.io/org/test-playground/project/123]\n\n[More About this issue|https://security.snyk.io/vuln/SNYK-JS-ACORN-559469]\n\n",
 "JiraIssueDetail": {
 "SNYK-JS-ACORN-559469": {
 "JiraIssue": {

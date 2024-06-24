@@ -6,11 +6,13 @@ snyk:
     type: vuln #what snyk issue types should we consider to ticket
     priorityScoreThreshold: 20
     ifUpgradeAvailableOnly: true
+    ifAutoFixableOnly: true
 jira:
     jiraTicketType: Task
     jiraProjectID: 15698
     assigneeId: 1238769
     priorityIsSeverity: true
+    cveInTitle: false
     customMandatoryFields:
         Something:
             Value: This is a summary

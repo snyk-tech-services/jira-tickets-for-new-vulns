@@ -17,7 +17,10 @@ func TestFormatJiraTicketFunc(t *testing.T) {
 	projectInfo, _ := jsn.NewJson(readFixture("./fixtures/project.json"))
 	issueData, _ := jsn.NewJson(readFixture("./fixtures/vulnForJiraAggregatedWithPathForTicketTest.json"))
 
-	jiraTicket := formatJiraTicket(issueData, projectInfo)
+	flags := flags{}
+	flags.optionalFlags.cveInTitle = true
+
+	jiraTicket := formatJiraTicket(issueData, projectInfo, flags)
 
 	// Convert jira ticket into a string
 	ticket := fmt.Sprintf("%v", jiraTicket)
@@ -32,7 +35,6 @@ func TestFormatJiraTicketFunc(t *testing.T) {
 
 	for scanner.Scan() {
 		compare := strings.Contains(ticket, scanner.Text())
-		//fmt.Println(scanner.Text())
 		assert.Equal(t, compare, true)
 	}
 

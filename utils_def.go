@@ -29,13 +29,17 @@ type optionalFlags struct {
 	projectLifecycle       string
 	jiraTicketType         string
 	severity               string
+	severityArray          string
 	issueType              string
 	maturityFilterString   string
 	assigneeID             string
 	labels                 string
+	dueDate                string
 	priorityIsSeverity     bool
 	priorityScoreThreshold int
 	debug                  bool
 	dryRun                 bool
+	cveInTitle             bool
 	ifUpgradeAvailableOnly bool
+	ifAutoFixableOnly      bool
 }

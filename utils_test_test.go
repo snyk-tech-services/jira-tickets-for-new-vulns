@@ -28,7 +28,7 @@ func TestSetOptionFunc(t *testing.T) {
 		orgID:         "0e9373a6-f858-11ec-b939-0242ac120002",
 		apiToken:      "123",
 		jiraProjectID: "15698",
-		endpointAPI:   "https://snyk.io/api",
+		endpointAPI:   "https://api.snyk.io",
 	}
 
 	optionalResult := &optionalFlags{
@@ -43,6 +43,7 @@ func TestSetOptionFunc(t *testing.T) {
 		priorityScoreThreshold: 20,
 		projectID:              "",
 		severity:               "critical",
+		cveInTitle:             true,
 	}
 
 	assert.Equal(optionalResult, &options.optionalFlags)
@@ -62,7 +63,7 @@ func TestSetOptionMixFunc(t *testing.T) {
 		"--token=123",
 		"--type=license",
 		"--assigneeId=654",
-		"--api=http://snyk.io/api",
+		"--api=http://api.snyk.io",
 		"--configFile=./fixtures",
 		"--orgID=0e9373a6-f858-11ec-b939-0242ac120002",
 		"--jiraProjectID=15699",
@@ -75,7 +76,7 @@ func TestSetOptionMixFunc(t *testing.T) {
 		orgID:         "0e9373a6-f858-11ec-b939-0242ac120002",
 		apiToken:      "123",
 		jiraProjectID: "15699",
-		endpointAPI:   "http://snyk.io/api",
+		endpointAPI:   "http://api.snyk.io",
 	}
 
 	optionalResult := &optionalFlags{
@@ -90,6 +91,7 @@ func TestSetOptionMixFunc(t *testing.T) {
 		priorityScoreThreshold: 20,
 		projectID:              "",
 		severity:               "critical",
+		cveInTitle:             true,
 	}
 
 	assert.Equal(optionalResult, &options.optionalFlags)
@@ -134,6 +136,7 @@ func TestSetOption(t *testing.T) {
 		projectID:              "",
 		severity:               "critical",
 		ifUpgradeAvailableOnly: true,
+		ifAutoFixableOnly:      true,
 	}
 
 	customMandatoryJiraFields := map[string]interface{}{"Something": map[string]interface{}{"Value": "This is a summary"}, "transition": map[string]interface{}{"id": 5}}

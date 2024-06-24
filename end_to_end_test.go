@@ -26,7 +26,7 @@ func TestEndToEndFunc(t *testing.T) {
 	os.Args = append(os.Args, "--jiraProjectID=123")
 	os.Args = append(os.Args, "--api="+server.URL)
 
-	// Keeping the line below => useful for debug but print too much things
+	// Keeping the line below => useful for debug but print too many things
 	// os.Args = append(os.Args, "-debug=true")
 
 	// Get the console output
@@ -42,13 +42,13 @@ func TestEndToEndFunc(t *testing.T) {
 	os.Stdout = rescueStdout
 
 	// Checking the log file
-	path, found := findLogFile()
+	path, found := findLogFile("listOfTicketCreated")
 
 	assert.FileExists(t, path)
 	assert.True(t, found)
 
 	// check if the json is valid
-	file, err := ioutil.ReadFile(path)
+	file, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}

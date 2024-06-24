@@ -19,9 +19,12 @@ func main() {
 	// test if mandatory flags are present
 	options.mandatoryFlags.checkMandatoryAreSet()
 
+	// Create the log file for the current run
+	filenameNotCreated := CreateLogFile(customDebug, "ErrorsFile_")
+
 	// Get the project ids associated with org
-	// If project Id is not specified => get all the projets
-	projectIDs, er := getProjectsIds(options, customDebug)
+	// If project ID is not specified => get all the projects
+	projectIDs, er := getProjectsIds(options, customDebug, filenameNotCreated)
 	if er != nil {
 		log.Fatal(er)
 	}
@@ -36,7 +39,7 @@ func main() {
 	logFile := make(map[string]map[string]interface{})
 
 	// Create the log file for the current run
-	filename := CreateLogFile(customDebug)
+	filename := CreateLogFile(customDebug, "listOfTicketCreated_")
 
 	for _, project := range projectIDs {
 
@@ -59,7 +62,7 @@ func main() {
 		log.Println("*** INFO *** Step 3/4 - Getting vulns")
 		vulnsPerPath, skippedIssues, err := getVulnsWithoutTicket(options, project, maturityFilter, tickets, customDebug)
 		if err != nil {
-			customDebug.Debug("*** ERROR *** could not vulnerability details. Skipping project ", project)
+			customDebug.Debug("*** ERROR *** could not get vulnerability details. Skipping project ", project)
 			continue
 		}
 
@@ -108,6 +111,8 @@ func main() {
 
 	// writing into the file
 	writeLogFile(logFile, filename, customDebug)
+
+	// TODO: add the list of not created tickets
 
 	if options.optionalFlags.dryRun {
 		fmt.Println("\n*************************************************************************************************************")

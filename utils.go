@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -87,7 +88,7 @@ Function setOption
 set the optional flags structure
 **
 */
-func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper.Viper) {
+func (Of *optionalFlags) setOptionalFlags(debugPtr bool, dryRunPtr bool, v viper.Viper) {
 
 	Of.projectID = v.GetString("snyk.projectID")
 	Of.projectCriticality = v.GetString("snyk.projectCriticality")
@@ -95,15 +96,19 @@ func (Of *optionalFlags) setoptionalFlags(debugPtr bool, dryRunPtr bool, v viper
 	Of.projectLifecycle = v.GetString("snyk.projectLifecycle")
 	Of.jiraTicketType = v.GetString("jira.jiraTicketType")
 	Of.severity = v.GetString("snyk.severity")
+	Of.severityArray = v.GetString("snyk.severityArray")
 	Of.issueType = v.GetString("snyk.type")
 	Of.maturityFilterString = v.GetString("snyk.maturityFilter")
 	Of.assigneeID = v.GetString("jira.assigneeID")
 	Of.labels = v.GetString("jira.labels")
+	Of.dueDate = v.GetString("jira.dueDate")
 	Of.priorityIsSeverity = v.GetBool("jira.priorityIsSeverity")
 	Of.priorityScoreThreshold = v.GetInt("snyk.priorityScoreThreshold")
 	Of.debug = debugPtr
 	Of.dryRun = dryRunPtr
+	Of.cveInTitle = v.GetBool("jira.cveInTitle")
 	Of.ifUpgradeAvailableOnly = v.GetBool("snyk.ifUpgradeAvailableOnly")
+	Of.ifAutoFixableOnly = v.GetBool("snyk.ifAutoFixableOnly")
 }
 
 /*
@@ -142,26 +147,34 @@ func (opt *flags) setOption(args []string) {
 
 	fs.String("orgID", "", "Your Snyk Organization ID (check under Settings)")
 	fs.String("projectID", "", "Optional. Your Project ID. Will sync all projects Of your organization if not provided")
-	fs.String("api", "https://snyk.io/api", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
+	fs.String("api", "https://api.snyk.io", "Optional. Your API endpoint for onprem deployments (https://yourdeploymenthostname/api)")
 	apiTokenPtr = fs.String("token", "", "Your API token")
 	fs.String("jiraProjectID", "", "Your JIRA projectID (jiraProjectID or jiraProjectKey is required)")
 	fs.String("jiraProjectKey", "", "Your JIRA projectKey (jiraProjectID or jiraProjectKey is required)")
 	fs.String("jiraTicketType", "Bug", "Optional. Chosen JIRA ticket type")
+	fs.String("severityArray", "", "Optional. Your severity array, to be used for multiple or specific severity")
 	fs.String("projectCriticality", "", "Optional. Include only projects whose criticality attribute contains one or more of the specified values.")
 	fs.String("projectEnvironment", "", "Optional. Include only projects whose environment attribute contains one or more of the specified values.")
 	fs.String("projectLifecycle", "", "Optional. Include only projects whose lifecycle attribute contains one or more of the specified values.")
-	fs.String("severity", "low", "Optional. Your severity threshold")
+	fs.String("severity", "", "Optional. Your severity threshold")
 	fs.String("maturityFilter", "", "Optional. include only maturity level(s) separated by commas [mature,proof-of-concept,no-known-exploit,no-data]")
 	fs.String("type", "all", "Optional. Your issue type (all|vuln|license)")
-	fs.String("assigneeId", "", "Optional. The Jira user accountId to assign issues to.")
+	fs.String("assigneeId", "", "Optional. The Jira user accountId to assign issues to")
 	fs.String("labels", "", "Optional. Jira ticket labels")
+	fs.String("dueDate", "", "Optional. The built-in Due Date field")
 	fs.Bool("priorityIsSeverity", false, "Boolean. Use issue severity as priority")
 	fs.Int("priorityScoreThreshold", 0, "Optional. Your min priority score threshold [INT between 0 and 1000]")
 	debugPtr = fs.Bool("debug", false, "Optional. Boolean. enable debug mode")
-	dryRunPtr = fs.Bool("dryRun", false, "Optional. Boolean. create a file with all the tickets without open them on jira")
-	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Open tickets only for upgradable issues")
+	dryRunPtr = fs.Bool("dryRun", false, "Optional. Boolean. Creates a file with all the tickets without open them on jira")
+	fs.Bool("cveInTitle", false, "Optional. Boolean. Adds the CVEs to the jira ticket title")
+	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Opens tickets only for upgradable issues")
+	fs.Bool("ifAutoFixableOnly", false, "Optional. Boolean. Opens tickets for issues that are fixable (no effect when using ifUpgradeAvailableOnly)")
 	configFilePtr = fs.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
-	fs.Parse(args)
+	errParse := fs.Parse(args)
+	if errParse != nil {
+		log.Println("*** ERROR *** Error parsing command line arguments: ", errParse.Error())
+		os.Exit(1)
+	}
 
 	// Have to set one by one because the name in the config file doesn't correspond to the flag name
 	// This can be done at any time
@@ -176,13 +189,17 @@ func (opt *flags) setOption(args []string) {
 	v.BindPFlag("snyk.projectLifecycle", fs.Lookup("projectLifecycle"))
 	v.BindPFlag("jira.jiraTicketType", fs.Lookup("jiraTicketType"))
 	v.BindPFlag("snyk.severity", fs.Lookup("severity"))
+	v.BindPFlag("snyk.severityArray", fs.Lookup("severityArray"))
 	v.BindPFlag("snyk.type", fs.Lookup("type"))
 	v.BindPFlag("snyk.maturityFilter", fs.Lookup("maturityFilter"))
 	v.BindPFlag("jira.assigneeID", fs.Lookup("assigneeId"))
 	v.BindPFlag("jira.labels", fs.Lookup("labels"))
+	v.BindPFlag("jira.cveInTitle", fs.Lookup("cveInTitle"))
+	v.BindPFlag("jira.dueDate", fs.Lookup("dueDate"))
 	v.BindPFlag("jira.priorityIsSeverity", fs.Lookup("priorityIsSeverity"))
 	v.BindPFlag("snyk.priorityScoreThreshold", fs.Lookup("priorityScoreThreshold"))
 	v.BindPFlag("snyk.ifUpgradeAvailableOnly", fs.Lookup("ifUpgradeAvailableOnly"))
+	v.BindPFlag("snyk.ifAutoFixableOnly", fs.Lookup("ifAutoFixableOnly"))
 
 	// Set and parse config file
 	v.SetConfigName("jira") // config file name without extension
@@ -194,7 +211,7 @@ func (opt *flags) setOption(args []string) {
 		v.AddConfigPath(".")
 	}
 
-	configFile, configFileLocation := CheckConfigPresent(*configFilePtr)
+	configFile, configFileLocation := ReadFile(*configFilePtr, true)
 
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -209,7 +226,7 @@ func (opt *flags) setOption(args []string) {
 
 	// Setting the flags structure
 	opt.mandatoryFlags.setMandatoryFlags(apiTokenPtr, *v)
-	opt.optionalFlags.setoptionalFlags(*debugPtr, *dryRunPtr, *v)
+	opt.optionalFlags.setOptionalFlags(*debugPtr, *dryRunPtr, *v)
 
 	// check the flags rules
 	opt.checkFlags()
@@ -240,11 +257,15 @@ To work properly with jira these needs to be respected:
 */
 func (flags *flags) checkFlags() {
 	if flags.mandatoryFlags.jiraProjectID != "" && flags.mandatoryFlags.jiraProjectKey != "" {
-		log.Fatalf(("*** ERROR *** You passed both jiraProjectID and jiraProjectKey in parameters\n Please, Use jiraProjectID OR jiraProjectKey, not both"))
+		log.Fatalf("*** ERROR *** You passed both jiraProjectID and jiraProjectKey in parameters\n Please, Use jiraProjectID OR jiraProjectKey, not both")
 	}
 
 	if flags.optionalFlags.priorityScoreThreshold < 0 || flags.optionalFlags.priorityScoreThreshold > 1000 {
 		log.Fatalf("*** ERROR *** %d is not a valid score. Must be between 0-1000.", flags.optionalFlags.priorityScoreThreshold)
+	}
+
+	if flags.optionalFlags.severityArray != "" && flags.optionalFlags.severity != "" {
+		log.Fatalf(("*** ERROR *** You passed both severityArray and severity in parameters\n Please, Use severityArray OR severity, not both"))
 	}
 }
 
@@ -256,13 +277,14 @@ argument: debug
 Check if the file exist if not create it
 **
 */
-func CreateLogFile(customDebug debug) string {
+
+func CreateLogFile(customDebug debug, fileType string) string {
 
 	// Get date
 	date := getDate()
 
 	// Set filename
-	filename := "listOfTicketCreated_" + date + ".json"
+	filename := fileType + date + ".json"
 
 	// If the file doesn't exist, create it, or append to the file
 	_, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -348,31 +370,43 @@ func writeLogFile(logFile map[string]map[string]interface{}, filename string, cu
 	return
 }
 
-func writeErrorFile(errorText string, customDebug debug) {
+func Sprintf2(format string, a ...interface{}) string {
+	a = append(a, "\r")
+	return fmt.Sprintf(format, a...)
+}
 
-	// Get date
-	date := getDateDayOnly()
+func writeErrorFile(function string, errorText string, customDebug debug) {
 
-	// Set filename
-	filename := "Error_" + date + ".json"
+	errorsInterface := make(map[string]interface{})
 
-	// If the file doesn't exist => create it, append to the file otherwise
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	// Get filePath
+	filename, err := FindFile("ErrorsFile")
+
+	// Read the file, unMarshallto get a map[]interface{} and append the new error and Marshall to create a json
+	// ReadFile
+	jsonErrofile, _ := ReadFile(filename, false)
+
+	// unMarshall
+	err = json.Unmarshal(jsonErrofile, &errorsInterface)
 	if err != nil {
-		customDebug.Debug("*** ERROR *** Could not open file ", filename)
-		return
+		log.Println("*** ERROR *** Please check the format config file", err)
 	}
 
-	errorTextByte := []byte(errorText + "\n")
-
-	if _, err := f.Write(errorTextByte); err != nil {
-		customDebug.Debug("*** ERROR *** Could write in file")
-		return
+	// Add the new error
+	if errorsInterface[function] != nil {
+		errorsInterface[function] = Sprintf2(errorText, errorsInterface[function])
+	} else {
+		errorsInterface[function] = errorText
 	}
 
-	if err := f.Close(); err != nil {
-		customDebug.Debug("*** ERROR ***  Could not close file")
-		return
+	NewErrorsList, err := json.Marshal(errorsInterface)
+	if err != nil {
+		log.Println("*** ERROR *** Please check the format config file, could not extract 'jira' config", err)
+	}
+
+	err = ioutil.WriteFile(filename, NewErrorsList, 0644)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return
@@ -586,6 +620,12 @@ func checkSnykValue(snykValues interface{}) bool {
 				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a boolean", key, reflect.TypeOf(value).String())
 				return false
 			}
+		case "ifAutoFixableOnly":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "bool" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a boolean", key, reflect.TypeOf(value).String())
+				return false
+			}
 		default:
 			log.Printf("*** ERROR *** Please check the format config file, the snyk key %s is not supported by this tool", key)
 			return false
@@ -650,10 +690,22 @@ func checkJiraValue(JiraValues interface{}) (bool, map[string]interface{}) {
 				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
 				return false, nil
 			}
+		case "dueDate":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				return false, nil
+			}
 		case "priorityIsSeverity":
 			valueType := reflect.TypeOf(value).String()
 			if valueType != "bool" {
-				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a string", key, reflect.TypeOf(value).String())
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a boolean", key, reflect.TypeOf(value).String())
+				return false, nil
+			}
+		case "cveInTitle":
+			valueType := reflect.TypeOf(value).String()
+			if valueType != "bool" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be a boolean", key, reflect.TypeOf(value).String())
 				return false, nil
 			}
 		case "customMandatoryFields":
@@ -670,6 +722,51 @@ func checkJiraValue(JiraValues interface{}) (bool, map[string]interface{}) {
 
 	return isJiraConfigOk, customMandatoryJiraFields
 }
+
+// func checkMandatoryField(customJiraMandatoryField_ interface{}, yamlCustomJiraMandatoryField map[interface{}]interface{}) (bool, map[string]interface{}) {
+
+// 	jsonCustomJiraMandatoryField := make(map[string]interface{})
+// 	fields := make(map[string]interface{})
+
+// 	marshalCustomJiraMandatoryField, err := yaml.Marshal(customJiraMandatoryField_)
+// 	if err != nil {
+// 		log.Println("*** ERROR *** Please check the format config file, could not extract 'customMandatoryFields' config", err)
+// 	}
+
+// 	err = yaml.Unmarshal(marshalCustomJiraMandatoryField, &yamlCustomJiraMandatoryField)
+// 	if err != nil {
+// 		log.Println("*** ERROR *** Please check the format config file, could not extract 'customMandatoryFields' config", err)
+// 	}
+
+// 	// converting the type, the yaml type is not compatible with the json one
+// 	// json doesn't understand map[interface{}]interface{} => it will fail
+// 	// when marshalling the ticket in a json format
+// 	jsonCustomJiraMandatoryField = convertYamltoJson(yamlCustomJiraMandatoryField)
+
+// 	log.Println("jsonCustomJiraMandatoryField, %s", jsonCustomJiraMandatoryField)
+
+// 	for i, s := range jsonCustomJiraMandatoryField {
+
+// 		value, ok := s.(map[string]interface{})
+// 		if ok {
+// 			v, ok := value["value"].(string)
+// 			if ok {
+// 				if strings.HasPrefix(v, JiraPrefix) {
+// 					s, err = supportJiraFormats(v, debug{PrintDebug: false})
+// 					if err != nil {
+// 						log.Printf("*** ERROR *** Error while extracting the mandatory Jira fields configuration\n %s", err)
+// 						return false, nil
+// 					}
+// 				}
+// 			}
+// 		} else {
+// 			log.Println(fmt.Sprintf("*** ERROR *** Expected mandatory Jira fields configuration to be in format map[string]interface{}, received type: %T for field %s ", s, i))
+// 			return false, nil
+// 		}
+// 		fields[i] = s
+// 	}
+// 	return true, fields
+// }
 
 func checkMandatoryField(customJiraMandatoryField_ interface{}, yamlCustomJiraMandatoryField map[interface{}]interface{}) (bool, map[string]interface{}) {
 
@@ -691,49 +788,77 @@ func checkMandatoryField(customJiraMandatoryField_ interface{}, yamlCustomJiraMa
 	// when marshalling the ticket in a json format
 	jsonCustomJiraMandatoryField = convertYamltoJson(yamlCustomJiraMandatoryField)
 
-	for i, s := range jsonCustomJiraMandatoryField {
+	log.Println("jsonCustomJiraMandatoryField, %s", jsonCustomJiraMandatoryField)
 
-		value, ok := s.(map[string]interface{})
-		if ok {
-			v, ok := value["value"].(string)
+	for i, s := range jsonCustomJiraMandatoryField {
+		switch v := s.(type) {
+		case string:
+			fields[i] = v
+		case map[string]interface{}:
+			value, ok := v["value"].(string)
 			if ok {
-				if strings.HasPrefix(v, JiraPrefix) {
-					s, err = supportJiraFormats(v, debug{PrintDebug: false})
+				if strings.HasPrefix(value, JiraPrefix) {
+					s, err = supportJiraFormats(value, debug{PrintDebug: false})
 					if err != nil {
 						log.Printf("*** ERROR *** Error while extracting the mandatory Jira fields configuration\n %s", err)
 						return false, nil
 					}
 				}
 			}
-		} else {
-			log.Println(fmt.Sprintf("*** ERROR *** Expected mandatory Jira fields configuration to be in format map[string]interface{}, received type: %T for field %s ", s, i))
+			fields[i] = s
+		default:
+			log.Println(fmt.Sprintf("*** ERROR *** Unexpected type for field %s: %T", i, s))
 			return false, nil
 		}
-		fields[i] = s
 	}
 	return true, fields
 }
 
 /*
 **
-function CheckConfigFileFormat
+function ReadFile
 input path string, path to the config file
 return []byte config file
 Try to read the yaml file. If this fails the config file is not valid yaml
 **
 */
-func CheckConfigPresent(path string) ([]byte, string) {
+func ReadFile(path string, config bool) ([]byte, string) {
 
 	if len(path) == 0 {
 		path = "."
 	}
 
-	file := path + "/jira.yaml"
-
-	yamlFile, err := ioutil.ReadFile(file)
-	if err != nil {
-		fmt.Printf("*** ERROR *** Could not read config file at location: %s. Please ensure the file exists and is formatted correctly.\nERROR: %s\n", file, err.Error())
+	var err error
+	filePath := path + "/jira.yaml"
+	if !config {
+		filePath, err = FindFile("ErrorsFile")
 	}
 
-	return yamlFile, file
+	file, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		fmt.Printf("*** ERROR *** Could not read file at location: %s. Please ensure the file exists and is formatted correctly.\nERROR: %s\n", filePath, err.Error())
+	}
+
+	return file, filePath
+}
+
+func FindFile(fileName string) (string, error) {
+
+	// list all file in the directory
+	fileInfo, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Fatal()
+	}
+
+	// Look for the one starting with listOfTicketCreated or ErrorsFile
+	for _, file := range fileInfo {
+		if !file.IsDir() {
+			if strings.HasPrefix(file.Name(), fileName) {
+				filePath := "./" + file.Name()
+				return filePath, nil
+			}
+		}
+	}
+	errorMessage := fmt.Sprintf("Failure, Could not find File %s", fileName)
+	return "", errors.New(errorMessage)
 }

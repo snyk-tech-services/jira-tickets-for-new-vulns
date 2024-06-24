@@ -75,7 +75,9 @@ func TestOpenJiraTicketWithLabelsFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.cveInTitle = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.ifAutoFixableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf
@@ -134,7 +136,9 @@ func TestOpenJiraTicketWithoutLabelsFunc(t *testing.T) {
 	Of.projectID = ""
 	Of.maturityFilterString = ""
 	Of.dryRun = false
+	Of.cveInTitle = false
 	Of.ifUpgradeAvailableOnly = false
+	Of.ifAutoFixableOnly = false
 
 	flags := flags{}
 	flags.mandatoryFlags = Mf

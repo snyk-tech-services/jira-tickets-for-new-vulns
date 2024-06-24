@@ -26,7 +26,7 @@ return path : string
 find log file and return path
 **
 */
-func findLogFile() (string, bool) {
+func findLogFile(fileType string) (string, bool) {
 
 	// list all file in the directory
 	fileInfo, err := ioutil.ReadDir(".")
@@ -34,12 +34,12 @@ func findLogFile() (string, bool) {
 		log.Fatal()
 	}
 
-	// Look for the one starting with listOfTicketCreated
+	// Look for the one starting with listOfTicketCreated or ErrorsFile
 	path := "./"
 	found := false
 	for _, file := range fileInfo {
 		if !file.IsDir() {
-			if strings.HasPrefix(file.Name(), "listOfTicketCreated") {
+			if strings.HasPrefix(file.Name(), fileType) {
 				path += file.Name()
 				found = true
 				break
@@ -61,7 +61,17 @@ clean logs after test
 func removeLogFile() {
 
 	// Find log file
-	path, found := findLogFile()
+	path, found := findLogFile("ErrorsFile")
+
+	if found {
+		// Delete the file created for the test
+		e := os.Remove(path)
+		if e != nil {
+			log.Fatal(e)
+		}
+	}
+
+	path, found = findLogFile("listOfTicketCreated")
 
 	if found {
 		// Delete the file created for the test
@@ -360,8 +370,7 @@ func HTTPResponseEndToEnd() *httptest.Server {
 	var resp []byte
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if string(r.RequestURI) == "/v1/org/123/projects" {
-
+		if string(r.RequestURI) == "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&limit=100" {
 			resp = readFixture("./fixtures/orgEndToEnd.json")
 
 		} else if r.RequestURI == "/v1/org/123/project/123" {
@@ -411,6 +420,35 @@ func HTTPResponseEndToEnd() *httptest.Server {
 
 }
 
+func HTTPResponseRestPagination() *httptest.Server {
+
+	var resp []byte
+	var status = http.StatusOK
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if string(r.RequestURI) == "/rest/orgs/xyz-paging/projects?version=2022-07-08~beta&status=active" {
+			resp = readFixture("./fixtures/rest_pagination1.json")
+
+		} else if r.RequestURI == "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2022-07-08~beta&status=active&limit=10&starting_after=test-get-page2" {
+
+			resp = readFixture("./fixtures/rest_pagination2.json")
+
+		} else if r.RequestURI == "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2022-07-08~beta&status=active&limit=10&starting_after=test-get-page3" {
+
+			resp = readFixture("./fixtures/rest_pagination3.json")
+			
+		} else {
+			fmt.Println("Error while mocking request", r.URL)
+			status = http.StatusNotFound
+		}
+
+		w.WriteHeader(status)
+		w.Write(resp)
+
+	}))
+
+}
+
 // HTTPResponseStubAndMirrorRequest Stubbing HTTP response
 func HTTPResponseStubAndMirrorCodeRequest() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -442,6 +480,27 @@ func readFixture(path string) []byte {
 	return data
 }
 
+// In the REST api tests, we just want the data array, not the full fixture.
+type Fixture struct {
+	Data json.RawMessage `json:"data"`
+}
+
+func readFixtureData(path string) []byte {
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatalf("failed reading file: %s", err)
+	}
+
+	var fixture Fixture
+
+	err = json.Unmarshal(data, &fixture)
+	if err != nil {
+		log.Fatalf("failed unmarshalling json: %s", err)
+	}
+
+	return fixture.Data
+}
+
 func HTTPResponseCodeIssueStubAndMirrorRequest() *httptest.Server {
 
 	var resp []byte
@@ -450,73 +509,73 @@ func HTTPResponseCodeIssueStubAndMirrorRequest() *httptest.Server {
 			resp = []byte("404 - url mismatch")
 		} else if r.RequestURI == "/v1/org/123/project/456/issue/xxbac5ed-83dd-xx65-8730-2xxx4467e00d/jira-issue" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/results/singleCodeJiraTicketOpeningResponse")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=456&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=456&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeData.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=high&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=high&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataHighIssuesWithPaginationPage1.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=critical&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=critical&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataCriticalIssuesWithPaginationPage1.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental&severity=critical&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental&severity=critical&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataCriticalIssuesWithPaginationPage2.json")
-		} else if r.RequestURI == "/v3//orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental&severity=critical&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
+		} else if r.RequestURI == "/rest//orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental&severity=critical&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataCriticalIssuesWithPaginationPage3.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental?limit=10&severity=critical&starting_after=v1.eyJwcmlvcml0eVNjb3JlIjo1NTgsImlkIjoiNjU5MDc3Mjg1In0%3D" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&version=2021-08-20~experimental?limit=10&severity=critical&starting_after=v1.eyJwcmlvcml0eVNjb3JlIjo1NTgsImlkIjoiNjU5MDc3Mjg1In0%3D" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataCriticalIssuesWithPaginationPage3.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=1234&version=2021-08-20~experimental?limit=10&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=1234&version=2021-08-20~experimental?limit=10&starting_after=v1.eyJpZCI6Mz1zODQyMH0%3D" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeData.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=low&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=789&severity=low&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataLowIssues.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=high&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=789&severity=high&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataHighIssues.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=critical&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=789&severity=critical&version=2021-08-20~experimental" {
 			w.WriteHeader(http.StatusNotFound)
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=7891&severity=low&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=7891&severity=low&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataLowIssues.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=7891&severity=high&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=7891&severity=high&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataHighIssuesIgnored.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=7891&severity=critical&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=7891&severity=critical&version=2021-08-20~experimental" {
 			w.WriteHeader(http.StatusNotFound)
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=1234&severity=high&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=1234&severity=high&version=2021-08-20~experimental" {
 			w.WriteHeader(http.StatusNotFound)
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=medium&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=medium&version=2021-08-20~experimental" {
 			w.WriteHeader(http.StatusNotFound)
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=1234&severity=low&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=1234&severity=low&version=2021-08-20~experimental" {
 			w.WriteHeader(http.StatusNotFound)
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=789&severity=medium&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=789&severity=medium&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataMediumIssues.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=low&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues?project_id=1234&severity=low&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataEmpty.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues?project_id=7891&severity=medium&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues?project_id=7891&severity=medium&version=2021-08-20~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeDataMediumIssues.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=456&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=456&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=1234&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=1234&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00q?project_id=1234&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetailsForPagination.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-critical2-xx65-8730-2xxx4467e00q?project_id=1234&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-critical2-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetailsForPagination.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-critical1-xx65-8730-2xxx4467e00q?project_id=1234&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/xxbac5ed-critical1-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetailsForPagination.json")
-		} else if r.RequestURI == "/v3/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/bbbbbbb-83dd-xx65-8730-2xxx4467e00q?project_id=1234&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/xxx99a85-c519-xxxx-ae55-xxx9b9bfaxxx/issues/detail/code/bbbbbbb-83dd-xx65-8730-2xxx4467e00q?project_id=1234&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetailsForPagination.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=456&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=456&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails2.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=456&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=456&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails3.json")
 		} else if r.RequestURI == "/v1/org/123/project/456/issue/SNYK-JS-MINIMIST-559764/jira-issue" {
 			resp = readFixture("./fixtures/singleJiraTicketOpeningResponse.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=789&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=789&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=789&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=789&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails2.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=789&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=789&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails3.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=7891&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e00d?project_id=7891&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetailsWithIgnore.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=7891&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0xx?project_id=7891&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails2.json")
-		} else if r.RequestURI == "/v3/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=7891&version=2021-08-20~experimental" {
+		} else if r.RequestURI == "/rest/orgs/123/issues/detail/code/xxbac5ed-83dd-xx65-8730-2xxx4467e0zz?project_id=7891&version=2022-04-06~experimental" {
 			resp = readFixture("./fixtures/snyk_code_fixtures/snykCodeIssueDetails3.json")
 		} else {
 			fmt.Println("**** TEST ERROR *** Could not match URL", r.RequestURI)

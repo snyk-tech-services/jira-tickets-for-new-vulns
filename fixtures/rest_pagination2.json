@@ -1,0 +1,370 @@
+{
+    "jsonapi": {
+        "version": "1.0"
+    },
+    "data": [
+        {
+            "type": "project",
+            "id": "16dc0ee0-1971-4b31-9aad-04a58296c951",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:todolist-goof/todolist-web-common/pom.xml",
+                "created": "2023-05-15T21:41:38.844Z",
+                "origin": "github-enterprise",
+                "type": "maven",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "15050f4d-bc1d-4ae1-9210-e57464784513",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:todolist-goof/pom.xml",
+                "created": "2023-05-15T21:41:38.413Z",
+                "origin": "github-enterprise",
+                "type": "maven",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "9802aad6-4bd4-49f2-a6a3-d348948741bd",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/java-goof.yaml",
+                "created": "2023-05-15T21:41:37.942Z",
+                "origin": "github-enterprise",
+                "type": "k8sconfig",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "42c46b5f-bef9-45ea-a0c4-400df7f62e2b",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/noegress.yaml",
+                "created": "2023-05-15T21:41:37.691Z",
+                "origin": "github-enterprise",
+                "type": "k8sconfig",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "c7cfc320-d086-4b4b-9683-2f0acfa7d3bc",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/metallb-config.yaml",
+                "created": "2023-05-15T21:41:37.618Z",
+                "origin": "github-enterprise",
+                "type": "k8sconfig",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "365e2b8d-caf9-4cd0-91d1-706b6ec8cf2d",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/java-goof3.yaml",
+                "created": "2023-05-15T21:41:37.517Z",
+                "origin": "github-enterprise",
+                "type": "k8sconfig",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "cbf9df12-1045-4aaf-a8f7-7c48314f76c8",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/java-goof2.yaml",
+                "created": "2023-05-15T21:41:37.504Z",
+                "origin": "github-enterprise",
+                "type": "k8sconfig",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "763b5a42-aef4-46ac-81fc-55a666af540c",
+            "attributes": {
+                "name": "xyz-snyk/juice-shop:frontend/package.json",
+                "created": "2023-05-15T21:41:37.073Z",
+                "origin": "github-enterprise",
+                "type": "npm",
+                "status": "active",
+                "targetReference": "master",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "dbdc972a-052d-4557-bd76-ef584b3b372d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/dbdc972a-052d-4557-bd76-ef584b3b372d"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "c6ab6d04-9bef-49d3-a05a-05c6198c12f1",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:todolist-goof/k8s/calico.yaml",
+                "created": "2023-05-15T21:41:36.865Z",
+                "origin": "github-enterprise",
+                "type": "k8sconfig",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        },
+        {
+            "type": "project",
+            "id": "ff4b434e-b4c2-4a5b-b40e-d8413d71a4e5",
+            "attributes": {
+                "name": "xyz-snyk/java-goof-new:log4shell-goof/log4shell-server/k8s/deploy.yaml",
+                "created": "2023-05-15T21:41:36.717Z",
+                "origin": "github-enterprise",
+                "type": "k8sconfig",
+                "status": "active",
+                "targetReference": "main",
+                "businessCriticality": [],
+                "lifecycle": [],
+                "environment": [],
+                "tags": []
+            },
+            "relationships": {
+                "target": {
+                    "data": {
+                        "type": "target",
+                        "id": "5d483d79-d050-4aea-8edd-41cba965f677"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/targets/5d483d79-d050-4aea-8edd-41cba965f677"
+                    }
+                },
+                "importingUser": {
+                    "data": {
+                        "type": "user",
+                        "id": "66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    },
+                    "links": {
+                        "self": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/users/66bd4557-3a1b-4e33-80e0-dc418283753d"
+                    }
+                }
+            }
+        }
+    ],
+    "links": {
+        "next": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2022-07-08~beta&status=active&limit=10&starting_after=test-get-page3"
+    }
+}
