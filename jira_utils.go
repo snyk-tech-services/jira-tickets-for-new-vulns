@@ -147,6 +147,10 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json, flags flags) *Jir
 
 	// Build Summary
 	summary := projectInfo.K("name").String().Value + " - " + issueData.K("title").String().Value
+
+	// Sanitizing subject to prevent Path Traversal protection failure in Web Application Firewall
+	summary = strings.ReplaceAll(summary, "/bin/", "_bin_")
+
 	if flags.optionalFlags.cveInTitle == true && len(cveIdentifiers) > 0 {
 		summary = fmt.Sprintf("%s - %s", summary, strings.Join(cveIdentifiers, ", "))
 	}

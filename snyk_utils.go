@@ -105,6 +105,14 @@ func makeSnykAPIRequest(verb string, endpointURL string, snykToken string, body 
 		errorMessage := fmt.Sprintf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
 		writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
 		return nil, errors.New("Not found, Request failed")
+	} else if response.StatusCode == 403 {
+		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		customDebug.Debugf("*** INFO *** Please check that all expected fields are present in the config file\n")
+		customDebug.Debugf("*** INFO *** Forbidden could indicate illegal strings in the body, such as Path Traversal\n")
+		customDebug.Debugf("*** INFO *** Details : %s\n", string(responseData))
+		errorMessage := fmt.Sprintf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
+		writeErrorFile("makeSnykAPIRequest", errorMessage, customDebug)
+		return nil, errors.New("Forbidden Entity, Request failed")
 	} else if response.StatusCode == 422 {
 		customDebug.Debugf("*** INFO *** Request on endpoint '%s' failed with error %s\n", endpointURL, response.Status)
 		customDebug.Debugf("*** INFO *** Please check that all expected fields are present in the config file\n")
