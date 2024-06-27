@@ -14,7 +14,6 @@ Aimed to be executed at regular interval or with a trigger of your choice (webho
 
 ## 6.x version breaking change
 assigneeId is now a string, not an int. Wrap your assigneeId in quotes to "migrate" to 6.x version and above.
-Please update your yaml files accordingly.
 
 ## Installation
 You can either download the binaries from the [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
