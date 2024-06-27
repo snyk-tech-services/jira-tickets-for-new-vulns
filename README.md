@@ -12,6 +12,9 @@ Aimed to be executed at regular interval or with a trigger of your choice (webho
 
 **This repository is in maintenance mode, no new features are being developed. Bug & security fixes will continue to be delivered. Open source contributions are welcome for small features & fixes (no breaking changes)**
 
+## 6.x version breaking change
+assigneeId is now a string, not an int. Wrap your assigneeId in quotes to "migrate" to 6.x version and above.
+
 ## Installation
 You can either download the binaries from the [the release page](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/releases)
 or
@@ -99,7 +102,7 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
   [Jira ID of user](https://community.atlassian.com/t5/Jira-questions/How-do-I-find-my-account-ID/qaq-p/1702795#:~:text=Click%20your%20Profile%20menu%20in,people%2F%20is%20your%20account%20ID.&text=p.s.%20of%20course%20this%20is%20a%20manual%20way%20to%20check%20user%20IDs.&text=Ah%2C%20for%20some%20reason%20I%20thought%20you%20were%20on%20Jira%20Cloud!) to assign tickets to.
 
-  *Example*: `--assigneeId=123abc456def789`
+  *Example*: `--assigneeId="123abc456def789"`
 - **DEPRECATED** `--assigneeName` *optional*
 
   Currently Snyk supports Jira API v2 where this field is now deprecated. See the [Jira deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/).
@@ -305,7 +308,7 @@ snyk:
 jira:
     jiraTicketType: Task # <Task|Bug|....>
     jiraProjectID: 12345
-    assigneeId: 123abc456def789
+    assigneeId: "123abc456def789"
     priorityIsSeverity: true # <true|false>
     labels: label1 # <IssueLabel1>,<IssueLabel2>
     jiraProjectKey: testProject
