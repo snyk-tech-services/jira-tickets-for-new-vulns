@@ -374,10 +374,17 @@ func writeErrorFile(function string, errorText string, customDebug debug) {
 
 	// Get filePath
 	filename, err := FindFile("ErrorsFile")
+	if err != nil {
+		workingDir, _ := os.Getwd()
+		log.Printf("*** ERROR *** Could not find any ErrorsFiles in the working directory at %s: %v", workingDir, err)
+	}
 
 	// Read the file, unMarshallto get a map[]interface{} and append the new error and Marshall to create a json
 	// ReadFile
 	jsonErrofile, _ := ReadFile(filename, false)
+	if jsonErrofile == nil {
+		log.Println("*** ERROR *** No content in ErrorsFile, could not get errors")
+	}
 
 	// unMarshall
 	err = json.Unmarshal(jsonErrofile, &errorsInterface)
@@ -673,8 +680,8 @@ func checkJiraValue(JiraValues interface{}) (bool, map[string]interface{}) {
 			}
 		case "assigneeId":
 			valueType := reflect.TypeOf(value).String()
-			if valueType != "int" {
-				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be an integer", key, reflect.TypeOf(value).String())
+			if valueType != "string" {
+				log.Printf("*** ERROR *** Please check the format config file, %s is of type %s when it should be an string", key, reflect.TypeOf(value).String())
 				return false, nil
 			}
 		case "labels":
