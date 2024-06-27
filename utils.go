@@ -376,7 +376,7 @@ func writeErrorFile(function string, errorText string, customDebug debug) {
 	filename, err := FindFile("ErrorsFile")
 	if err != nil {
 		workingDir, _ := os.Getwd()
-		log.Println("*** ERROR *** Could not find any ErrorsFiles in the working directory at %s", workingDir, err)
+		log.Println("*** ERROR *** Could not find any ErrorsFiles in the working directory at location: ", workingDir, "\n", err)
 	}
 
 	// Read the file, unMarshallto get a map[]interface{} and append the new error and Marshall to create a json
