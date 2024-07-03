@@ -212,6 +212,10 @@ git clone the repo, build.
 
 ### Please report issues.
 
+## Important notes
+
+This tool does not hit JIRA directly but instead makes API requests against Snyk, which in turn talks to the configured Jira in the platform.
+
 ## Dependencies
 https://github.com/michael-go/go-jsn/jsn to make JSON parsing a breeze
 github.com/tidwall/sjson
