@@ -307,9 +307,9 @@ func getSnykCodeIssueWithoutTickets(flags flags, projectID string, tickets map[s
 	var errorMessage error
 
 	// Doing this for test propose
-	endpointAPI := "https://api.snyk.io"
-	if IsTestRun() {
-		endpointAPI = flags.mandatoryFlags.endpointAPI
+	endpointAPI := flags.mandatoryFlags.endpointAPI
+	if endpointAPI == "" {
+		endpointAPI = "https://api.snyk.io"
 	}
 
 	for _, severityIndexValue := range severity {
