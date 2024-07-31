@@ -32,12 +32,18 @@ type Field struct {
 	Priority    *PriorityType `json:"priority,omitempty"`
 	Labels      []string      `json:"labels,omitempty"`
 	DueDate     string        `json:"duedate,omitempty"`
+	FeatureTeam []CustomField `json:"customfield_10354,omitempty"`
+}
+
+type CustomField struct {
+	Value string `json:"value,omitempty"`
 }
 
 // Assignee is the account ID of the Jira user to assign tickets to
 type Assignee struct {
-	Name      string `json:"name,omitempty"`
-	AccountId string `json:"accountId,omitempty"`
+	Name         string `json:"name,omitempty"`
+	AccountId    string `json:"accountId,omitempty"`
+	EmailAddress string `json:"emailAddress,omitempty"`
 }
 
 // Project is the Jira project ID or Key

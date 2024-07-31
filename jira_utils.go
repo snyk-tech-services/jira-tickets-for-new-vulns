@@ -155,10 +155,15 @@ func formatJiraTicket(jsonVuln jsn.Json, projectInfo jsn.Json, flags flags) *Jir
 		summary = fmt.Sprintf("%s - %s", summary, strings.Join(cveIdentifiers, ", "))
 	}
 
+	team := CustomField{
+		Value: "HackOverflow",
+	}
 	jiraTicket := &JiraIssue{
 		Field{
 			Summary:     summary,
+			Assignees:   &Assignee{EmailAddress: "c-jgodinez@g-p.com"},
 			Description: descriptionBody,
+			FeatureTeam: []CustomField{team},
 		},
 	}
 
