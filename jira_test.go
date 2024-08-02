@@ -57,8 +57,8 @@ func TestOpenJiraTicketFunc(t *testing.T) {
 	// setting debug
 	cD := debug{}
 	cD.setDebug(false)
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.NotNil(tickets)
@@ -112,8 +112,8 @@ func TestOpenJiraTicketWithProjectKeyFunc(t *testing.T) {
 	// setting debug
 	cD := debug{}
 	cD.setDebug(false)
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.NotNil(tickets)
@@ -169,8 +169,8 @@ func TestOpenJiraTicketErrorAndRetryFunc(t *testing.T) {
 	cD.setDebug(false)
 
 	CreateLogFile(cD, "ErrorsFile_")
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	removeLogFile()
 
@@ -228,8 +228,8 @@ func TestOpenJiraMultipleTicketsErrorAndRetryFunc(t *testing.T) {
 	cD.setDebug(false)
 
 	CreateLogFile(cD, "ErrorsFile_")
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	assert.NotNil(tickets)
 	assert.Equal("", NotCreatedIssueId)
@@ -303,8 +303,8 @@ func TestOpenJiraMultipleTicketsErrorAndRetryAndFailFunc(t *testing.T) {
 	cD.setDebug(false)
 
 	CreateLogFile(cD, "ErrorsFile_")
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	assert.Equal(string(readFixture("./fixtures/results/NotCreatedIssueIdSingle")), NotCreatedIssueId)
 	assert.NotNil(numberIssueCreated)
@@ -379,9 +379,9 @@ func TestOpenJiraMultipleTicketsFailureFunc(t *testing.T) {
 	cD.setDebug(false)
 
 	CreateLogFile(cD, "ErrorsFile_")
-
+	repoMap := map[string]Repo{}
 	//endpointAPI string, orgID string, token string, jiraProjectID string, jiraProjectKey string, jiraTicketType string, assigneeID string, labels string, projectInfo jsn.Json, vulnForJira interface{}, priorityIsSeverity bool
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	fmt.Println(numberIssueCreated)
 	assert.NotNil(tickets)
@@ -456,8 +456,8 @@ func TestOpenJiraTicketWithAssigneeIDFunc(t *testing.T) {
 	cD.setDebug(false)
 
 	CreateLogFile(cD, "ErrorsFile_")
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	var mirroredResponse mirroredResponse
 	if err := json.Unmarshal([]byte(jiraResponse), &mirroredResponse); err != nil {
@@ -521,8 +521,8 @@ func TestOpenJiraTicketDryRun(t *testing.T) {
 	cD.setDebug(false)
 
 	CreateLogFile(cD, "ErrorsFile_")
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	removeLogFile()
 
@@ -579,8 +579,8 @@ func TestOpenJiraMultipleTicketsIsUpgradableFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 	CreateLogFile(cD, "ErrorsFile_")
-
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	fmt.Println(NotCreatedIssueId)
 	assert.NotNil(tickets)
@@ -655,8 +655,8 @@ func TestOpenJiraMultipleTicketsifAutoFixableOnlyFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 	CreateLogFile(cD, "ErrorsFile_")
-
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	fmt.Println(NotCreatedIssueId)
 	assert.NotNil(tickets)
@@ -731,8 +731,8 @@ func TestOpenJiraSingleTicketIfAutoFixableOnlyFunc(t *testing.T) {
 	cD := debug{}
 	cD.setDebug(false)
 	CreateLogFile(cD, "ErrorsFile_")
-
-	NumberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	NumberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	fmt.Println(NotCreatedIssueId)
 	assert.NotNil(tickets)
@@ -810,8 +810,8 @@ func TestOpenJiraTicketDryRyn(t *testing.T) {
 	cD.setDebug(false)
 
 	CreateLogFile(cD, "ErrorsFile_")
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	removeLogFile()
 
@@ -872,8 +872,8 @@ func TestOpenJiraTicketDryRunifAutoFixableOnly(t *testing.T) {
 	cD.setDebug(false)
 
 	CreateLogFile(cD, "ErrorsFile_")
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	removeLogFile()
 
@@ -1035,8 +1035,8 @@ func TestOpenJiraTicketError50xAndRetryFunc(t *testing.T) {
 	cD.setDebug(false)
 
 	CreateLogFile(cD, "ErrorsFile_")
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	assert.NotNil(tickets)
 	assert.Equal("", NotCreatedIssueId)
@@ -1093,8 +1093,8 @@ func TestOpenJiraTicketWithDueDateFunc(t *testing.T) {
 	// setting debug
 	cD := debug{}
 	cD.setDebug(false)
-
-	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, cD)
+	repoMap := map[string]Repo{}
+	numberIssueCreated, jiraResponse, NotCreatedIssueId, tickets := openJiraTickets(flags, projectInfo, vulnsForJira, repoMap, cD)
 
 	assert.Equal("", NotCreatedIssueId)
 	assert.NotNil(tickets)

@@ -108,6 +108,8 @@ func (Of *optionalFlags) setOptionalFlags(debugPtr bool, dryRunPtr bool, v viper
 	Of.cveInTitle = v.GetBool("jira.cveInTitle")
 	Of.ifUpgradeAvailableOnly = v.GetBool("snyk.ifUpgradeAvailableOnly")
 	Of.ifAutoFixableOnly = v.GetBool("snyk.ifAutoFixableOnly")
+	Of.dynamoRegion = v.GetString("dynamo.region")
+	Of.dynamoProfile = v.GetString("dynamo.profile")
 }
 
 /*
@@ -167,6 +169,8 @@ func (opt *flags) setOption(args []string) {
 	fs.Bool("cveInTitle", false, "Optional. Boolean. Adds the CVEs to the jira ticket title")
 	fs.Bool("ifUpgradeAvailableOnly", false, "Optional. Boolean. Opens tickets only for upgradable issues")
 	fs.Bool("ifAutoFixableOnly", false, "Optional. Boolean. Opens tickets for issues that are fixable (no effect when using ifUpgradeAvailableOnly)")
+	fs.String("dynamoRegion", "", "Optional. The AWS region that AppSec DynamoDB resides in")
+	fs.String("dynamoProfile", "", "Optional. The local AWS authentication profile name to use")
 	configFilePtr = fs.String("configFile", "", "Optional. Config file path. Use config file to set parameters")
 	errParse := fs.Parse(args)
 	if errParse != nil {
@@ -197,6 +201,8 @@ func (opt *flags) setOption(args []string) {
 	v.BindPFlag("snyk.priorityScoreThreshold", fs.Lookup("priorityScoreThreshold"))
 	v.BindPFlag("snyk.ifUpgradeAvailableOnly", fs.Lookup("ifUpgradeAvailableOnly"))
 	v.BindPFlag("snyk.ifAutoFixableOnly", fs.Lookup("ifAutoFixableOnly"))
+	v.BindPFlag("dynamo.region", fs.Lookup("dynamoRegion"))
+	v.BindPFlag("dynamo.profile", fs.Lookup("dynamoProfile"))
 
 	// Set and parse config file
 	v.SetConfigName("jira") // config file name without extension
