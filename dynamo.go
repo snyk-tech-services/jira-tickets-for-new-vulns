@@ -21,15 +21,20 @@ type Repo struct {
 
 const REPO_TABLE_NAME = "gpp-prod-repos"
 
-func getRepos() (map[string]Repo, error) {
+func getRepos(region string, profile string) (map[string]Repo, error) {
 	// Using the SDK's default configuration, loading additional config
 	// and credentials values from the environment variables, shared
 	// credentials, and shared configuration files
 	ctx := context.TODO()
-	cfg, err := config.LoadDefaultConfig(ctx,
-		config.WithRegion("us-east-1"),
-		config.WithSharedConfigProfile("legacy-security"),
-	)
+	cfgRegion := config.WithRegion("us-east-1")
+	if region != "" {
+		cfgRegion = config.WithRegion(region)
+	}
+	cfgProfile := config.WithSharedConfigProfile("legacy-security")
+	if profile != "" {
+		cfgProfile = config.WithSharedConfigProfile(profile)
+	}
+	cfg, err := config.LoadDefaultConfig(ctx, cfgRegion, cfgProfile)
 	if err != nil {
 		log.Fatalf("Unable to load SDK config, %v", err)
 		return nil, err
@@ -55,7 +60,9 @@ func getRepos() (map[string]Repo, error) {
 	// create a map indexed by full repo name
 	m := make(map[string]Repo)
 	for _, r := range pRepos {
-		m[r.Org+"/"+r.Name] = r
+		if (r.TeamOwner != "none") || (r.TeamOwner == "") {
+			m["https://github.com/"+r.Org+"/"+r.Name] = r
+		}
 	}
 	return m, nil
 }

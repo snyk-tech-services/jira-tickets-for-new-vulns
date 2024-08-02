@@ -8,7 +8,7 @@ import (
 
 func TestDynamoFunc(t *testing.T) {
 	assert := assert.New(t)
-	repos, err := getRepos()
+	repos, err := getRepos("", "")
 	assert.Nil(err)
 	assert.True(len(repos) > 0)
 }

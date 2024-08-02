@@ -41,4 +41,6 @@ type optionalFlags struct {
 	cveInTitle             bool
 	ifUpgradeAvailableOnly bool
 	ifAutoFixableOnly      bool
+	dynamoRegion           string
+	dynamoProfile          string
 }
