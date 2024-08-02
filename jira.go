@@ -95,7 +95,7 @@ create a ticket for a specific vuln
 
 **
 */
-func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, customDebug debug) ([]byte, *Tickets, error, string) {
+func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, repoMap map[string]Repo, customDebug debug) ([]byte, *Tickets, error, string) {
 
 	jsonVuln, _ := jsn.NewJson(vulnForJira)
 	issueType := jsonVuln.K("data").K("attributes").K("issueType").String().Value
@@ -108,7 +108,7 @@ func openJiraTicket(flags flags, projectInfo jsn.Json, vulnForJira interface{}, 
 		jiraTicket = formatCodeJiraTicket(jsonVuln, projectInfo, flags)
 		vulnID = jsonVuln.K("data").K("id").String().Value
 	} else {
-		jiraTicket = formatJiraTicket(jsonVuln, projectInfo, flags)
+		jiraTicket = formatJiraTicket(jsonVuln, projectInfo, flags, repoMap)
 	}
 
 	if len(vulnID) == 0 {
@@ -244,7 +244,7 @@ func displayErrorForIssue(vulnForJira interface{}, reason string, error error, e
 	return message
 }
 
-func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]interface{}, customDebug debug) (int, string, string, map[string]interface{}) {
+func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]interface{}, repoMap map[string]Repo, customDebug debug) (int, string, string, map[string]interface{}) {
 	fullResponseDataAggregated := ""
 	fullListNotCreatedIssue := ""
 	RequestFailed := false
@@ -277,7 +277,7 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 		RequestFailed = false
 
 		customDebug.Debug("*** INFO *** Trying to open ticket for vuln:", jsonVuln.K("issueData").K("title").String().Value)
-		responseDataAggregatedByte, ticket, err, jiraApiUrl := openJiraTicket(flags, projectInfo, vulnForJira, customDebug)
+		responseDataAggregatedByte, ticket, err, jiraApiUrl := openJiraTicket(flags, projectInfo, vulnForJira, repoMap, customDebug)
 		if err != nil {
 			message := fmt.Sprintf("*** ERROR *** Failed to open a Jira ticket via Snyk API: %s\nERROR:%s", jiraApiUrl, err)
 			writeErrorFile("openJiraTickets", message, customDebug)
@@ -294,7 +294,7 @@ func openJiraTickets(flags flags, projectInfo jsn.Json, vulnsForJira map[string]
 					customDebug.Debug("*** INFO *** Retrying with priorityIsSeverity set to false, max retries=", MaxNumberOfRetry)
 
 					flags.optionalFlags.priorityIsSeverity = false
-					responseDataAggregatedByte, ticket, err, jiraApiUrl = openJiraTicket(flags, projectInfo, vulnForJira, customDebug)
+					responseDataAggregatedByte, ticket, err, jiraApiUrl = openJiraTicket(flags, projectInfo, vulnForJira, repoMap, customDebug)
 					if err != nil {
 						fullListNotCreatedIssue += displayErrorForIssue(vulnForJira, "api", err, jiraApiUrl, customDebug)
 					} else {

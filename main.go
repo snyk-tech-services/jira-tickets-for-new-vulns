@@ -41,6 +41,15 @@ func main() {
 	// Create the log file for the current run
 	filename := CreateLogFile(customDebug, "listOfTicketCreated_")
 
+	// Get appsec cmdb
+	log.Println(options.optionalFlags.dynamoRegion)
+	repoMap, er := getRepos(options.optionalFlags.dynamoRegion, options.optionalFlags.dynamoProfile)
+	if er != nil {
+		log.Println("*** ERROR *** Could not retieve repos from AppSec CMDB")
+		log.Fatal(er)
+	}
+	log.Println(fmt.Sprintf("*** INFO *** Retrieved %d repos from AppSec CMDB", len(repoMap)))
+
 	for _, project := range projectIDs {
 
 		log.Println("*** INFO *** Step 1/4 - Retrieving project", project)
@@ -77,7 +86,7 @@ func main() {
 			log.Println("*** INFO *** Step 4/4 - No new Jira ticket required")
 		} else {
 			log.Println("*** INFO *** Step 4/4 - Opening Jira tickets")
-			numberIssueCreated, jiraResponse, notCreatedJiraIssues, projectsTickets = openJiraTickets(options, projectInfo, vulnsPerPath, customDebug)
+			numberIssueCreated, jiraResponse, notCreatedJiraIssues, projectsTickets = openJiraTickets(options, projectInfo, vulnsPerPath, repoMap, customDebug)
 			if jiraResponse == "" && !options.optionalFlags.dryRun {
 				log.Println("*** ERROR *** Failed to create Jira ticket(s)")
 			}
