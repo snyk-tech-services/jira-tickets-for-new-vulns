@@ -307,7 +307,7 @@ https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-creat
 */
 func supportJiraFormats(v string, customDebug debug) (result interface{}, err error) {
 
-	valueSplit := strings.Split(v, "-")
+	valueSplit := strings.SplitN(v, "-", 3)
 
 	switch valueSplit[1] {
 	case JiraMultiSelect:
