@@ -333,3 +333,7 @@ Notes:
       Using the config file above, running `./snyk-jira-sync-macOs --Org=1234 --configFile=./path/to/folder --token=123`
       the org ID used by the tool will be `1234` and not `a1b2c3de-99b1-4f3f-bfdb-6ee4b4990513`
   - See 'Extended options' for default values
+
+
+# Release process
+Releasing requires to indicate the correct [semver version jump](https://github.com/snyk-tech-services/jira-tickets-for-new-vulns/blob/0b60fcfdebd1f47057e4444e89816d17321dfbfd/.circleci/config.yml#L58C27-L58C121) using commit prefix.
