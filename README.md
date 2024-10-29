@@ -11,6 +11,7 @@ Aimed to be executed at regular interval or with a trigger of your choice (webho
 
 
 **This repository is in maintenance mode, no new features are being developed. Bug & security fixes will continue to be delivered. Open source contributions are welcome for small features & fixes (no breaking changes)**
+**This tool does not fall into any of the standard support packages**
 
 ## 6.x version breaking change
 assigneeId is now a string, not an int. Wrap your assigneeId in quotes to "migrate" to 6.x version and above.
