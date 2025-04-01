@@ -30,6 +30,9 @@ func getOrgProjects(flags flags, customDebug debug) ([]jsn.Json, error) {
 			projectsAPI += "&lifecycle=" + strings.Replace(flags.optionalFlags.projectLifecycle, ",", "%2C", -1)
 		}
 	}
+	if len(flags.optionalFlags.targetID) > 0 {
+		projectsAPI += "&target_id=" + strings.Replace(flags.optionalFlags.targetID, ",", "%2C", -1)
+	}
 
 	var err error
 
@@ -49,7 +52,12 @@ func getProjectsIds(options flags, customDebug debug, notCreatedLogFile string) 
 
 	var projectIds []string
 	if len(options.optionalFlags.projectID) == 0 {
-		filters := "projectCriticality: " + options.optionalFlags.projectCriticality + "\n projectEnvironment: " + options.optionalFlags.projectEnvironment + "\n projectLifecycle: " + options.optionalFlags.projectLifecycle
+		filters :=
+			"projectCriticality: " + options.optionalFlags.projectCriticality +
+			"\n projectEnvironment: " + options.optionalFlags.projectEnvironment +
+			"\n projectLifecycle: " + options.optionalFlags.projectLifecycle +
+			"\n targetID:" + options.optionalFlags.targetID
+
 		log.Println("*** INFO *** Project ID not specified - listing all projects that match the following filters: ", filters)
 
 		projects, err := getOrgProjects(options, customDebug)
@@ -58,7 +66,7 @@ func getProjectsIds(options flags, customDebug debug, notCreatedLogFile string) 
 			writeErrorFile("getProjectsIds", message, customDebug)
 			return nil, err
 		}
-	
+
 		for _, project := range projects {
 			projectID := project.K("id").String().Value
 			projectIds = append(projectIds, projectID)

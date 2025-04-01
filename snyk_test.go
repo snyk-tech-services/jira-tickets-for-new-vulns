@@ -239,6 +239,46 @@ func TestGetOrgProjectsLifecycle(t *testing.T) {
 	return
 }
 
+// Test GetProjectDetails function with a lifecycle filter
+func TestGetOrgProjectsTargetID(t *testing.T) {
+	expectedTestURL := "/rest/orgs/123/projects?version=2022-07-08~beta&status=active&limit=100&target_id=68e9e0ae-39e7-4751-bb10-553bea246da4"
+	assert := assert.New(t)
+	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
+
+	defer server.Close()
+
+	// setting mandatory options
+	Mf := MandatoryFlags{}
+	Mf.orgID = "123"
+	Mf.endpointAPI = server.URL
+	Mf.apiToken = "123"
+	Mf.jiraProjectID = "123"
+
+	// setting optional options
+	Of := optionalFlags{}
+	Of.targetID = "68e9e0ae-39e7-4751-bb10-553bea246da4"
+	flags := flags{}
+	flags.mandatoryFlags = Mf
+	flags.optionalFlags = Of
+
+	// setting debug
+	cD := debug{}
+	cD.setDebug(false)
+
+	CreateLogFile(cD, "ErrorsFile_")
+
+	response, _ := getOrgProjects(flags, cD)
+
+	opts := jsondiff.DefaultConsoleOptions()
+	marshalledResp, _ := json.Marshal(response)
+	comparison, _ := jsondiff.Compare(readFixtureData("./fixtures/org.json"), marshalledResp, &opts)
+	assert.Equal("FullMatch", comparison.String())
+
+	removeLogFile()
+
+	return
+}
+
 // Test getProjectsIds function
 func TestGetProjectsIdsAllProjects(t *testing.T) {
 

@@ -27,6 +27,7 @@ type optionalFlags struct {
 	projectCriticality     string
 	projectEnvironment     string
 	projectLifecycle       string
+	targetID               string
 	jiraTicketType         string
 	severity               string
 	issueType              string

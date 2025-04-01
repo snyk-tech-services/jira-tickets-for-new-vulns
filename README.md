@@ -75,6 +75,12 @@ Use `go install github.com/snyk-tech-services/jira-tickets-for-new-vulns@latest`
 
   *Example*: `--projectID=0e9373a6-f858-11ec-b939-0242ac120002`
 
+- `--targetID` *optional*
+
+  By default all projects in a given Snyk organization will by synced, if `targetID` is set only projects associated with the specified target will be synced. Target public ID can be located using the [targets api](https://docs.snyk.io/snyk-api/reference/targets).
+
+  *Example* `--targetID=0b59d175-95dd-40cc-aa35-48b3697b86a7`
+
 - `--api` *optional*
 
   Alternative API host.
