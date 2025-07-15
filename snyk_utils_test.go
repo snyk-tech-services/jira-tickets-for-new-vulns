@@ -89,7 +89,7 @@ func TestRESTPaginationFunc(t *testing.T) {
 
 	defer server.Close()
 
-	response, err := makeSnykAPIRequest_REST("GET", server.URL, "/rest/orgs/xyz-paging/projects?version=2022-07-08~beta&status=active", "123", nil, cD)
+	response, err := makeSnykAPIRequest_REST("GET", server.URL, "/rest/orgs/xyz-paging/projects?version=2024-10-15&status=active", "123", nil, cD)
 	if err != nil {
 		panic(err)
 	}
