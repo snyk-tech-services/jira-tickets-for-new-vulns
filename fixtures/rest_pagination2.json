@@ -365,6 +365,6 @@
         }
     ],
     "links": {
-        "next": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2022-07-08~beta&status=active&limit=10&starting_after=test-get-page3"
+        "next": "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2024-10-15&status=active&limit=10&starting_after=test-get-page3"
     }
 }

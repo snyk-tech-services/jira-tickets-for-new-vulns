@@ -11,7 +11,7 @@ import (
 
 func getOrgProjects(flags flags, customDebug debug) ([]jsn.Json, error) {
 	verb := "GET"
-	api_version := "2022-07-08~beta"
+	api_version := "2024-10-15"
 
 	baseURL := flags.mandatoryFlags.endpointAPI + "/rest"
 
