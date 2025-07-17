@@ -370,7 +370,7 @@ func HTTPResponseEndToEnd() *httptest.Server {
 	var resp []byte
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if string(r.RequestURI) == "/rest/orgs/123/projects?version=2024-10-15&status=active&limit=100" {
+		if string(r.RequestURI) == "/rest/orgs/123/projects?version=2024-10-15&limit=100" {
 			resp = readFixture("./fixtures/orgEndToEnd.json")
 
 		} else if r.RequestURI == "/v1/org/123/project/123" {
@@ -426,14 +426,14 @@ func HTTPResponseRestPagination() *httptest.Server {
 	var status = http.StatusOK
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if string(r.RequestURI) == "/rest/orgs/xyz-paging/projects?version=2024-10-15&status=active" {
+		if string(r.RequestURI) == "/rest/orgs/xyz-paging/projects?version=2024-10-15" {
 			resp = readFixture("./fixtures/rest_pagination1.json")
 
-		} else if r.RequestURI == "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2024-10-15&status=active&limit=10&starting_after=test-get-page2" {
+		} else if r.RequestURI == "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2024-10-15&limit=10&starting_after=test-get-page2" {
 
 			resp = readFixture("./fixtures/rest_pagination2.json")
 
-		} else if r.RequestURI == "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2024-10-15&status=active&limit=10&starting_after=test-get-page3" {
+		} else if r.RequestURI == "/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2024-10-15&limit=10&starting_after=test-get-page3" {
 
 			resp = readFixture("./fixtures/rest_pagination3.json")
 			

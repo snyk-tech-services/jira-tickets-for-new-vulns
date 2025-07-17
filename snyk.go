@@ -15,7 +15,7 @@ func getOrgProjects(flags flags, customDebug debug) ([]jsn.Json, error) {
 
 	baseURL := flags.mandatoryFlags.endpointAPI + "/rest"
 
-	projectsAPI := "/orgs/" + flags.mandatoryFlags.orgID + "/projects?version=" + api_version + "&status=active&limit=100"
+	projectsAPI := "/orgs/" + flags.mandatoryFlags.orgID + "/projects?version=" + api_version + "&limit=100"
 	if len(flags.optionalFlags.projectCriticality) > 0 || len(flags.optionalFlags.projectEnvironment) > 0 || len(flags.optionalFlags.projectLifecycle) > 0 {
 
 		if len(flags.optionalFlags.projectCriticality) > 0 {
