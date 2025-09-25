@@ -101,3 +101,21 @@ func TestRESTPaginationFunc(t *testing.T) {
 	comparison, _ := jsondiff.Compare(fixture, marshalledResp, &opts)
 	assert.Equal("FullMatch", comparison.String())
 }
+
+func TestRESTPaginationWithDoubleRestPrefix(t *testing.T) {
+	// Test the fix for preventing double /rest prefix in pagination URLs
+	assert := assert.New(t)
+	cD := debug{}
+	cD.setDebug(false)
+	server := HTTPResponseRestPaginationWithDoubleRest()
+
+	defer server.Close()
+
+	response, err := makeSnykAPIRequest_REST("GET", server.URL, "/rest/orgs/xyz-paging/projects?version=2024-10-15", "123", nil, cD)
+	if err != nil {
+		panic(err)
+	}
+
+	// Should have received data from both pages without errors
+	assert.Greater(len(response), 0, "Should have received paginated data")
+}
