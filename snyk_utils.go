@@ -221,7 +221,16 @@ func makeSnykAPIRequest_REST(verb string, baseURL string, endpointURL string, sn
 		if !next.IsValid {
 			url = ""
 		} else {
-			url = baseURL + next.Value
+			// Smart URL construction to prevent double /rest prefix
+			if strings.HasPrefix(next.Value, "/rest/") {
+				// If next.Value already has /rest prefix, extract base domain from baseURL
+				// and construct full URL to avoid double /rest
+				baseDomain := strings.TrimSuffix(baseURL, "/rest")
+				url = baseDomain + next.Value
+			} else {
+				// Normal case: next.Value doesn't have /rest prefix
+				url = baseURL + next.Value
+			}
 		}
 	}
 

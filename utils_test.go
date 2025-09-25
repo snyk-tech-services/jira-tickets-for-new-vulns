@@ -586,3 +586,51 @@ func HTTPResponseCodeIssueStubAndMirrorRequest() *httptest.Server {
 	}))
 
 }
+
+func HTTPResponseRestPaginationWithDoubleRest() *httptest.Server {
+	// Test server that simulates API returning next links with /rest prefix
+	// This tests our fix for preventing double /rest in URLs
+	var resp []byte
+	var status = http.StatusOK
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if string(r.RequestURI) == "/rest/orgs/xyz-paging/projects?version=2024-10-15" {
+			// Return a response with next link that includes /rest prefix (problematic case)
+			resp = []byte(`{
+				"jsonapi": {"version": "1.0"},
+				"data": [
+					{
+						"type": "project",
+						"id": "test-project-1",
+						"attributes": {"name": "Test Project 1"}
+					}
+				],
+				"links": {
+					"next": "/rest/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2024-10-15&limit=10&starting_after=test-page2"
+				}
+			}`)
+
+		} else if r.RequestURI == "/rest/orgs/408fbcd1-2b1d-4892-a0b4-48cb3908c50d/projects?version=2024-10-15&limit=10&starting_after=test-page2" {
+			// Second page response (should be reached with our fix)
+			resp = []byte(`{
+				"jsonapi": {"version": "1.0"},
+				"data": [
+					{
+						"type": "project",
+						"id": "test-project-2",
+						"attributes": {"name": "Test Project 2"}
+					}
+				]
+			}`)
+			
+		} else {
+			fmt.Println("Error while mocking request", r.URL)
+			status = http.StatusNotFound
+		}
+
+		w.WriteHeader(status)
+		w.Write(resp)
+
+	}))
+
+}
