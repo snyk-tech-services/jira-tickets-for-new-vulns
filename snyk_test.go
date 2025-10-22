@@ -118,7 +118,7 @@ func TestGetOrgProjects(t *testing.T) {
 
 // Test GetProjectDetails function with a criticality filter
 func TestGetOrgProjectsCriticality(t *testing.T) {
-	expectedTestURL := "/rest/orgs/123/projects?version=2024-10-15&limit=100&businessCriticality=critical"
+	expectedTestURL := "/rest/orgs/123/projects?version=2024-10-15&limit=100&business_criticality=critical"
 	assert := assert.New(t)
 	server := HTTPResponseCheckAndStub(expectedTestURL, "org")
 

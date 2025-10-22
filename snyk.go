@@ -19,7 +19,7 @@ func getOrgProjects(flags flags, customDebug debug) ([]jsn.Json, error) {
 	if len(flags.optionalFlags.projectCriticality) > 0 || len(flags.optionalFlags.projectEnvironment) > 0 || len(flags.optionalFlags.projectLifecycle) > 0 {
 
 		if len(flags.optionalFlags.projectCriticality) > 0 {
-			projectsAPI += "&businessCriticality=" + strings.Replace(flags.optionalFlags.projectCriticality, ",", "%2C", -1)
+			projectsAPI += "&business_criticality=" + strings.Replace(flags.optionalFlags.projectCriticality, ",", "%2C", -1)
 		}
 
 		if len(flags.optionalFlags.projectEnvironment) > 0 {
@@ -54,9 +54,9 @@ func getProjectsIds(options flags, customDebug debug, notCreatedLogFile string) 
 	if len(options.optionalFlags.projectID) == 0 {
 		filters :=
 			"projectCriticality: " + options.optionalFlags.projectCriticality +
-			"\n projectEnvironment: " + options.optionalFlags.projectEnvironment +
-			"\n projectLifecycle: " + options.optionalFlags.projectLifecycle +
-			"\n targetID:" + options.optionalFlags.targetID
+				"\n projectEnvironment: " + options.optionalFlags.projectEnvironment +
+				"\n projectLifecycle: " + options.optionalFlags.projectLifecycle +
+				"\n targetID:" + options.optionalFlags.targetID
 
 		log.Println("*** INFO *** Project ID not specified - listing all projects that match the following filters: ", filters)
 
